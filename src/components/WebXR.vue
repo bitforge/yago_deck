@@ -19,7 +19,7 @@ export default class WebXR extends Vue {
 
     const scene = new THREE.Scene();
 
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.3);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 4);
     directionalLight.position.set(10, 15, 10);
     scene.add(directionalLight);
 
@@ -68,7 +68,7 @@ export default class WebXR extends Vue {
 
     let flower;
     loader.load(
-      "https://immersive-web.github.io/webxr-samples/media/gltf/sunflower/sunflower.gltf",
+      "https://genie-ar.ch/v/r75tc8kn/glb",
       function (gltf) {
         flower = gltf.scene;
       }
