@@ -8,6 +8,7 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import * as THREE from "three";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 
 @Component
 export default class WebXR extends Vue {
@@ -38,9 +39,7 @@ export default class WebXR extends Vue {
     camera.matrixAutoUpdate = false;
 
     // Initialize a WebXR session using "immersive-ar".
-    const session = await navigator.xr.requestSession("immersive-ar", {
-      requiredFeatures: ["hit-test"],
-    });
+    const session = await navigator.xr.requestSession("immersive-ar", {requiredFeatures: ["hit-test"]});
     session.updateRenderState({
       baseLayer: new XRWebGLLayer(session, gl),
     });
@@ -56,7 +55,7 @@ export default class WebXR extends Vue {
       space: viewerSpace,
     });
 
-    const loader = new THREE.GLTFLoader();
+    const loader = new GLTFLoader();
     let reticle;
     loader.load(
       "https://immersive-web.github.io/webxr-samples/media/gltf/reticle/reticle.gltf",
