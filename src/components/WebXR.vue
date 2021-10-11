@@ -9,17 +9,16 @@
 import { Component, Vue } from "vue-property-decorator";
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
-import { XRFrame } from "three";
-import { XRWebGLLayer } from "webxr";
+import { XRFrame, XRWebGLLayer } from "three";
 
 @Component
 export default class WebXR extends Vue {
   private async activateXR() {
     const canvas = document.createElement("canvas");
     document.body.appendChild(canvas);
-    const gl: WebGLRenderingContext | null = canvas.getContext("webgl", {
+    const gl = canvas.getContext("webgl", {
       xrCompatible: true,
-    }) as WebGLRenderingContext;
+    }) as any;
 
     const scene = new THREE.Scene();
 
@@ -32,7 +31,6 @@ export default class WebXR extends Vue {
       alpha: true,
       preserveDrawingBuffer: true,
       canvas: canvas,
-      context: gl,
     });
     renderer.autoClear = false;
 
@@ -43,9 +41,10 @@ export default class WebXR extends Vue {
     camera.matrixAutoUpdate = false;
 
     // Initialize a WebXR session using "immersive-ar".
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const xr = (navigator as any).xr;
-    if (xr == null) throw new Error("WebXR not supported");
+    if (xr == null) {
+      throw new Error("WebXR not supported");
+    }
 
     const session = await xr.requestSession("immersive-ar", {
       requiredFeatures: ["hit-test"],
