@@ -9,13 +9,17 @@
 import { Component, Vue } from "vue-property-decorator";
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+import { XRFrame } from "three";
+import { XRWebGLLayer } from "webxr";
 
 @Component
 export default class WebXR extends Vue {
   private async activateXR() {
     const canvas = document.createElement("canvas");
     document.body.appendChild(canvas);
-    const gl = canvas.getContext("webgl", { xrCompatible: true });
+    const gl: WebGLRenderingContext | null = canvas.getContext("webgl", {
+      xrCompatible: true,
+    }) as WebGLRenderingContext;
 
     const scene = new THREE.Scene();
 
@@ -39,9 +43,18 @@ export default class WebXR extends Vue {
     camera.matrixAutoUpdate = false;
 
     // Initialize a WebXR session using "immersive-ar".
-    const session = await navigator.xr.requestSession("immersive-ar", {requiredFeatures: ["hit-test"]});
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const xr = (navigator as any).xr;
+    if (xr == null) throw new Error("WebXR not supported");
+
+    const session = await xr.requestSession("immersive-ar", {
+      requiredFeatures: ["hit-test"],
+    });
+
     session.updateRenderState({
       baseLayer: new XRWebGLLayer(session, gl),
+      depthNear: 0.1,
+      depthFar: 1000.0,
     });
 
     // A 'local' reference space has a native origin that is located
@@ -56,7 +69,7 @@ export default class WebXR extends Vue {
     });
 
     const loader = new GLTFLoader();
-    let reticle;
+    let reticle: THREE.Group;
     loader.load(
       "https://immersive-web.github.io/webxr-samples/media/gltf/reticle/reticle.gltf",
       function (gltf) {
@@ -66,15 +79,13 @@ export default class WebXR extends Vue {
       }
     );
 
-    let flower;
-    loader.load(
-      "https://genie-ar.ch/v/r75tc8kn/glb",
-      function (gltf) {
-        flower = gltf.scene;
-      }
-    );
+    let flower: THREE.Group;
+    loader.load("https://genie-ar.ch/v/r75tc8kn/glb", function (gltf) {
+      flower = gltf.scene;
+    });
 
-    session.addEventListener("select", (event) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    session.addEventListener("select", (evt: Event) => {
       if (flower) {
         const clone = flower.clone();
         clone.position.copy(reticle.position);
@@ -83,7 +94,7 @@ export default class WebXR extends Vue {
     });
 
     // Create a render loop that allows us to draw on the AR view.
-    const onXRFrame = (time, frame) => {
+    const onXRFrame = (time: number, frame: XRFrame) => {
       // Queue up the next draw request.
       session.requestAnimationFrame(onXRFrame);
 
@@ -111,12 +122,14 @@ export default class WebXR extends Vue {
         const hitTestResults = frame.getHitTestResults(hitTestSource);
         if (hitTestResults.length > 0 && reticle) {
           const hitPose = hitTestResults[0].getPose(referenceSpace);
-          reticle.visible = true;
-          reticle.position.set(
-            hitPose.transform.position.x,
-            hitPose.transform.position.y,
-            hitPose.transform.position.z
-          );
+          if (hitPose) {
+            reticle.visible = true;
+            reticle.position.set(
+              hitPose.transform.position.x,
+              hitPose.transform.position.y,
+              hitPose.transform.position.z
+            );
+          }
           reticle.updateMatrixWorld(true);
         }
 
