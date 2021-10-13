@@ -7,9 +7,16 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import * as THREE from "three";
+// import THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
-import { XRFrame, XRWebGLLayer } from "three";
+import {
+  Scene,
+  DirectionalLight,
+  WebGLRenderer,
+  PerspectiveCamera,
+  Group,
+  XRFrame,
+} from "three";
 
 @Component
 export default class WebXR extends Vue {
@@ -18,26 +25,27 @@ export default class WebXR extends Vue {
     document.body.appendChild(canvas);
     const gl = canvas.getContext("webgl", {
       xrCompatible: true,
-    }) as any;
+    }) as WebGLRenderingContext;
 
-    const scene = new THREE.Scene();
+    const scene = new Scene();
 
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 4);
+    const directionalLight = new DirectionalLight(0xffffff, 1);
     directionalLight.position.set(10, 15, 10);
     scene.add(directionalLight);
 
     // Set up the WebGLRenderer, which handles rendering to the session's base layer.
-    const renderer = new THREE.WebGLRenderer({
+    const renderer = new WebGLRenderer({
       alpha: true,
       preserveDrawingBuffer: true,
       canvas: canvas,
+      context: gl,
     });
     renderer.autoClear = false;
 
     // The API directly updates the camera matrices.
     // Disable matrix auto updates so three.js doesn't attempt
     // to handle the matrices independently.
-    const camera = new THREE.PerspectiveCamera();
+    const camera = new PerspectiveCamera();
     camera.matrixAutoUpdate = false;
 
     // Initialize a WebXR session using "immersive-ar".
@@ -52,8 +60,6 @@ export default class WebXR extends Vue {
 
     session.updateRenderState({
       baseLayer: new XRWebGLLayer(session, gl),
-      depthNear: 0.1,
-      depthFar: 1000.0,
     });
 
     // A 'local' reference space has a native origin that is located
@@ -68,7 +74,7 @@ export default class WebXR extends Vue {
     });
 
     const loader = new GLTFLoader();
-    let reticle: THREE.Group;
+    let reticle: Group;
     loader.load(
       "https://immersive-web.github.io/webxr-samples/media/gltf/reticle/reticle.gltf",
       function (gltf) {
@@ -78,7 +84,7 @@ export default class WebXR extends Vue {
       }
     );
 
-    let flower: THREE.Group;
+    let flower: Group;
     loader.load("https://genie-ar.ch/v/r75tc8kn/glb", function (gltf) {
       flower = gltf.scene;
     });
