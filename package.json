@@ -5,7 +5,7 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "deploy": "gsutil -m -o \"GSUtil:parallel_process_count=1\" rsync -r dist gs://webxr-demo/",
+    "deploy": "gsutil -m -h \"Cache-Control: no-store\" rsync -d -r dist gs://webxr-demo/",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
