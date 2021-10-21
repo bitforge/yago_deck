@@ -1,23 +1,14 @@
 <template>
   <div class="webxr">
-    <canvas ref="glcanvas" class="glcanvas"></canvas>
-    <div class="slider">
-      <div class="slides">
-        <div v-for="(model, index) in models" :key="index" class="slide">
-          <button
-            class="slide"
-            :style="{ backgroundImage: 'url(' + model.image + ')' }"
-            @click="activateXR()"
-          ></button>
-        </div>
-      </div>
-    </div>
+    <h1>Hello WebXR!</h1>
+    <button @click="activateXR()">Start WebXR</button>
+    <canvas ref="glcanvas"></canvas>
   </div>
 </template>
 
 <script lang="ts">
+// @ts-nocheck
 import { Component, Vue } from "vue-property-decorator";
-import { Configuration, Model, ModelsApi } from "@/api";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import {
   Scene,
@@ -29,52 +20,20 @@ import {
 } from "three";
 
 @Component
-export default class WebXr extends Vue {
-  private apiKey = "Token bf51a81599630627c69dfb90561983627ef1e66f";
-  // Genie Demo Projekt
-  private projectId = "dfe91633-9d4c-4cf3-be2e-eb0ab036add3";
-  // Models
-  private models: Model[] = [];
-  // selected button/model
-  private selectedModelId = "f555f1c0-c6b9-4c76-97f9-57d103141550";
-
-  private async mounted(): Promise<void> {
-    try {
-      const modelApi = new ModelsApi(
-        new Configuration({ apiKey: this.apiKey })
-      );
-      const modelList = await modelApi.modelsList({ project: this.projectId });
-      this.updateModels(modelList);
-    } catch (error: any) {
-      console.log(error);
-    }
-  }
-
-  private updateModels(models: Model[]): void {
-    this.models = models;
-  }
-
-  private updateSelectedModelId(modelId: string): void {
-    this.selectedModelId = modelId;
-  }
-
-  private async activateXR(): Promise<void> {
-    // Canvas
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+export default class WebXrTutorial extends Vue {
+  private async activateXR() {
     const canvas = this.$refs.glcanvas;
     const gl = canvas.getContext("webgl", {
       xrCompatible: true,
     }) as WebGLRenderingContext;
 
-    // Scene
     const scene = new Scene();
 
-    // Lightning
-    // const directionalLight = new THREE.DirectionalLightHelper(0xffffff, 0.3);
-    // directionalLight.position.set(10, 15, 10);
-    // scene.add(directionalLight);
+    const directionalLight = new DirectionalLight(0xffffff, 1);
+    directionalLight.position.set(10, 15, 10);
+    scene.add(directionalLight);
 
-    // Renderer
+    // Set up the WebGLRenderer, which handles rendering to the session's base layer.
     const renderer = new WebGLRenderer({
       alpha: true,
       preserveDrawingBuffer: true,
@@ -83,16 +42,22 @@ export default class WebXr extends Vue {
     });
     renderer.autoClear = false;
 
-    // Camera    const camera = new THREE.PerspectiveCamera();
+    // The API directly updates the camera matrices
+    // Disable matrix auto updates so three.js doesn't attempt
+    // to handle the matrices independently.
     const camera = new PerspectiveCamera();
     camera.matrixAutoUpdate = false;
 
-    var xr = (navigator as any).xr;
+    // Initialize a WebXR session using "immersive-ar".
+    const xr = (navigator as any).xr;
+    if (xr == null) {
+      throw new Error("WebXR not supported");
+    }
 
-    // Session
     const session = await xr.requestSession("immersive-ar", {
       requiredFeatures: ["hit-test"],
     });
+
     session.updateRenderState({
       baseLayer: new XRWebGLLayer(session, gl),
     });
@@ -108,10 +73,9 @@ export default class WebXr extends Vue {
       space: viewerSpace,
     });
 
-    // GLTFLoader
-    const gltfLoader = new GLTFLoader();
+    const loader = new GLTFLoader();
     let reticle: Group;
-    gltfLoader.load(
+    loader.load(
       "https://immersive-web.github.io/webxr-samples/media/gltf/reticle/reticle.gltf",
       function (gltf) {
         reticle = gltf.scene;
@@ -120,21 +84,22 @@ export default class WebXr extends Vue {
       }
     );
 
-    var models3dObject: { [id: string]: Group } = {};
-    for (let model of this.models) {
-      gltfLoader.load(
-        model.glb,
-        (gltf) => (models3dObject[model.id] = gltf.scene),
-        () => null,
-        (error) => console.error("Model Error:", model.id)
-      );
-    }
+    let flower: Group;
+    // let models = {
+    //   'id_mdl1': flower1,
+    //   'id_mdl2': flower2
+    // }
 
-    console.log(models3dObject);
+    // models.id_mdl1s
 
+    loader.load("https://genie-ar.ch/v/r75tc8kn/glb", function (gltf) {
+      flower = gltf.scene;
+    });
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     session.addEventListener("select", (evt: Event) => {
-      if (models3dObject[this.selectedModelId]) {
-        const clone = models3dObject[this.selectedModelId].clone();
+      if (flower) {
+        const clone = flower.clone();
         clone.position.copy(reticle.position);
         scene.add(clone);
       }
@@ -189,46 +154,5 @@ export default class WebXr extends Vue {
 }
 </script>
 
-<style scoped>
-.glcanvas {
-  z-index: 1;
-}
-
-.slider {
-  z-index: 2;
-  width: 100%;
-  text-align: center;
-  overflow: hidden;
-  position: absolute;
-  bottom: 16px;
-}
-
-.slides {
-  display: flex;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
-}
-
-.slide {
-  scroll-snap-align: start;
-  flex-shrink: 0;
-  width: 100px;
-  height: 100px;
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-  background-color: #fff;
-  margin-right: 10px;
-  border-radius: 10px;
-  border: none;
-  display: flex;
-  border-inline-start-color: #4285f4;
-  border: solid 1px #4285f4;
-}
-
-.slide.selected {
-  border: 2px solid #4285f4;
-}
-</style>
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style scoped></style>

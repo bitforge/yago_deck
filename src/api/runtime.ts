@@ -13,7 +13,7 @@
  */
 
 
-export const BASE_PATH = "http://localhost".replace(/\/+$/, "");
+export const BASE_PATH = "https://genie-ar.ch/".replace(/\/+$/, "");
 
 const isBlob = (value: any) => typeof Blob !== 'undefined' && value instanceof Blob;
 
@@ -149,7 +149,7 @@ export class Configuration {
     }
 
     get fetchApi(): FetchAPI {
-        return this.configuration.fetchApi;
+        return this.configuration.fetchApi!;
     }
 
     get middleware(): Middleware[] {

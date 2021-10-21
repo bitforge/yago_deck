@@ -1,16 +1,16 @@
 <template>
   <div id="app">
-    <WebXR></WebXR>
+    <WebXr></WebXr>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import WebXR from "./components/WebXR.vue";
+import WebXr from "./components/WebXr.vue";
 
 @Component({
   components: {
-    WebXR,
+    WebXr,
   },
 })
 export default class App extends Vue {}
