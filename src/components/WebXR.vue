@@ -2,10 +2,20 @@
   <div class="webxr">
     <canvas ref="glcanvas" class="glcanvas"></canvas>
     <button slot="ar-button" id="ar-button" @click="activateXR()">
-      View in your Space
+      Start WebXR
     </button>
     <div claas="domOverlay" ref="domOverlay">
-      <div class="touch" ref="touch" @click="placeModel()"></div>
+      <div class="removeButtons">
+        <button class="removeAllButton" @click="removeAllModels()">
+          Remove all objects
+        </button>
+        <button class="removeLastButton" @click="removeLastModel()">
+          Remove last objects
+        </button>
+      </div>
+      <div class="touch" ref="touch" @click="placeModel()">
+        <p>Tap anywhere to place!</p>
+      </div>
       <div class="slider" ref="slider">
         <div class="slides">
           <div v-for="(model, index) in models" :key="index" class="slide">
@@ -30,14 +40,18 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import { Configuration, Model, ModelsApi } from "@/api";
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import {
   Scene,
   DirectionalLight,
+  AmbientLight,
+  SpotLight,
+  HemisphereLight,
   WebGLRenderer,
   PerspectiveCamera,
   Group,
   XRFrame,
+  Object3D,
 } from "three";
 
 @Component
@@ -55,16 +69,6 @@ export default class WebXr extends Vue {
   private gltfLoader = new GLTFLoader();
   private reticle: Group;
   private scene = new Scene();
-  // private canvas = this.$refs.glcanvas;
-  // private gl = this.canvas.getContext("webgl", {
-  //   xrCompatible: true,
-  // }) as WebGLRenderingContext;
-  // private renderer = new WebGLRenderer({
-  //   alpha: true,
-  //   preserveDrawingBuffer: true,
-  //   canvas: this.canvas,
-  //   context: this.gl,
-  // });
   private camera = new PerspectiveCamera();
 
   private async mounted(): Promise<void> {
@@ -118,26 +122,42 @@ export default class WebXr extends Vue {
     }
   }
 
+  private removeAllModels(): void {
+    console.log(this.scene);
+    console.log(this.scene.children);
+    while (this.scene.children.length >= 3) {
+      this.scene.remove(this.scene.children[this.scene.children.length - 1]);
+    }
+  }
+
+  private removeLastModel(): void {
+    if (this.scene.children.length >= 3) {
+      this.scene.remove(this.scene.children[this.scene.children.length - 1]);
+    }
+  }
+
   private async activateXR(): Promise<void> {
     const canvas = this.$refs.glcanvas;
     const gl = canvas.getContext("webgl", {
       xrCompatible: true,
     }) as WebGLRenderingContext;
+
     // Lightning
-    // const directionalLight = new THREE.DirectionalLightHelper(0xffffff, 0.3);
-    // directionalLight.position.set(10, 15, 10);
-    // scene.add(directionalLight);
+    const heimsphereLight = new HemisphereLight(0xffffbb, 0x080820, 2);
+    this.scene.add(heimsphereLight);
+    // const ambientLight = new DirectionalLight(0xfffffff, 2);
+    // ambientLight.position.set(10, 15, 10);
+    // this.scene.add(ambientLight);
 
     // Renderer
     const renderer = new WebGLRenderer({
       alpha: true,
       preserveDrawingBuffer: true,
-      canvas: this.canvas,
+      canvas: canvas,
       context: gl,
     });
     renderer.autoClear = false;
-
-    // Camera    const camera = new THREE.PerspectiveCamera();
+    // Camera
     this.camera.matrixAutoUpdate = false;
 
     // Session
@@ -150,30 +170,14 @@ export default class WebXr extends Vue {
     session.updateRenderState({
       baseLayer: new XRWebGLLayer(session, gl),
     });
-    // A 'local' reference space has a native origin that is located
-    // near the viewer's position at the time the session was created.
+
     const referenceSpace = await session.requestReferenceSpace("local");
-    // Create another XRReferenceSpace that has the viewer as the origin.
     const viewerSpace = await session.requestReferenceSpace("viewer");
-    // Perform hit testing using the viewer as origin.
     const hitTestSource = await session.requestHitTestSource({
       space: viewerSpace,
     });
-    // GLTFLoader
 
     this.loadModelsObject3D();
-
-    // session.addEventListener("seelct", (evt: Event) => {
-    //   this.placeModel();
-    // });
-
-    // session.addEventListener("select", (evt: Event) => {
-    //   if (this.modelsObjecdt3D[this.selectedModelId]) {
-    //     const clone = this.modelsObjecdt3D[this.selectedModelId].clone();
-    //     clone.position.copy(this.reticle.position);
-    //     this.scene.add(clone);
-    //   }
-    // });
 
     // Create a render loop that allows us to draw on the AR view.
     const onXRFrame = (time: number, frame: XRFrame) => {
@@ -220,6 +224,12 @@ export default class WebXr extends Vue {
 
 <style scoped>
 .webxr {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: #eee;
   overflow-x: hidden;
 }
 
@@ -239,7 +249,7 @@ export default class WebXr extends Vue {
   left: 50%;
   transform: translateX(-50%);
   white-space: nowrap;
-  bottom: 132px;
+  bottom: 50%;
   padding: 0px 16px 0px 40px;
   font-family: Roboto Regular, Helvetica Neue, sans-serif;
   font-size: 14px;
@@ -263,13 +273,50 @@ export default class WebXr extends Vue {
   outline: 1px solid #4285f4;
 }
 
+.removeAllButton {
+  position: absolute;
+  color: #fff;
+  border: solid 1px #fff;
+  font-size: 15px;
+  top: 15px;
+  left: 15px;
+  margin-bottom: 10px;
+  background: none;
+  z-index: 2;
+}
+
+.removeLastButton {
+  position: absolute;
+  color: #fff;
+  border: solid 1px #fff;
+  font-size: 15px;
+  top: 15px;
+  right: 15px;
+  margin-bottom: 10px;
+  background: none;
+  z-index: 2;
+}
+
 .touch {
-  border: 5px solid orange;
-  top: 0;
+  top: 50px;
   left: 0;
   right: 0;
   bottom: 121px;
   position: absolute;
+  z-index: 1;
+}
+
+.touch p {
+  position: absolute;
+  color: #fff;
+  font-size: 12px;
+  bottom: 10px;
+  right: 0;
+  left: 0;
+}
+
+.touch button:active {
+  border: solid 2px #4285f4;
 }
 
 .slider {
@@ -277,7 +324,6 @@ export default class WebXr extends Vue {
   text-align: center;
   overflow: hidden;
   position: absolute;
-  border: 2px solid red;
   z-index: 2;
   left: 0;
   right: 0;
@@ -287,14 +333,14 @@ export default class WebXr extends Vue {
 
 .slides {
   position: absolute;
-  bottom: 16px;
-  left: 0;
+  left: 10px;
   right: 0;
   display: flex;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
+  display: hide;
 }
 
 .slide {
@@ -306,11 +352,11 @@ export default class WebXr extends Vue {
   background-repeat: no-repeat;
   background-position: center;
   background-color: #fff;
-  margin-right: 10px;
   border-radius: 10px;
+  margin-right: 10px;
+  margin-bottom: 10px;
   border: none;
   display: flex;
-  /* border: 1px solid #4285f4; */
 }
 
 .slide.selected {
