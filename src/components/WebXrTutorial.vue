@@ -92,12 +92,9 @@ export default class WebXrTutorial extends Vue {
 
     // models.id_mdl1s
 
-    loader.load(
-      "https://immersive-web.github.io/webxr-samples/media/gltf/sunflower/sunflower.gltf",
-      function (gltf) {
-        flower = gltf.scene;
-      }
-    );
+    loader.load("https://genie-ar.ch/v/lwqiizo6/glb", function (gltf) {
+      flower = gltf.scene;
+    });
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     session.addEventListener("select", (evt: Event) => {

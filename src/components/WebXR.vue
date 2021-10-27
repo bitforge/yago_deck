@@ -43,15 +43,13 @@ import { Configuration, Model, ModelsApi } from "@/api";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import {
   Scene,
-  DirectionalLight,
   AmbientLight,
-  SpotLight,
   HemisphereLight,
+  DirectionalLight,
   WebGLRenderer,
   PerspectiveCamera,
   Group,
   XRFrame,
-  Object3D,
 } from "three";
 
 @Component
@@ -123,8 +121,6 @@ export default class WebXr extends Vue {
   }
 
   private removeAllModels(): void {
-    console.log(this.scene);
-    console.log(this.scene.children);
     while (this.scene.children.length >= 3) {
       this.scene.remove(this.scene.children[this.scene.children.length - 1]);
     }
@@ -143,11 +139,13 @@ export default class WebXr extends Vue {
     }) as WebGLRenderingContext;
 
     // Lightning
-    const heimsphereLight = new HemisphereLight(0xffffbb, 0x080820, 2);
-    this.scene.add(heimsphereLight);
-    // const ambientLight = new DirectionalLight(0xfffffff, 2);
-    // ambientLight.position.set(10, 15, 10);
-    // this.scene.add(ambientLight);
+    const ambientLight = new AmbientLight(0xffffff, 1.5);
+    this.scene.add(ambientLight);
+    // const heimsphereLight = new HemisphereLight(0xffffbb, 0x080820, 1);
+    // this.scene.add(heimsphereLight);
+    // const directionalLight = new DirectionalLight(0xffffff, 1);
+    // directionalLight.position.set(10, 15, 10);
+    // this.scene.add(directionalLight);
 
     // Renderer
     const renderer = new WebGLRenderer({
@@ -157,6 +155,7 @@ export default class WebXr extends Vue {
       context: gl,
     });
     renderer.autoClear = false;
+
     // Camera
     this.camera.matrixAutoUpdate = false;
 
