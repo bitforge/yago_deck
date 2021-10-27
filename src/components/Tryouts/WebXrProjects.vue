@@ -12,7 +12,7 @@
 </template>
 
 <script lang="ts">
-import WebXrModels from "./WebXrModels.vue";
+import WebXrModels from "../Tryouts/WebXrModels.vue";
 import { Configuration } from "@/api/runtime";
 import { Component, Vue } from "vue-property-decorator";
 import { AuthApi } from "@/api/apis/AuthApi";

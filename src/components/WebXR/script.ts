@@ -1,43 +1,3 @@
-<template>
-  <div class="webxr">
-    <canvas ref="glcanvas" class="glcanvas"></canvas>
-    <button slot="ar-button" id="ar-button" @click="activateXR()">
-      Start WebXR
-    </button>
-    <div claas="domOverlay" ref="domOverlay">
-      <div class="removeButtons">
-        <button class="removeAllButton" @click="removeAllModels()">
-          Remove all objects
-        </button>
-        <button class="removeLastButton" @click="removeLastModel()">
-          Remove last objects
-        </button>
-      </div>
-      <div class="touch" ref="touch" @click="placeModel()">
-        <p>Tap anywhere to place!</p>
-      </div>
-      <div class="slider" ref="slider">
-        <div class="slides">
-          <div v-for="(model, index) in models" :key="index" class="slide">
-            <button
-              v-if="model.id == selectedModelId"
-              class="slide selected"
-              :style="{ backgroundImage: 'url(' + model.image + ')' }"
-            ></button>
-            <button
-              v-else
-              class="slide"
-              :style="{ backgroundImage: 'url(' + model.image + ')' }"
-              @click="updateSelectedModelId(model.id)"
-            ></button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</template>
-
-<script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import { Configuration, Model, ModelsApi } from "@/api";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
@@ -104,7 +64,7 @@ export default class WebXr extends Vue {
   }
 
   private loadModelsObject3D(): void {
-    for (let model of this.models) {
+    for (const model of this.models) {
       this.gltfLoader.load(
         model.glb,
         (gltf) => (this.modelsObjecdt3D[model.id] = gltf.scene)
@@ -141,11 +101,6 @@ export default class WebXr extends Vue {
     // Lightning
     const ambientLight = new AmbientLight(0xffffff, 1.5);
     this.scene.add(ambientLight);
-    // const heimsphereLight = new HemisphereLight(0xffffbb, 0x080820, 1);
-    // this.scene.add(heimsphereLight);
-    // const directionalLight = new DirectionalLight(0xffffff, 1);
-    // directionalLight.position.set(10, 15, 10);
-    // this.scene.add(directionalLight);
 
     // Renderer
     const renderer = new WebGLRenderer({
@@ -160,7 +115,7 @@ export default class WebXr extends Vue {
     this.camera.matrixAutoUpdate = false;
 
     // Session
-    var xr = (navigator as any).xr;
+    const xr = (navigator as any).xr;
     const session = await xr.requestSession("immersive-ar", {
       requiredFeatures: ["hit-test"],
       optionalFeatures: ["dom-overlay"],
@@ -219,154 +174,3 @@ export default class WebXr extends Vue {
     session.requestAnimationFrame(onXRFrame);
   }
 }
-</script>
-
-<style scoped>
-.webxr {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  background-color: #eee;
-  overflow-x: hidden;
-}
-
-.glcanvas {
-  z-index: 1;
-  transform: translateZ(0);
-  pointer-events: none;
-}
-
-#ar-button {
-  background-image: url("https://modelviewer.dev/assets/ic_view_in_ar_new_googblue_48dp.png");
-  background-repeat: no-repeat;
-  background-size: 20px 20px;
-  background-position: 12px 50%;
-  background-color: #fff;
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  white-space: nowrap;
-  bottom: 50%;
-  padding: 0px 16px 0px 40px;
-  font-family: Roboto Regular, Helvetica Neue, sans-serif;
-  font-size: 14px;
-  color: #4285f4;
-  height: 36px;
-  line-height: 36px;
-  border-radius: 18px;
-  border: 1px solid #dadce0;
-  z-index: 2;
-}
-
-#ar-button:active {
-  background-color: #e8eaed;
-}
-
-#ar-button:focus {
-  outline: none;
-}
-
-#ar-button:focus-visible {
-  outline: 1px solid #4285f4;
-}
-
-.removeAllButton {
-  position: absolute;
-  color: #fff;
-  border: solid 1px #fff;
-  font-size: 15px;
-  top: 15px;
-  left: 15px;
-  margin-bottom: 10px;
-  background: none;
-  z-index: 2;
-}
-
-.removeLastButton {
-  position: absolute;
-  color: #fff;
-  border: solid 1px #fff;
-  font-size: 15px;
-  top: 15px;
-  right: 15px;
-  margin-bottom: 10px;
-  background: none;
-  z-index: 2;
-}
-
-.touch {
-  top: 50px;
-  left: 0;
-  right: 0;
-  bottom: 121px;
-  position: absolute;
-  z-index: 1;
-}
-
-.touch p {
-  position: absolute;
-  color: #fff;
-  font-size: 12px;
-  bottom: 10px;
-  right: 0;
-  left: 0;
-}
-
-.touch button:active {
-  border: solid 2px #4285f4;
-}
-
-.slider {
-  width: 100%;
-  text-align: center;
-  overflow: hidden;
-  position: absolute;
-  z-index: 2;
-  left: 0;
-  right: 0;
-  height: 120px;
-  bottom: 0;
-}
-
-.slides {
-  position: absolute;
-  left: 10px;
-  right: 0;
-  display: flex;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
-  display: hide;
-}
-
-.slide {
-  scroll-snap-align: start;
-  flex-shrink: 0;
-  width: 100px;
-  height: 100px;
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-  background-color: #fff;
-  border-radius: 10px;
-  margin-right: 10px;
-  margin-bottom: 10px;
-  border: none;
-  display: flex;
-}
-
-.slide.selected {
-  border: 2px solid #4285f4;
-}
-
-.slide:focus {
-  outline: none;
-}
-
-.slide:focus-visible {
-  outline: 1px solid #4285f4;
-}
-</style>

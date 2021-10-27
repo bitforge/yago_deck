@@ -6,8 +6,7 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import WebXr from "./components/WebXr.vue";
-
+import WebXr from "./components/WebXR/WebXR.vue";
 @Component({
   components: {
     WebXr,
