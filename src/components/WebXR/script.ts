@@ -6,6 +6,7 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import {
   Scene,
   DirectionalLight,
+  LightProbe,
   WebGLRenderer,
   PerspectiveCamera,
   Group,
@@ -28,6 +29,11 @@ export default class WebXr extends Vue {
   private reticle: Group;
   private scene = new Scene();
   private camera = new PerspectiveCamera();
+  private xrLightProbe: XRLightEstimate | null;
+
+  // THREE.js Lightning
+  private directionalLight = new DirectionalLight(0xffffff, 1);
+  private lightProbe = new LightProbe();
 
   private async mounted(): Promise<void> {
     try {
@@ -39,6 +45,7 @@ export default class WebXr extends Vue {
       // setting first model as selected
       this.updateSelectedModelId(this.models[0].id);
       this.loadReticle();
+      this.addLightning();
     } catch (error: any) {
       console.log(error);
     }
@@ -61,6 +68,11 @@ export default class WebXr extends Vue {
         this.scene.add(this.reticle);
       }
     );
+  }
+
+  private addLightning(): void {
+    this.scene.add(this.directionalLight);
+    this.scene.add(this.lightProbe);
   }
 
   private loadModelsObject3D(): void {
@@ -92,19 +104,31 @@ export default class WebXr extends Vue {
     }
   }
 
+  private updateLightningEstimate(frame: XRFrame): void {
+    // Get light estimate from XRFrame
+    const lightEstimate = frame.getLightEstimate(this.xrLightProbe);
+    // Calculate max light intensity
+    const primary = lightEstimate.primaryLightIntensity;
+    const maxLight = Math.max(primary.x, Math.max(primary.y, primary.z));
+    const intensity = Math.max(1.0, maxLight);
+    this.directionalLight.intensity = intensity;
+    // Set directional light position and color
+    const direction = lightEstimate.primaryLightDirection;
+    this.directionalLight.position.set(direction.x, direction.y, direction.z);
+    this.directionalLight.color.setRGB(
+      primary.x / intensity,
+      primary.y / intensity,
+      primary.z / intensity
+    );
+    // Update light estimation harmonics
+    this.lightProbe.sh.fromArray(lightEstimate.sphericalHarmonicsCoefficients);
+  }
+
   private async activateXR(): Promise<void> {
     const canvas = this.$refs.glcanvas;
     const gl = canvas.getContext("webgl", {
       xrCompatible: true,
     }) as WebGLRenderingContext;
-
-    // Lightning
-    const directionalLight1 = new DirectionalLight(0xffffff, 1.5);
-    const directionalLight2 = new DirectionalLight(0xffffff, 1);
-    directionalLight1.position.set(10, 15, 10);
-    directionalLight2.position.set(-10, 15, -10);
-    this.scene.add(directionalLight1);
-    this.scene.add(directionalLight2);
 
     // Renderer
     const renderer = new WebGLRenderer({
@@ -121,7 +145,7 @@ export default class WebXr extends Vue {
     // Session
     const xr = (navigator as any).xr;
     const session = await xr.requestSession("immersive-ar", {
-      requiredFeatures: ["hit-test"],
+      requiredFeatures: ["hit-test", "light-estimation"],
       optionalFeatures: ["dom-overlay"],
       domOverlay: { root: this.$refs.domOverlay },
     });
@@ -135,17 +159,26 @@ export default class WebXr extends Vue {
       space: viewerSpace,
     });
 
+    // Create XR Light Probe
+    this.xrLightProbe = await session.requestLightProbe();
+
+    // Load Genie models list
     this.loadModelsObject3D();
 
     // Create a render loop that allows us to draw on the AR view.
     const onXRFrame = (time: number, frame: XRFrame) => {
       // Queue up the next draw request.
       session.requestAnimationFrame(onXRFrame);
+
+      // Update Lightning from light estimate
+      this.updateLightningEstimate(frame);
+
       // Bind the graphics framebuffer to the baseLayer's framebuffer
       gl.bindFramebuffer(
         gl.FRAMEBUFFER,
         session.renderState.baseLayer.framebuffer
       );
+
       // Retrieve the pose of the device.
       // XRFrame.getViewerPose can return null while the session attempts to establish tracking.
       const pose = frame.getViewerPose(referenceSpace);
@@ -154,6 +187,7 @@ export default class WebXr extends Vue {
         const view = pose.views[0];
         const viewport = session.renderState.baseLayer.getViewport(view);
         renderer.setSize(viewport.width, viewport.height);
+
         // Use the view's transform matrix and projection matrix to configure the THREE.camera.
         this.camera.matrix.fromArray(view.transform.matrix);
         this.camera.projectionMatrix.fromArray(view.projectionMatrix);

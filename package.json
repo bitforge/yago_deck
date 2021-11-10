@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
+    "ngrok": "ngrok http -host-header=rewrite 8080",
     "build": "vue-cli-service build",
     "deploy": "gsutil -m -h \"Cache-Control: no-store\" rsync -d -r dist gs://webxr-demo/",
     "lint": "vue-cli-service lint"
