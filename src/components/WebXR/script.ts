@@ -5,8 +5,6 @@ import { Configuration, Model, ModelsApi } from "@/api";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import {
   Scene,
-  AmbientLight,
-  HemisphereLight,
   DirectionalLight,
   WebGLRenderer,
   PerspectiveCamera,
@@ -101,8 +99,12 @@ export default class WebXr extends Vue {
     }) as WebGLRenderingContext;
 
     // Lightning
-    const ambientLight = new AmbientLight(0xffffff, 1.5);
-    this.scene.add(ambientLight);
+    const directionalLight1 = new DirectionalLight(0xffffff, 1.5);
+    const directionalLight2 = new DirectionalLight(0xffffff, 1);
+    directionalLight1.position.set(10, 15, 10);
+    directionalLight2.position.set(-10, 15, -10);
+    this.scene.add(directionalLight1);
+    this.scene.add(directionalLight2);
 
     // Renderer
     const renderer = new WebGLRenderer({
