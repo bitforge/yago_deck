@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { Component, Vue } from "vue-property-decorator";
 import { Configuration, Model, ModelsApi } from "@/api";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
