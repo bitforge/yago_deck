@@ -1,19 +1,19 @@
 <template>
   <div class="webxr">
     <canvas ref="glcanvas" class="glcanvas"></canvas>
-    <button slot="ar-button" id="ar-button" @click="activateXR()">
+    <button slot="ar-button" id="ar-button" @click="activateXR">
       Start WebXR
     </button>
-    <div claas="domOverlay" ref="domOverlay">
+    <div claas="domOverlay" ref="domOverlay" v-show="xrSessionActive">
       <div class="removeButtons">
-        <button class="removeAllButton" @click="removeAllModels()">
+        <button class="removeAllButton" @click="removeAllModels">
           Remove all objects
         </button>
-        <button class="removeLastButton" @click="removeLastModel()">
+        <button class="removeLastButton" @click="removeLastModel">
           Remove last objects
         </button>
       </div>
-      <div class="touch" ref="touch" @click="placeModel()">
+      <div class="touch" ref="touch" @click="placeModel">
         <p>Tap anywhere to place!</p>
       </div>
       <div class="slider" ref="slider">

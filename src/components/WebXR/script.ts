@@ -22,6 +22,8 @@ export default class WebXr extends Vue {
   private models: Model[] = [];
   // selected button/model
   private selectedModelId = "";
+  // Toggles UI layer visiblity
+  private xrSessionActive = false;
 
   // WebXR:
   private modelsObjecdt3D: { [id: string]: Group } = {};
@@ -164,6 +166,9 @@ export default class WebXr extends Vue {
 
     // Load Genie models list
     this.loadModelsObject3D();
+
+    // Show DOM overlay once XR Session is active
+    this.xrSessionActive = true;
 
     // Create a render loop that allows us to draw on the AR view.
     const onXRFrame = (time: number, frame: XRFrame) => {
