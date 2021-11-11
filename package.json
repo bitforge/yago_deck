@@ -4,10 +4,10 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
-    "ngrok": "ngrok http -host-header=rewrite 8080",
     "build": "vue-cli-service build --modern",
+    "lint": "vue-cli-service lint",
     "deploy": "gsutil -m -h \"Cache-Control: no-store\" rsync -d -r dist gs://webxr-demo/",
-    "lint": "vue-cli-service lint"
+    "ngrok": "ngrok http -host-header=rewrite 8080"
   },
   "dependencies": {
     "@types/three": "^0.132.2",
@@ -18,7 +18,8 @@
     "three.js": "^0.77.1",
     "vue": "^2.6.11",
     "vue-class-component": "^7.2.3",
-    "vue-property-decorator": "^9.1.2"
+    "vue-property-decorator": "^9.1.2",
+    "vuex": "^3.4.0"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^4.18.0",
@@ -26,6 +27,7 @@
     "@vue/cli-plugin-babel": "^4.5.15",
     "@vue/cli-plugin-eslint": "^4.5.15",
     "@vue/cli-plugin-typescript": "^4.5.15",
+    "@vue/cli-plugin-vuex": "~4.5.0",
     "@vue/cli-service": "^4.5.15",
     "@vue/eslint-config-prettier": "^6.0.0",
     "@vue/eslint-config-typescript": "^7.0.0",
@@ -36,14 +38,5 @@
     "prettier": "^2.2.1",
     "typescript": "~4.1.5",
     "vue-template-compiler": "^2.6.11"
-  },
-  "gitHooks": {
-    "pre-commit": "lint-staged"
-  },
-  "lint-staged": {
-    "*.{js,jsx,vue,ts,tsx}": [
-      "vue-cli-service lint",
-      "git add"
-    ]
   }
 }
