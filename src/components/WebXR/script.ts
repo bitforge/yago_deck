@@ -36,7 +36,7 @@ export default class WebXr extends Vue {
     // THREE.js
     private gl: WebGLRenderingContext | null;
     private renderer: WebGLRenderer | null;
-    private modelsObjecdt3D: { [id: string]: Group } = {};
+    private models3D: { [id: string]: Group } = {};
     private gltfLoader = new GLTFLoader();
     private reticle: Group;
     private scene = new Scene();
@@ -47,8 +47,7 @@ export default class WebXr extends Vue {
     private async mounted(): Promise<void> {
         try {
             const modelApi = new ModelsApi(new Configuration({ apiKey: this.apiKey }));
-            const modelList = await modelApi.modelsList({ project: this.projectId });
-            this.updateModels(modelList);
+            this.models = await modelApi.modelsList({ project: this.projectId });
             // setting first model as selected
             this.updateSelectedModelId(this.models[0].id);
             this.loadReticle();
@@ -57,10 +56,6 @@ export default class WebXr extends Vue {
         } catch (error: any) {
             console.log(error);
         }
-    }
-
-    private updateModels(models: Model[]): void {
-        this.models = models;
     }
 
     private updateSelectedModelId(modelId: string): void {
@@ -86,13 +81,13 @@ export default class WebXr extends Vue {
 
     private loadModelsObject3D(): void {
         for (const model of this.models) {
-            this.gltfLoader.load(model.glb, gltf => (this.modelsObjecdt3D[model.id] = gltf.scene));
+            this.gltfLoader.load(model.glb, gltf => (this.models3D[model.id] = gltf.scene));
         }
     }
 
     private placeModel(): void {
-        if (this.modelsObjecdt3D[this.selectedModelId]) {
-            const clone = this.modelsObjecdt3D[this.selectedModelId].clone();
+        if (this.models3D[this.selectedModelId]) {
+            const clone = this.models3D[this.selectedModelId].clone();
             clone.position.copy(this.reticle.position);
             this.scene.add(clone);
         }
@@ -184,11 +179,8 @@ export default class WebXr extends Vue {
                 const hitPose = hitTestResults[0].getPose(this.referenceSpace);
                 if (hitPose) {
                     this.reticle.visible = true;
-                    this.reticle.position.set(
-                        hitPose.transform.position.x,
-                        hitPose.transform.position.y,
-                        hitPose.transform.position.z
-                    );
+                    const pos = hitPose.transform.position;
+                    this.reticle.position.set(pos.x, pos.y, pos.z);
                 }
                 this.reticle.updateMatrixWorld(true);
             }
