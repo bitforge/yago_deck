@@ -12,8 +12,8 @@ import { Scene, DirectionalLight, LightProbe, WebGLRenderer, PerspectiveCamera, 
 @Component
 export default class WebXr extends Vue {
     private apiKey = 'Token bf51a81599630627c69dfb90561983627ef1e66f';
-    // Genie Demo Projekt
-    private projectId = 'dfe91633-9d4c-4cf3-be2e-eb0ab036add3';
+    // Using feey plants as demo project
+    private projectId = '03d861a8-90fe-42bb-aeba-a4aead7917ea';
     // Models from Project (Genie Demo)
     private models: Model[] = [];
     // selected button/model
@@ -161,7 +161,7 @@ export default class WebXr extends Vue {
         // Bail out right away if required stuff is not available
         if (!this.renderer || !this.session.renderState.baseLayer || !this.gl) return;
 
-        // Update Lightning from light estimate
+        // Update Lightning estimate for current frame
         this.updateLightningEstimate(frame);
 
         // Bind the graphics framebuffer to the baseLayer's framebuffer
