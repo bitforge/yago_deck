@@ -7,7 +7,8 @@
 import { Component, Vue } from 'vue-property-decorator';
 import { Configuration, Model, ModelsApi } from '@/api';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { Scene, Object3D, DirectionalLight, LightProbe, WebGLRenderer, PerspectiveCamera, Group } from 'three';
+// import { Scene, Object3D, DirectionalLight, LightProbe, WebGLRenderer, PerspectiveCamera, Group } from 'three';
+import * as THREE from 'three';
 
 @Component
 export default class WebXr extends Vue {
@@ -21,22 +22,23 @@ export default class WebXr extends Vue {
     // Toggles UI layer visiblity
     public xrSessionActive = false;
 
-    // WebXR:
+    // WebXR & WebGL:
     private session: XRSession | null = null;
     private xrLightProbe: XRLightEstimate | null = null;
     private referenceSpace: XRReferenceSpace | null = null;
     private hitTestSource: XRHitTestSource | null = null;
+    private gl: WebGLRenderingContext | null = null;
 
     // THREE.js
-    private gl: WebGLRenderingContext | null = null;
-    private renderer: WebGLRenderer | null = null;
-    private models3D: { [id: string]: Group } = {};
+    private renderer: THREE.WebGLRenderer | null = null;
+    private models3D: { [id: string]: THREE.Group } = {};
     private gltfLoader = new GLTFLoader();
-    private nopsy: Group | null = null;
-    private scene = new Scene();
-    private camera = new PerspectiveCamera();
-    private directionalLight = new DirectionalLight(0xffffff, 1);
-    private lightProbe = new LightProbe();
+    private nopsy: THREE.Group | null = null;
+    private previewModel: THREE.Object3D | null = null;
+    private scene = new THREE.Scene();
+    private camera = new THREE.PerspectiveCamera();
+    private directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+    private lightProbe = new THREE.LightProbe();
 
     public async mounted(): Promise<void> {
         try {
@@ -62,6 +64,8 @@ export default class WebXr extends Vue {
 
     private loadModel(modelId: string): void {
         const model = this.models.find(model => model.id === modelId);
+        if (!model || !model.glb) throw 'Cloud not find model infos for ' + modelId;
+
         this.gltfLoader.load(model.glb, gltf => {
             const object3D = gltf.scene;
             object3D.name = `model-${model.id}`;
@@ -111,7 +115,7 @@ export default class WebXr extends Vue {
     }
 
     public removeLastModel(): void {
-        const lastModel = this.scene.children.at(-1) as Object3D;
+        const lastModel = this.scene.children.at(-1) as THREE.Object3D;
         if (lastModel && lastModel.name.startsWith('model')) {
             this.scene.remove(lastModel);
         }
@@ -131,7 +135,7 @@ export default class WebXr extends Vue {
         }) as WebGLRenderingContext;
 
         // Renderer
-        this.renderer = new WebGLRenderer({
+        this.renderer = new THREE.WebGLRenderer({
             alpha: true,
             preserveDrawingBuffer: true,
             canvas: canvas,
@@ -209,11 +213,46 @@ export default class WebXr extends Vue {
                     const pos = hitPose.transform.position;
                     this.nopsy.position.set(pos.x, pos.y, pos.z);
                 }
+
+                // Update semi transparent preview model
+                this.updatePreviewModel();
+
                 this.nopsy.updateMatrixWorld(true);
             }
 
             // Render the scene with THREE.WebGLRenderer.
             this.renderer.render(this.scene, this.camera);
+        }
+    }
+
+    private updatePreviewModel(): void {
+        // Nopsy is absolutely required!
+        if (!this.nopsy) return;
+
+        // Update preview model when necessary
+        const previewModelUpdateNeeded =
+            this.selectedModelId &&
+            this.models3D[this.selectedModelId] &&
+            this.previewModel?.name != `model-${this.selectedModelId}`;
+
+        if (previewModelUpdateNeeded) {
+            // Remove old version when present
+            if (this.previewModel) this.nopsy.remove(this.previewModel);
+            // Add new semi transparent clone
+            this.previewModel = this.models3D[this.selectedModelId].clone();
+            this.previewModel.traverse((object: THREE.Object3D<THREE.Event>) => {
+                const mesh = object as THREE.Mesh;
+                const material = mesh.material as THREE.MeshStandardMaterial;
+                if (material) {
+                    const transMat = material.clone();
+                    transMat.format = THREE.RGBAFormat;
+                    transMat.transparent = true;
+                    transMat.opacity = 0.5;
+                    transMat.side = THREE.DoubleSide;
+                    mesh.material = transMat;
+                }
+            });
+            this.nopsy.add(this.previewModel);
         }
     }
 
