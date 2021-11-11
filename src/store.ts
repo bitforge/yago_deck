@@ -12,7 +12,17 @@ const state: MainState = {
 
 export default new Vuex.Store({
     state,
-    mutations: {},
+    mutations: {
+        setXRSupported(state: MainState, xrSupported: boolean): void {
+            state.xrSupported = xrSupported;
+        },
+        setXRActive(state: MainState, xrActive: boolean): void {
+            state.xrActive = xrActive;
+        },
+        setModels(state: MainState, models: Model[]): void {
+            state.models = models;
+        },
+    },
     actions: {},
     modules: {},
 });

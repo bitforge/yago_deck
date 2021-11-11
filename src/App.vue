@@ -1,17 +1,21 @@
 <template>
     <div id="app">
-        <Launcher />
-        <WebXr />
+        <web-xr>
+            <dom-overlay />
+        </web-xr>
+        <launcher />
     </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import Launcher from './components/Launcher.vue';
+import DomOverlay from './components/DomOverlay.vue';
 import WebXr from './components/WebXR.vue';
 @Component({
     components: {
         Launcher,
+        DomOverlay,
         WebXr,
     },
 })

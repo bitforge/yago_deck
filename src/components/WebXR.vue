@@ -1,63 +1,28 @@
 <template>
     <div class="webxr">
         <canvas ref="glcanvas" class="glcanvas"></canvas>
-        <div class="domOverlay" ref="domOverlay">
-            <div class="toolbar" v-if="xrSessionActive">
-                <button @click="removeLastModel">
-                    <img src="~@/assets/img/undo.svg" />
-                    <span>Undo</span>
-                </button>
-                <button @click="removeAllModels">
-                    <img src="~@/assets/img/delete.svg" />
-                    <span>Clear</span>
-                </button>
-            </div>
-            <div class="touch" ref="touch" @click="placeModel" v-if="xrSessionActive">
-                <p>Tap anywhere to place!</p>
-            </div>
-            <div class="slider" ref="slider">
-                <div class="slides">
-                    <div v-for="(model, index) in models" :key="index" class="slide">
-                        <button
-                            v-if="model.id == selectedModelId"
-                            class="slide selected"
-                            :style="{ backgroundImage: 'url(' + model.image + ')' }"></button>
-                        <button
-                            v-else
-                            class="slide"
-                            :style="{ backgroundImage: 'url(' + model.image + ')' }"
-                            @click="updateSelectedModelId(model.id)"></button>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <slot></slot>
     </div>
 </template>
 
 <script lang="ts">
 // Typescript and WebXR unfortunately are not in a love relation yet
-// Disabling all checks is required to build this project, but missing out on the benefits of ts
-// Whenever a complete type declaration for WebXR is available, remove this line
+// Disabling checks is required to build this project, but missing out on all benefits of ts :(
+
+// When you feel brave: try to find or create a good WebXR type definition
+// If you fail to make it work, please increase this counter:
+// FAILED_ATTEMPTS_TO_MARRY_TYPESCRIPT_AND_WEBXR = 2
 
 // @ts-nocheck
 
 import { Component, Vue } from 'vue-property-decorator';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { Messages } from '@/Messaging';
+import { Model } from '@/api';
 import * as THREE from 'three';
 
 @Component
 export default class WebXr extends Vue {
-    private apiKey = 'Token bf51a81599630627c69dfb90561983627ef1e66f';
-    // Using feey plants as demo project
-    private projectId = '03d861a8-90fe-42bb-aeba-a4aead7917ea';
-    // Models from Project (Genie Demo)
-    private models: Model[] = [];
-    // selected button/model
-    private selectedModelId = '';
-    // Toggles UI layer visiblity
-    public xrSessionActive = false;
-
     // WebXR & WebGL:
     private session: XRSession | null = null;
     private xrLightProbe: XRLightEstimate | null = null;
@@ -77,17 +42,24 @@ export default class WebXr extends Vue {
     private lightProbe = new THREE.LightProbe();
 
     public mounted(): void {
+        // Subscribe to events
         this.$bus.$on(Messages.MODELS_LOADED, this.onModelsLoaded);
-        this.$bus.$on(Messages.LAUNCH_XR_SESSION, this.onLaunchXR);
+        this.$bus.$on(Messages.LAUNCH_XR, this.onLaunchXR);
+        this.$bus.$on(Messages.MODEL_PLACE, this.placeModel);
+        this.$bus.$on(Messages.MODEL_UNDO, this.removeLastModel);
+        this.$bus.$on(Messages.MODEL_CLEAR, this.removeAllModels);
+        this.$bus.$on(Messages.MODEL_SELECT, this.updateSelectedModelId);
+
+        // Prepare Scene
+        this.initCamera();
+        this.addLightning();
+        this.loadNopsy();
     }
 
     private onModelsLoaded() {
-        this.models = this.$store.state.models;
         // setting first model as selected
-        this.updateSelectedModelId(this.models[0].id);
-        this.loadNopsy();
-        this.addLightning();
-        this.initCamera();
+        const models = this.$store.state.models as Model[];
+        this.updateSelectedModelId(models[0].id);
     }
 
     private updateSelectedModelId(modelId: string): void {
@@ -99,7 +71,8 @@ export default class WebXr extends Vue {
     }
 
     private loadModel(modelId: string): void {
-        const model = this.models.find(model => model.id === modelId);
+        const models = this.$store.state.models as Model[];
+        const model = models.find(model => model.id === modelId);
         if (!model || !model.glb) throw 'Cloud not find model infos for ' + modelId;
 
         this.gltfLoader.load(model.glb, gltf => {
@@ -107,6 +80,15 @@ export default class WebXr extends Vue {
             object3D.name = `model-${model.id}`;
             this.models3D[model.id] = object3D;
         });
+    }
+
+    private initCamera(): void {
+        this.camera.matrixAutoUpdate = false;
+    }
+
+    private addLightning(): void {
+        this.scene.add(this.directionalLight);
+        this.scene.add(this.lightProbe);
     }
 
     private loadNopsy(): void {
@@ -123,21 +105,19 @@ export default class WebXr extends Vue {
         });
     }
 
-    private addLightning(): void {
-        this.scene.add(this.directionalLight);
-        this.scene.add(this.lightProbe);
-    }
-
-    private initCamera(): void {
-        this.camera.matrixAutoUpdate = false;
-    }
-
-    public placeModel(): void {
+    public placeModel(modelId: string): void {
         if (!this.nopsy) return;
-        if (this.models3D[this.selectedModelId]) {
-            const clone = this.models3D[this.selectedModelId].clone();
+        if (this.models3D[modelId]) {
+            const clone = this.models3D[modelId].clone();
             clone.position.copy(this.nopsy.position);
             this.scene.add(clone);
+        }
+    }
+
+    public removeLastModel(): void {
+        const lastModel = this.scene.children.at(-1) as THREE.Object3D;
+        if (lastModel && lastModel.name.startsWith('model')) {
+            this.scene.remove(lastModel);
         }
     }
 
@@ -147,13 +127,6 @@ export default class WebXr extends Vue {
             if (child.name.startsWith('model')) {
                 this.scene.remove(child);
             }
-        }
-    }
-
-    public removeLastModel(): void {
-        const lastModel = this.scene.children.at(-1) as THREE.Object3D;
-        if (lastModel && lastModel.name.startsWith('model')) {
-            this.scene.remove(lastModel);
         }
     }
 
@@ -175,10 +148,11 @@ export default class WebXr extends Vue {
 
         // Session
         const xr = (navigator as any).xr;
+        const domOverlay = document.querySelector('#domOverlay');
         this.session = await xr.requestSession('immersive-ar', {
             requiredFeatures: ['hit-test', 'light-estimation'],
             optionalFeatures: ['dom-overlay'],
-            domOverlay: { root: this.$refs.domOverlay },
+            domOverlay: { root: domOverlay },
         });
 
         if (!this.session) {
@@ -203,7 +177,6 @@ export default class WebXr extends Vue {
         this.session.requestAnimationFrame(this.onXRFrame);
 
         // Show DOM overlay once XR Session is active
-        this.xrSessionActive = true;
         this.$store.commit('setXRActive', true);
     }
 
@@ -260,7 +233,7 @@ export default class WebXr extends Vue {
         // Nopsy is absolutely required!
         if (!this.nopsy) return;
 
-        // Update preview model when necessary
+        // Update preview model only when necessary
         const previewModelUpdateNeeded =
             this.selectedModelId &&
             this.models3D[this.selectedModelId] &&
@@ -320,120 +293,6 @@ export default class WebXr extends Vue {
 }
 
 .glcanvas {
-    z-index: 1;
-    transform: translateZ(0);
     pointer-events: none;
-}
-
-.toolbar {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-
-    position: absolute;
-    bottom: 140px;
-    left: 0;
-    right: 0;
-
-    padding-top: calc(env(safe-area-inset-top) + 10px);
-    padding-left: 10px;
-    padding-right: 10px;
-    padding-bottom: 10px;
-
-    z-index: 100;
-}
-
-.toolbar button {
-    color: #fff;
-    background-color: rgba(0, 0, 0, 0.3);
-    border: none;
-    border-radius: 8px;
-    font-size: 14px;
-    padding: 8px 16px;
-
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
-
-.toolButton img {
-    width: 24px;
-    height: 24px;
-    padding: 4px;
-}
-
-.touch {
-    top: 100px;
-    left: 0;
-    right: 0;
-    bottom: 121px;
-    position: absolute;
-    z-index: 10;
-}
-
-.touch p {
-    position: absolute;
-    color: #fff;
-    font-size: 12px;
-    bottom: 10px;
-    right: 0;
-    left: 0;
-}
-
-.touch button:active {
-    border: solid 2px #4285f4;
-}
-
-.slider {
-    width: 100%;
-    height: 120px;
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: env(safe-area-inset-bottom, 20px);
-    text-align: center;
-    overflow: hidden;
-    z-index: 100;
-}
-
-.slides {
-    position: absolute;
-    left: 10px;
-    right: 0;
-    display: flex;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch;
-    display: hide;
-}
-
-.slide {
-    scroll-snap-align: start;
-    flex-shrink: 0;
-    width: 100px;
-    height: 100px;
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    background-color: #fff;
-    border-radius: 10px;
-    margin-right: 10px;
-    margin-bottom: 10px;
-    border: none;
-    display: flex;
-}
-
-.slide.selected {
-    border: 2px solid #4285f4;
-}
-
-.slide:focus {
-    outline: none;
-}
-
-.slide:focus-visible {
-    outline: 1px solid #4285f4;
 }
 </style>

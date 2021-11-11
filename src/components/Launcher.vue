@@ -13,7 +13,7 @@ import { Configuration, ModelsApi } from '@/api';
 import { Messages } from '@/Messaging';
 
 @Component
-export default class WebXr extends Vue {
+export default class Launcher extends Vue {
     private apiKey = 'Token bf51a81599630627c69dfb90561983627ef1e66f';
     // Using feey plants as demo project
     private projectId = '03d861a8-90fe-42bb-aeba-a4aead7917ea';
@@ -22,18 +22,16 @@ export default class WebXr extends Vue {
 
     public mounted(): void {
         this.xrSupported = (navigator as any).xr !== undefined;
-        this.$store.state.xrSupported = this.xrSupported;
-        if (this.xrSupported) {
-            this.loadModels();
-        }
+        this.$store.commit('setXRSupported', this.xrSupported);
+        this.loadModels();
     }
 
     public async loadModels(): Promise<void> {
         try {
             const modelApi = new ModelsApi(new Configuration({ apiKey: this.apiKey }));
             const models = await modelApi.modelsList({ project: this.projectId });
-            this.$store.state.models = models;
-            this.$bus.$emit(Messages.MODELS_LOADED, models);
+            this.$store.commit('setModels', models);
+            this.$bus.$emit(Messages.MODELS_LOADED);
         } catch (error: any) {
             console.log(error);
         }
@@ -44,7 +42,7 @@ export default class WebXr extends Vue {
         if (!this.xrSupported) return this.onWebXRFail();
 
         // Start things off with an event
-        this.$bus.$emit(Messages.LAUNCH_XR_SESSION);
+        this.$bus.$emit(Messages.LAUNCH_XR);
     }
 
     private onWebXRFail(): void {
@@ -63,7 +61,7 @@ export default class WebXr extends Vue {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #222;
+    background-color: #22222299;
 }
 
 @keyframes vibrant {
@@ -96,7 +94,6 @@ export default class WebXr extends Vue {
     padding: 0 16px;
     font-weight: 700;
     font-size: 16px;
-    z-index: 10;
 }
 
 #ar-button:hover {

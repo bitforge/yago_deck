@@ -14,6 +14,10 @@ export interface EventBus {
 }
 
 export enum Messages {
+    LAUNCH_XR = 'LAUNCH_XR',
     MODELS_LOADED = 'MODELS_LOADED',
-    LAUNCH_XR_SESSION = 'LAUNCH_XR_SESSION',
+    MODEL_PLACE = 'MODEL_PLACE',
+    MODEL_SELECT = 'MODEL_SELECTED',
+    MODEL_UNDO = 'MODEL_UNDO',
+    MODEL_CLEAR = 'MODEL_CLEAR',
 }
