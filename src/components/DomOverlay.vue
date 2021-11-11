@@ -41,20 +41,20 @@ export default class DomOverlay extends Vue {
     public selectedModelId = '';
 
     public placeModel(): void {
-        this.$bus.$emit(Messages.MODEL_PLACE, this.selectedModelId);
+        this.$root.$emit(Messages.MODEL_PLACE, this.selectedModelId);
     }
 
     public undoLastModel(): void {
-        this.$bus.$emit(Messages.MODEL_UNDO);
+        this.$root.$emit(Messages.MODEL_UNDO);
     }
 
     public clearModels(): void {
-        this.$bus.$emit(Messages.MODEL_CLEAR);
+        this.$root.$emit(Messages.MODEL_CLEAR);
     }
 
     public selectModel(modelId: string): void {
         this.selectedModelId = modelId;
-        this.$bus.$emit(Messages.MODEL_SELECT, modelId);
+        this.$root.$emit(Messages.MODEL_SELECT, modelId);
     }
 }
 </script>

@@ -1,23 +1,12 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import Vue from 'vue';
 
-// Global event bus to send messages between components
-// Also helpful to decouple classes
-
-export const MainBus: EventBus = new Vue();
-
-export interface EventBus {
-    $on(event: string | string[], callback: Function): this;
-    $once(event: string | string[], callback: Function): this;
-    $off(event?: string | string[], callback?: Function): this;
-    $emit(event: string, ...args: any[]): this;
-}
+// Global events sent on $root component
 
 export enum Messages {
-    LAUNCH_XR = 'LAUNCH_XR',
-    MODELS_LOADED = 'MODELS_LOADED',
-    MODEL_PLACE = 'MODEL_PLACE',
-    MODEL_SELECT = 'MODEL_SELECTED',
-    MODEL_UNDO = 'MODEL_UNDO',
-    MODEL_CLEAR = 'MODEL_CLEAR',
+    LAUNCH_XR = 'launchXR',
+    MODELS_LOADED = 'modelsLoaded',
+    MODEL_PLACE = 'placeModel',
+    MODEL_SELECT = 'selectModel',
+    MODEL_UNDO = 'removeLastModel',
+    MODEL_CLEAR = 'removeAllModels',
 }

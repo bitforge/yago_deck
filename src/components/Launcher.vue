@@ -31,7 +31,7 @@ export default class Launcher extends Vue {
             const modelApi = new ModelsApi(new Configuration({ apiKey: this.apiKey }));
             const models = await modelApi.modelsList({ project: this.projectId });
             this.$store.commit('setModels', models);
-            this.$bus.$emit(Messages.MODELS_LOADED);
+            this.$root.$emit(Messages.MODELS_LOADED);
         } catch (error: any) {
             console.log(error);
         }
@@ -42,7 +42,7 @@ export default class Launcher extends Vue {
         if (!this.xrSupported) return this.onWebXRFail();
 
         // Start things off with an event
-        this.$bus.$emit(Messages.LAUNCH_XR);
+        this.$root.$emit(Messages.LAUNCH_XR);
     }
 
     private onWebXRFail(): void {

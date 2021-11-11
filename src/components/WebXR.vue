@@ -43,12 +43,12 @@ export default class WebXr extends Vue {
 
     public mounted(): void {
         // Subscribe to events
-        this.$bus.$on(Messages.MODELS_LOADED, this.onModelsLoaded);
-        this.$bus.$on(Messages.LAUNCH_XR, this.onLaunchXR);
-        this.$bus.$on(Messages.MODEL_PLACE, this.placeModel);
-        this.$bus.$on(Messages.MODEL_UNDO, this.removeLastModel);
-        this.$bus.$on(Messages.MODEL_CLEAR, this.removeAllModels);
-        this.$bus.$on(Messages.MODEL_SELECT, this.updateSelectedModelId);
+        this.$root.$on(Messages.MODELS_LOADED, this.onModelsLoaded);
+        this.$root.$on(Messages.LAUNCH_XR, this.onLaunchXR);
+        this.$root.$on(Messages.MODEL_PLACE, this.placeModel);
+        this.$root.$on(Messages.MODEL_UNDO, this.removeLastModel);
+        this.$root.$on(Messages.MODEL_CLEAR, this.removeAllModels);
+        this.$root.$on(Messages.MODEL_SELECT, this.updateSelectedModelId);
 
         // Prepare Scene
         this.initCamera();
