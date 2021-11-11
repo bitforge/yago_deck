@@ -9,7 +9,7 @@
             </button>
         </div>
 
-        <div class="domOverlay" ref="domOverlay" v-show="xrSessionActive">
+        <div class="domOverlay" ref="domOverlay" v-show="!xrSessionActive">
             <div class="toolbar">
                 <button @click="removeLastModel">
                     <img src="~@/assets/img/undo.svg" />
