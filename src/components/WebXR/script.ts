@@ -11,6 +11,8 @@ import {
   PerspectiveCamera,
   Group,
   XRFrame,
+  XRReferenceSpace,
+  XRSession,
 } from "three";
 
 @Component
@@ -26,14 +28,19 @@ export default class WebXr extends Vue {
   private xrSessionActive = false;
 
   // WebXR:
+  private session: XRSession | null;
+  private xrLightProbe: XRLightEstimate | null;
+  private referenceSpace: XRReferenceSpace | XRBoundedReferenceSpace | null;
+  private hitTestSource: XRHitTestSource | null;
+
+  // THREE.js
+  private gl: WebGLRenderingContext | null;
+  private renderer: WebGLRenderer | null;
   private modelsObjecdt3D: { [id: string]: Group } = {};
   private gltfLoader = new GLTFLoader();
   private reticle: Group;
   private scene = new Scene();
   private camera = new PerspectiveCamera();
-  private xrLightProbe: XRLightEstimate | null;
-
-  // THREE.js Lightning
   private directionalLight = new DirectionalLight(0xffffff, 1);
   private lightProbe = new LightProbe();
 
@@ -48,6 +55,7 @@ export default class WebXr extends Vue {
       this.updateSelectedModelId(this.models[0].id);
       this.loadReticle();
       this.addLightning();
+      this.initCamera();
     } catch (error: any) {
       console.log(error);
     }
@@ -75,6 +83,10 @@ export default class WebXr extends Vue {
   private addLightning(): void {
     this.scene.add(this.directionalLight);
     this.scene.add(this.lightProbe);
+  }
+
+  private initCamera(): void {
+    this.camera.matrixAutoUpdate = false;
   }
 
   private loadModelsObject3D(): void {
@@ -106,6 +118,96 @@ export default class WebXr extends Vue {
     }
   }
 
+  private async activateXR(): Promise<void> {
+    // Create WebGL rendering context
+    const canvas = this.$refs.glcanvas;
+    this.gl = canvas.getContext("webgl", {
+      xrCompatible: true,
+    }) as WebGLRenderingContext;
+
+    // Renderer
+    this.renderer = new WebGLRenderer({
+      alpha: true,
+      preserveDrawingBuffer: true,
+      canvas: canvas,
+      context: this.gl,
+    });
+    this.renderer.autoClear = false;
+
+    // Session
+    const xr = (navigator as any).xr;
+    this.session = await xr.requestSession("immersive-ar", {
+      requiredFeatures: ["hit-test", "light-estimation"],
+      optionalFeatures: ["dom-overlay"],
+      domOverlay: { root: this.$refs.domOverlay },
+    });
+    this.session.updateRenderState({
+      baseLayer: new XRWebGLLayer(this.session, this.gl),
+    });
+
+    const viewerSpace = await this.session.requestReferenceSpace("viewer");
+    this.referenceSpace = await this.session.requestReferenceSpace("local");
+    this.hitTestSource = await this.session.requestHitTestSource({
+      space: viewerSpace,
+    });
+
+    // Create XR Light Probe
+    this.xrLightProbe = await this.session.requestLightProbe();
+
+    // Load Genie models list
+    this.loadModelsObject3D();
+
+    // Create a render loop that allows us to draw on the AR view.
+    this.session.requestAnimationFrame(this.onXRFrame);
+
+    // Show DOM overlay once XR Session is active
+    this.xrSessionActive = true;
+  }
+
+  private onXRFrame(time: number, frame: XRFrame): void {
+    // Queue up the next draw request.
+    this.session.requestAnimationFrame(this.onXRFrame);
+
+    // Update Lightning from light estimate
+    this.updateLightningEstimate(frame);
+
+    // Bind the graphics framebuffer to the baseLayer's framebuffer
+    this.gl.bindFramebuffer(
+      this.gl.FRAMEBUFFER,
+      this.session.renderState.baseLayer.framebuffer
+    );
+
+    // Retrieve the pose of the device.
+    // XRFrame.getViewerPose can return null while the session attempts to establish tracking.
+    const pose = frame.getViewerPose(this.referenceSpace);
+    if (pose) {
+      // In mobile AR, we only have one view.
+      const view = pose.views[0];
+      const viewport = this.session.renderState.baseLayer.getViewport(view);
+      this.renderer.setSize(viewport.width, viewport.height);
+
+      // Use the view's transform matrix and projection matrix to configure the THREE.camera.
+      this.camera.matrix.fromArray(view.transform.matrix);
+      this.camera.projectionMatrix.fromArray(view.projectionMatrix);
+      this.camera.updateMatrixWorld(true);
+      const hitTestResults = frame.getHitTestResults(this.hitTestSource);
+      if (hitTestResults.length > 0 && this.reticle) {
+        const hitPose = hitTestResults[0].getPose(this.referenceSpace);
+        if (hitPose) {
+          this.reticle.visible = true;
+          this.reticle.position.set(
+            hitPose.transform.position.x,
+            hitPose.transform.position.y,
+            hitPose.transform.position.z
+          );
+        }
+        this.reticle.updateMatrixWorld(true);
+      }
+      // Render the scene with THREE.WebGLRenderer.
+      this.renderer.render(this.scene, this.camera);
+    }
+  }
+
   private updateLightningEstimate(frame: XRFrame): void {
     // Get light estimate from XRFrame
     const lightEstimate = frame.getLightEstimate(this.xrLightProbe);
@@ -124,96 +226,5 @@ export default class WebXr extends Vue {
     );
     // Update light estimation harmonics
     this.lightProbe.sh.fromArray(lightEstimate.sphericalHarmonicsCoefficients);
-  }
-
-  private async activateXR(): Promise<void> {
-    const canvas = this.$refs.glcanvas;
-    const gl = canvas.getContext("webgl", {
-      xrCompatible: true,
-    }) as WebGLRenderingContext;
-
-    // Renderer
-    const renderer = new WebGLRenderer({
-      alpha: true,
-      preserveDrawingBuffer: true,
-      canvas: canvas,
-      context: gl,
-    });
-    renderer.autoClear = false;
-
-    // Camera
-    this.camera.matrixAutoUpdate = false;
-
-    // Session
-    const xr = (navigator as any).xr;
-    const session = await xr.requestSession("immersive-ar", {
-      requiredFeatures: ["hit-test", "light-estimation"],
-      optionalFeatures: ["dom-overlay"],
-      domOverlay: { root: this.$refs.domOverlay },
-    });
-    session.updateRenderState({
-      baseLayer: new XRWebGLLayer(session, gl),
-    });
-
-    const referenceSpace = await session.requestReferenceSpace("local");
-    const viewerSpace = await session.requestReferenceSpace("viewer");
-    const hitTestSource = await session.requestHitTestSource({
-      space: viewerSpace,
-    });
-
-    // Create XR Light Probe
-    this.xrLightProbe = await session.requestLightProbe();
-
-    // Load Genie models list
-    this.loadModelsObject3D();
-
-    // Show DOM overlay once XR Session is active
-    this.xrSessionActive = true;
-
-    // Create a render loop that allows us to draw on the AR view.
-    const onXRFrame = (time: number, frame: XRFrame) => {
-      // Queue up the next draw request.
-      session.requestAnimationFrame(onXRFrame);
-
-      // Update Lightning from light estimate
-      this.updateLightningEstimate(frame);
-
-      // Bind the graphics framebuffer to the baseLayer's framebuffer
-      gl.bindFramebuffer(
-        gl.FRAMEBUFFER,
-        session.renderState.baseLayer.framebuffer
-      );
-
-      // Retrieve the pose of the device.
-      // XRFrame.getViewerPose can return null while the session attempts to establish tracking.
-      const pose = frame.getViewerPose(referenceSpace);
-      if (pose) {
-        // In mobile AR, we only have one view.
-        const view = pose.views[0];
-        const viewport = session.renderState.baseLayer.getViewport(view);
-        renderer.setSize(viewport.width, viewport.height);
-
-        // Use the view's transform matrix and projection matrix to configure the THREE.camera.
-        this.camera.matrix.fromArray(view.transform.matrix);
-        this.camera.projectionMatrix.fromArray(view.projectionMatrix);
-        this.camera.updateMatrixWorld(true);
-        const hitTestResults = frame.getHitTestResults(hitTestSource);
-        if (hitTestResults.length > 0 && this.reticle) {
-          const hitPose = hitTestResults[0].getPose(referenceSpace);
-          if (hitPose) {
-            this.reticle.visible = true;
-            this.reticle.position.set(
-              hitPose.transform.position.x,
-              hitPose.transform.position.y,
-              hitPose.transform.position.z
-            );
-          }
-          this.reticle.updateMatrixWorld(true);
-        }
-        // Render the scene with THREE.WebGLRenderer.
-        renderer.render(this.scene, this.camera);
-      }
-    };
-    session.requestAnimationFrame(onXRFrame);
   }
 }
