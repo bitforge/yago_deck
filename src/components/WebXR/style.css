@@ -39,7 +39,7 @@
     padding: 0 16px;
     font-weight: 700;
     font-size: 16px;
-    z-index: 2;
+    z-index: 10;
 }
 
 #ar-button:hover {
@@ -64,7 +64,7 @@
     outline: 1px solid #4285f4;
 }
 
-.removeButtons {
+.toolbar {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -72,30 +72,35 @@
     padding-left: 10px;
     padding-right: 10px;
     padding-bottom: 10px;
-    z-index: 2;
+    z-index: 100;
 }
 
-.removeAllButton {
+.toolbar button {
     color: #fff;
-    border: solid 1px #fff;
-    font-size: 15px;
-    background: none;
+    background-color: rgba(0, 0, 0, 0.3);
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    padding: 8px 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
-.removeLastButton {
-    color: #fff;
-    border: solid 1px #fff;
-    font-size: 15px;
-    background: none;
+.toolButton img {
+    width: 24px;
+    height: 24px;
+    padding: 4px;
 }
 
 .touch {
-    top: 80px;
+    top: 100px;
     left: 0;
     right: 0;
     bottom: 121px;
     position: absolute;
-    z-index: 1;
+    z-index: 10;
 }
 
 .touch p {
@@ -120,7 +125,7 @@
     bottom: env(safe-area-inset-bottom, 20px);
     text-align: center;
     overflow: hidden;
-    z-index: 2;
+    z-index: 100;
 }
 
 .slides {
