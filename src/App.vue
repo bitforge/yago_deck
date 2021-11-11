@@ -1,14 +1,17 @@
 <template>
     <div id="app">
-        <WebXr></WebXr>
+        <Launcher />
+        <WebXr />
     </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import WebXr from './components/WebXR/WebXR.vue';
+import Launcher from './components/Launcher.vue';
+import WebXr from './components/WebXR.vue';
 @Component({
     components: {
+        Launcher,
         WebXr,
     },
 })

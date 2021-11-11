@@ -1,3 +1,40 @@
+<template>
+    <div class="webxr">
+        <canvas ref="glcanvas" class="glcanvas"></canvas>
+        <div class="domOverlay" ref="domOverlay">
+            <div class="toolbar" v-if="xrSessionActive">
+                <button @click="removeLastModel">
+                    <img src="~@/assets/img/undo.svg" />
+                    <span>Undo</span>
+                </button>
+                <button @click="removeAllModels">
+                    <img src="~@/assets/img/delete.svg" />
+                    <span>Clear</span>
+                </button>
+            </div>
+            <div class="touch" ref="touch" @click="placeModel" v-if="xrSessionActive">
+                <p>Tap anywhere to place!</p>
+            </div>
+            <div class="slider" ref="slider">
+                <div class="slides">
+                    <div v-for="(model, index) in models" :key="index" class="slide">
+                        <button
+                            v-if="model.id == selectedModelId"
+                            class="slide selected"
+                            :style="{ backgroundImage: 'url(' + model.image + ')' }"></button>
+                        <button
+                            v-else
+                            class="slide"
+                            :style="{ backgroundImage: 'url(' + model.image + ')' }"
+                            @click="updateSelectedModelId(model.id)"></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script lang="ts">
 // Typescript and WebXR unfortunately are not in a love relation yet
 // Disabling all checks is required to build this project, but missing out on the benefits of ts
 // Whenever a complete type declaration for WebXR is available, remove this line
@@ -5,9 +42,8 @@
 // @ts-nocheck
 
 import { Component, Vue } from 'vue-property-decorator';
-import { Configuration, Model, ModelsApi } from '@/api';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-// import { Scene, Object3D, DirectionalLight, LightProbe, WebGLRenderer, PerspectiveCamera, Group } from 'three';
+import { EventBus, Messages } from '@/EventBus';
 import * as THREE from 'three';
 
 @Component
@@ -40,18 +76,18 @@ export default class WebXr extends Vue {
     private directionalLight = new THREE.DirectionalLight(0xffffff, 1);
     private lightProbe = new THREE.LightProbe();
 
-    public async mounted(): Promise<void> {
-        try {
-            const modelApi = new ModelsApi(new Configuration({ apiKey: this.apiKey }));
-            this.models = await modelApi.modelsList({ project: this.projectId });
-            // setting first model as selected
-            this.updateSelectedModelId(this.models[0].id);
-            this.loadNopsy();
-            this.addLightning();
-            this.initCamera();
-        } catch (error: any) {
-            console.log(error);
-        }
+    public mounted(): void {
+        EventBus.$on(Messages.MODELS_LOADED, this.onModelsLoaded);
+        EventBus.$on(Messages.LAUNCH_XR_SESSION, this.onLaunchXR);
+    }
+
+    private onModelsLoaded(models: Model[]) {
+        this.models = models;
+        // setting first model as selected
+        this.updateSelectedModelId(this.models[0].id);
+        this.loadNopsy();
+        this.addLightning();
+        this.initCamera();
     }
 
     private updateSelectedModelId(modelId: string): void {
@@ -121,13 +157,7 @@ export default class WebXr extends Vue {
         }
     }
 
-    public async activateXR(): Promise<void> {
-        // Bail out early if WebXR is not supported by browser
-        if (!navigator.xr) {
-            alert('Unfortunately, your browser does not support WebXR. 😥 💔 📵');
-            return;
-        }
-
+    public async onLaunchXR(): Promise<void> {
         // Create WebGL rendering context
         const canvas = this.$refs.glcanvas as any;
         this.gl = canvas.getContext('webgl', {
@@ -276,3 +306,133 @@ export default class WebXr extends Vue {
         this.lightProbe.sh.fromArray(lightEstimate.sphericalHarmonicsCoefficients);
     }
 }
+</script>
+
+<style scoped>
+.webxr {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    overflow-x: hidden;
+}
+
+.glcanvas {
+    z-index: 1;
+    transform: translateZ(0);
+    pointer-events: none;
+}
+
+.toolbar {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+    position: absolute;
+    bottom: 140px;
+    left: 0;
+    right: 0;
+
+    padding-top: calc(env(safe-area-inset-top) + 10px);
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-bottom: 10px;
+
+    z-index: 100;
+}
+
+.toolbar button {
+    color: #fff;
+    background-color: rgba(0, 0, 0, 0.3);
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    padding: 8px 16px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.toolButton img {
+    width: 24px;
+    height: 24px;
+    padding: 4px;
+}
+
+.touch {
+    top: 100px;
+    left: 0;
+    right: 0;
+    bottom: 121px;
+    position: absolute;
+    z-index: 10;
+}
+
+.touch p {
+    position: absolute;
+    color: #fff;
+    font-size: 12px;
+    bottom: 10px;
+    right: 0;
+    left: 0;
+}
+
+.touch button:active {
+    border: solid 2px #4285f4;
+}
+
+.slider {
+    width: 100%;
+    height: 120px;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: env(safe-area-inset-bottom, 20px);
+    text-align: center;
+    overflow: hidden;
+    z-index: 100;
+}
+
+.slides {
+    position: absolute;
+    left: 10px;
+    right: 0;
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    display: hide;
+}
+
+.slide {
+    scroll-snap-align: start;
+    flex-shrink: 0;
+    width: 100px;
+    height: 100px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-color: #fff;
+    border-radius: 10px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    border: none;
+    display: flex;
+}
+
+.slide.selected {
+    border: 2px solid #4285f4;
+}
+
+.slide:focus {
+    outline: none;
+}
+
+.slide:focus-visible {
+    outline: 1px solid #4285f4;
+}
+</style>
