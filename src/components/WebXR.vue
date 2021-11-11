@@ -43,7 +43,7 @@
 
 import { Component, Vue } from 'vue-property-decorator';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { EventBus, Messages } from '@/Messaging';
+import { Messages } from '@/Messaging';
 import * as THREE from 'three';
 
 @Component
@@ -77,8 +77,8 @@ export default class WebXr extends Vue {
     private lightProbe = new THREE.LightProbe();
 
     public mounted(): void {
-        EventBus.$on(Messages.MODELS_LOADED, this.onModelsLoaded);
-        EventBus.$on(Messages.LAUNCH_XR_SESSION, this.onLaunchXR);
+        this.$bus.$on(Messages.MODELS_LOADED, this.onModelsLoaded);
+        this.$bus.$on(Messages.LAUNCH_XR_SESSION, this.onLaunchXR);
     }
 
     private onModelsLoaded() {

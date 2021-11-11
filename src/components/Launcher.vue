@@ -10,7 +10,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import { Configuration, ModelsApi } from '@/api';
-import { EventBus, Messages } from '@/Messaging';
+import { Messages } from '@/Messaging';
 
 @Component
 export default class WebXr extends Vue {
@@ -22,7 +22,7 @@ export default class WebXr extends Vue {
 
     public mounted(): void {
         this.xrSupported = (navigator as any).xr !== undefined;
-        this.$store.commit('setXRSuppored', this.xrSupported);
+        this.$store.state.xrSupported = this.xrSupported;
         if (this.xrSupported) {
             this.loadModels();
         }
@@ -32,8 +32,8 @@ export default class WebXr extends Vue {
         try {
             const modelApi = new ModelsApi(new Configuration({ apiKey: this.apiKey }));
             const models = await modelApi.modelsList({ project: this.projectId });
-            this.$store.commit('setModels', models);
-            EventBus.$emit(Messages.MODELS_LOADED, models);
+            this.$store.state.models = models;
+            this.$bus.$emit(Messages.MODELS_LOADED, models);
         } catch (error: any) {
             console.log(error);
         }
@@ -44,7 +44,7 @@ export default class WebXr extends Vue {
         if (!this.xrSupported) return this.onWebXRFail();
 
         // Start things off with an event
-        EventBus.$emit(Messages.LAUNCH_XR_SESSION);
+        this.$bus.$emit(Messages.LAUNCH_XR_SESSION);
     }
 
     private onWebXRFail(): void {
