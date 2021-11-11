@@ -32,7 +32,7 @@ export default class WebXr extends Vue {
     private renderer: WebGLRenderer | null = null;
     private models3D: { [id: string]: Group } = {};
     private gltfLoader = new GLTFLoader();
-    private reticle: Group | null = null;
+    private nopsy: Group | null = null;
     private scene = new Scene();
     private camera = new PerspectiveCamera();
     private directionalLight = new DirectionalLight(0xffffff, 1);
@@ -44,7 +44,7 @@ export default class WebXr extends Vue {
             this.models = await modelApi.modelsList({ project: this.projectId });
             // setting first model as selected
             this.updateSelectedModelId(this.models[0].id);
-            this.loadReticle();
+            this.loadNopsy();
             this.addLightning();
             this.initCamera();
         } catch (error: any) {
@@ -61,11 +61,17 @@ export default class WebXr extends Vue {
         }
     }
 
-    private loadReticle(): void {
-        this.gltfLoader.load('reticle.glb', gltf => {
-            this.reticle = gltf.scene;
-            this.reticle.visible = false;
-            this.scene.add(this.reticle);
+    private loadNopsy(): void {
+        // Nopsy is the name of our aim cursor
+        // The name was invented by Parki Banya Gang
+        // The original model was built with TinkerCAD:
+        // https://bit.ly/3C668ge
+        this.gltfLoader.load('nopsy.glb', gltf => {
+            this.nopsy = gltf.scene;
+            this.nopsy.name = 'nopsy';
+            this.nopsy.castShadow = false;
+            this.nopsy.visible = false;
+            this.scene.add(this.nopsy);
         });
     }
 
@@ -79,10 +85,10 @@ export default class WebXr extends Vue {
     }
 
     public placeModel(): void {
-        if (!this.reticle) return;
+        if (!this.nopsy) return;
         if (this.models3D[this.selectedModelId]) {
             const clone = this.models3D[this.selectedModelId].clone();
-            clone.position.copy(this.reticle.position);
+            clone.position.copy(this.nopsy.position);
             this.scene.add(clone);
         }
     }
@@ -181,16 +187,19 @@ export default class WebXr extends Vue {
             this.camera.matrix.fromArray(view.transform.matrix);
             this.camera.projectionMatrix.fromArray(view.projectionMatrix);
             this.camera.updateMatrixWorld(true);
+
+            // Check if viewport center has a hit test and update nopsy position
             const hitTestResults = frame.getHitTestResults(this.hitTestSource);
-            if (hitTestResults.length > 0 && this.reticle) {
+            if (hitTestResults.length > 0 && this.nopsy) {
                 const hitPose = hitTestResults[0].getPose(this.referenceSpace);
                 if (hitPose) {
-                    this.reticle.visible = true;
+                    this.nopsy.visible = true;
                     const pos = hitPose.transform.position;
-                    this.reticle.position.set(pos.x, pos.y, pos.z);
+                    this.nopsy.position.set(pos.x, pos.y, pos.z);
                 }
-                this.reticle.updateMatrixWorld(true);
+                this.nopsy.updateMatrixWorld(true);
             }
+
             // Render the scene with THREE.WebGLRenderer.
             this.renderer.render(this.scene, this.camera);
         }
