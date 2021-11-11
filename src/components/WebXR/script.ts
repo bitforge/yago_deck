@@ -1,19 +1,13 @@
+// Typescript and WebXR unfortunately are not in a love relation yet
+// Disabling all checks is required to build this project, but missing out on the benefits of ts
+// Whenever a complete type declaration for WebXR is available, remove this line
+
 // @ts-nocheck
 
 import { Component, Vue } from 'vue-property-decorator';
 import { Configuration, Model, ModelsApi } from '@/api';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import {
-    Scene,
-    DirectionalLight,
-    LightProbe,
-    WebGLRenderer,
-    PerspectiveCamera,
-    Group,
-    XRFrame,
-    XRReferenceSpace,
-    XRSession,
-} from 'three';
+import { Scene, DirectionalLight, LightProbe, WebGLRenderer, PerspectiveCamera, Group } from 'three';
 
 @Component
 export default class WebXr extends Vue {
@@ -25,20 +19,20 @@ export default class WebXr extends Vue {
     // selected button/model
     private selectedModelId = '';
     // Toggles UI layer visiblity
-    private xrSessionActive = false;
+    public xrSessionActive = false;
 
     // WebXR:
-    private session: XRSession | null;
-    private xrLightProbe: XRLightEstimate | null;
-    private referenceSpace: XRReferenceSpace | XRBoundedReferenceSpace | null;
-    private hitTestSource: XRHitTestSource | null;
+    private session: XRSession | null = null;
+    private xrLightProbe: XRLightEstimate | null = null;
+    private referenceSpace: XRReferenceSpace | null = null;
+    private hitTestSource: XRHitTestSource | null = null;
 
     // THREE.js
-    private gl: WebGLRenderingContext | null;
-    private renderer: WebGLRenderer | null;
+    private gl: WebGLRenderingContext | null = null;
+    private renderer: WebGLRenderer | null = null;
     private models3D: { [id: string]: Group } = {};
     private gltfLoader = new GLTFLoader();
-    private reticle: Group;
+    private reticle: Group | null = null;
     private scene = new Scene();
     private camera = new PerspectiveCamera();
     private directionalLight = new DirectionalLight(0xffffff, 1);
@@ -81,11 +75,13 @@ export default class WebXr extends Vue {
 
     private loadModelsObject3D(): void {
         for (const model of this.models) {
+            if (!model.glb) continue;
             this.gltfLoader.load(model.glb, gltf => (this.models3D[model.id] = gltf.scene));
         }
     }
 
     private placeModel(): void {
+        if (!this.reticle) return;
         if (this.models3D[this.selectedModelId]) {
             const clone = this.models3D[this.selectedModelId].clone();
             clone.position.copy(this.reticle.position);
@@ -107,7 +103,7 @@ export default class WebXr extends Vue {
 
     private async activateXR(): Promise<void> {
         // Create WebGL rendering context
-        const canvas = this.$refs.glcanvas;
+        const canvas = this.$refs.glcanvas as any;
         this.gl = canvas.getContext('webgl', {
             xrCompatible: true,
         }) as WebGLRenderingContext;
@@ -128,6 +124,12 @@ export default class WebXr extends Vue {
             optionalFeatures: ['dom-overlay'],
             domOverlay: { root: this.$refs.domOverlay },
         });
+
+        if (!this.session) {
+            alert('Sorry, could not start WebXR session! :(');
+            return;
+        }
+
         this.session.updateRenderState({
             baseLayer: new XRWebGLLayer(this.session, this.gl),
         });
@@ -153,7 +155,11 @@ export default class WebXr extends Vue {
 
     private onXRFrame(time: number, frame: XRFrame): void {
         // Queue up the next draw request.
+        if (!this.session) return;
         this.session.requestAnimationFrame(this.onXRFrame);
+
+        // Bail out right away if required stuff is not available
+        if (!this.renderer || !this.session.renderState.baseLayer || !this.gl) return;
 
         // Update Lightning from light estimate
         this.updateLightningEstimate(frame);
