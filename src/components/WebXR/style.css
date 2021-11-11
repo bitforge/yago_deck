@@ -25,7 +25,15 @@
     align-items: center;
 }
 
+@keyframes vibrant {
+    0%    { transform: scale(1.05); }
+    20%   { transform: scale(1); }
+    80%   { transform: scale(1); }
+    100%  { transform: scale(1.05); }
+}
+
 #ar-button {
+    animation: vibrant 0.8s infinite;
     display: flex;
     flex-direction: row;
     justify-content: center;

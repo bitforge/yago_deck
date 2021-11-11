@@ -5,7 +5,7 @@
         <div class="launcher">
             <button slot="ar-button" id="ar-button" @click="activateXR">
                 <img src="~@/assets/img/ar_icon.svg" />
-                Launch Genie WebXR Demo
+                👉 Launch Demo 👈 🥳🎉🤳🪴 👍
             </button>
         </div>
 
