@@ -38,7 +38,7 @@ export default class WebXr extends Vue {
     private directionalLight = new DirectionalLight(0xffffff, 1);
     private lightProbe = new LightProbe();
 
-    private async mounted(): Promise<void> {
+    public async mounted(): Promise<void> {
         try {
             const modelApi = new ModelsApi(new Configuration({ apiKey: this.apiKey }));
             this.models = await modelApi.modelsList({ project: this.projectId });
@@ -54,6 +54,11 @@ export default class WebXr extends Vue {
 
     private updateSelectedModelId(modelId: string): void {
         this.selectedModelId = modelId;
+        // Load model on demand
+        if (!this.models3D[modelId]) {
+            const model = this.models.find(model => model.id === modelId);
+            this.gltfLoader.load(model.glb, gltf => (this.models3D[model.id] = gltf.scene));
+        }
     }
 
     private loadReticle(): void {
@@ -73,14 +78,7 @@ export default class WebXr extends Vue {
         this.camera.matrixAutoUpdate = false;
     }
 
-    private loadModelsObject3D(): void {
-        for (const model of this.models) {
-            if (!model.glb) continue;
-            this.gltfLoader.load(model.glb, gltf => (this.models3D[model.id] = gltf.scene));
-        }
-    }
-
-    private placeModel(): void {
+    public placeModel(): void {
         if (!this.reticle) return;
         if (this.models3D[this.selectedModelId]) {
             const clone = this.models3D[this.selectedModelId].clone();
@@ -89,19 +87,19 @@ export default class WebXr extends Vue {
         }
     }
 
-    private removeAllModels(): void {
+    public removeAllModels(): void {
         while (this.scene.children.length >= 3) {
             this.scene.remove(this.scene.children[this.scene.children.length - 1]);
         }
     }
 
-    private removeLastModel(): void {
+    public removeLastModel(): void {
         if (this.scene.children.length >= 3) {
             this.scene.remove(this.scene.children[this.scene.children.length - 1]);
         }
     }
 
-    private async activateXR(): Promise<void> {
+    public async activateXR(): Promise<void> {
         // Create WebGL rendering context
         const canvas = this.$refs.glcanvas as any;
         this.gl = canvas.getContext('webgl', {
@@ -142,9 +140,6 @@ export default class WebXr extends Vue {
 
         // Create XR Light Probe
         this.xrLightProbe = await this.session.requestLightProbe();
-
-        // Load Genie models list
-        this.loadModelsObject3D();
 
         // Create a render loop that allows us to draw on the AR view.
         this.session.requestAnimationFrame(this.onXRFrame);
