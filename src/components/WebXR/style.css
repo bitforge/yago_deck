@@ -15,7 +15,7 @@
 }
 
 #ar-button {
-    background-image: url('https://modelviewer.dev/assets/ic_view_in_ar_new_googblue_48dp.png');
+    background-image: url('~@/assets/view_in_ar.png');
     background-repeat: no-repeat;
     background-size: 20px 20px;
     background-position: 12px 50%;

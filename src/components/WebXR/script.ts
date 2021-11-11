@@ -68,7 +68,7 @@ export default class WebXr extends Vue {
     }
 
     private loadReticle(): void {
-        this.gltfLoader.load('https://immersive-web.github.io/webxr-samples/media/gltf/reticle/reticle.gltf', gltf => {
+        this.gltfLoader.load('reticle.glb', gltf => {
             this.reticle = gltf.scene;
             this.reticle.visible = false;
             this.scene.add(this.reticle);
