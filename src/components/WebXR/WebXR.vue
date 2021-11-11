@@ -9,8 +9,8 @@
             </button>
         </div>
 
-        <div class="domOverlay" ref="domOverlay" v-show="!xrSessionActive">
-            <div class="toolbar">
+        <div class="domOverlay" ref="domOverlay">
+            <div class="toolbar" v-if="xrSessionActive">
                 <button @click="removeLastModel">
                     <img src="~@/assets/img/undo.svg" />
                     <span>Undo</span>
@@ -20,7 +20,7 @@
                     <span>Clear</span>
                 </button>
             </div>
-            <div class="touch" ref="touch" @click="placeModel">
+            <div class="touch" ref="touch" @click="placeModel" v-if="xrSessionActive">
                 <p>Tap anywhere to place!</p>
             </div>
             <div class="slider" ref="slider">

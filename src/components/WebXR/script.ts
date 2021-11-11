@@ -7,7 +7,7 @@
 import { Component, Vue } from 'vue-property-decorator';
 import { Configuration, Model, ModelsApi } from '@/api';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { Scene, DirectionalLight, LightProbe, WebGLRenderer, PerspectiveCamera, Group } from 'three';
+import { Scene, Object3D, DirectionalLight, LightProbe, WebGLRenderer, PerspectiveCamera, Group } from 'three';
 
 @Component
 export default class WebXr extends Vue {
@@ -54,11 +54,19 @@ export default class WebXr extends Vue {
 
     private updateSelectedModelId(modelId: string): void {
         this.selectedModelId = modelId;
-        // Load model on demand
+        // Load models on demand
         if (!this.models3D[modelId]) {
-            const model = this.models.find(model => model.id === modelId);
-            this.gltfLoader.load(model.glb, gltf => (this.models3D[model.id] = gltf.scene));
+            this.loadModel(modelId);
         }
+    }
+
+    private loadModel(modelId: string): void {
+        const model = this.models.find(model => model.id === modelId);
+        this.gltfLoader.load(model.glb, gltf => {
+            const object3D = gltf.scene;
+            object3D.name = `model-${model.id}`;
+            this.models3D[model.id] = object3D;
+        });
     }
 
     private loadNopsy(): void {
@@ -94,14 +102,18 @@ export default class WebXr extends Vue {
     }
 
     public removeAllModels(): void {
-        while (this.scene.children.length >= 3) {
-            this.scene.remove(this.scene.children[this.scene.children.length - 1]);
+        const children = this.scene.children.slice().reverse();
+        for (const child of children) {
+            if (child.name.startsWith('model')) {
+                this.scene.remove(child);
+            }
         }
     }
 
     public removeLastModel(): void {
-        if (this.scene.children.length >= 3) {
-            this.scene.remove(this.scene.children[this.scene.children.length - 1]);
+        const lastModel = this.scene.children.at(-1) as Object3D;
+        if (lastModel && lastModel.name.startsWith('model')) {
+            this.scene.remove(lastModel);
         }
     }
 
