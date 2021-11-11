@@ -43,7 +43,7 @@
 
 import { Component, Vue } from 'vue-property-decorator';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { EventBus, Messages } from '@/EventBus';
+import { EventBus, Messages } from '@/Messaging';
 import * as THREE from 'three';
 
 @Component
@@ -81,8 +81,8 @@ export default class WebXr extends Vue {
         EventBus.$on(Messages.LAUNCH_XR_SESSION, this.onLaunchXR);
     }
 
-    private onModelsLoaded(models: Model[]) {
-        this.models = models;
+    private onModelsLoaded() {
+        this.models = this.$store.state.models;
         // setting first model as selected
         this.updateSelectedModelId(this.models[0].id);
         this.loadNopsy();
@@ -204,6 +204,7 @@ export default class WebXr extends Vue {
 
         // Show DOM overlay once XR Session is active
         this.xrSessionActive = true;
+        this.$store.commit('setXRActive', true);
     }
 
     private onXRFrame(time: number, frame: XRFrame): void {
