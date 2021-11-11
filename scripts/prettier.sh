@@ -1,4 +1,3 @@
-#!/bin/bash
+#!/bin/bash -e
 cd "$(dirname $0)/.."
-
-npx prettier --write src
+exec npx prettier --write src
