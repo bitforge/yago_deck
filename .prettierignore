@@ -1,0 +1,3 @@
+# Ignore generated api
+src/api/**
+*.md

@@ -1,27 +1,27 @@
 <template>
-  <div id="app">
-    <WebXr></WebXr>
-  </div>
+    <div id="app">
+        <WebXr></WebXr>
+    </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
-import WebXr from "./components/WebXR/WebXR.vue";
+import { Component, Vue } from 'vue-property-decorator';
+import WebXr from './components/WebXR/WebXR.vue';
 @Component({
-  components: {
-    WebXr,
-  },
+    components: {
+        WebXr,
+    },
 })
 export default class App extends Vue {}
 </script>
 
 <style>
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+    font-family: Avenir, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-align: center;
+    color: #2c3e50;
+    margin-top: 60px;
 }
 </style>
