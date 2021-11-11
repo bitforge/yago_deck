@@ -2,7 +2,7 @@
     <div class="webxr">
         <canvas ref="glcanvas" class="glcanvas"></canvas>
         <button slot="ar-button" id="ar-button" @click="activateXR">Start WebXR</button>
-        <div claas="domOverlay" ref="domOverlay" v-show="xrSessionActive">
+        <div class="domOverlay" ref="domOverlay" v-show="xrSessionActive">
             <div class="removeButtons">
                 <button class="removeAllButton" @click="removeAllModels">Remove all objects</button>
                 <button class="removeLastButton" @click="removeLastModel">Remove last objects</button>

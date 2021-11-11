@@ -200,15 +200,19 @@ export default class WebXr extends Vue {
     private updateLightningEstimate(frame: XRFrame): void {
         // Get light estimate from XRFrame
         const lightEstimate = frame.getLightEstimate(this.xrLightProbe);
+        if (!lightEstimate) return;
+
         // Calculate max light intensity
         const primary = lightEstimate.primaryLightIntensity;
         const maxLight = Math.max(primary.x, Math.max(primary.y, primary.z));
         const intensity = Math.max(1.0, maxLight);
         this.directionalLight.intensity = intensity;
+
         // Set directional light position and color
         const direction = lightEstimate.primaryLightDirection;
         this.directionalLight.position.set(direction.x, direction.y, direction.z);
         this.directionalLight.color.setRGB(primary.x / intensity, primary.y / intensity, primary.z / intensity);
+
         // Update light estimation harmonics
         this.lightProbe.sh.fromArray(lightEstimate.sphericalHarmonicsCoefficients);
     }

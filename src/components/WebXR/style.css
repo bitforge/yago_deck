@@ -48,28 +48,29 @@
     outline: 1px solid #4285f4;
 }
 
-.removeAllButton {
-    position: absolute;
-    color: #fff;
-    border: solid 1px #fff;
-    font-size: 15px;
-    top: 15px;
-    left: 15px;
-    margin-bottom: 10px;
-    background: none;
+.removeButtons {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding-top: calc(env(safe-area-inset-top) + 10px);
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-bottom: 10px;
     z-index: 2;
 }
 
-.removeLastButton {
-    position: absolute;
+.removeAllButton {
     color: #fff;
     border: solid 1px #fff;
     font-size: 15px;
-    top: 15px;
-    right: 15px;
-    margin-bottom: 10px;
     background: none;
-    z-index: 2;
+}
+
+.removeLastButton {
+    color: #fff;
+    border: solid 1px #fff;
+    font-size: 15px;
+    background: none;
 }
 
 .touch {
@@ -96,14 +97,14 @@
 
 .slider {
     width: 100%;
-    text-align: center;
-    overflow: hidden;
+    height: 120px;
     position: absolute;
-    z-index: 2;
     left: 0;
     right: 0;
-    height: 120px;
-    bottom: 0;
+    bottom: env(safe-area-inset-bottom, 20px);
+    text-align: center;
+    overflow: hidden;
+    z-index: 2;
 }
 
 .slides {
