@@ -4,7 +4,7 @@
     right: 0;
     bottom: 0;
     left: 0;
-    background-color: #eee;
+    background-color: #222;
     overflow-x: hidden;
 }
 
@@ -14,30 +14,46 @@
     pointer-events: none;
 }
 
-#ar-button {
-    background-image: url('~@/assets/view_in_ar.png');
-    background-repeat: no-repeat;
-    background-size: 20px 20px;
-    background-position: 12px 50%;
-    background-color: #fff;
+.launcher {
     position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    white-space: nowrap;
-    bottom: 50%;
-    padding: 0px 16px 0px 40px;
-    font-family: Roboto Regular, Helvetica Neue, sans-serif;
-    font-size: 14px;
-    color: #4285f4;
-    height: 36px;
-    line-height: 36px;
-    border-radius: 18px;
-    border: 1px solid #dadce0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#ar-button {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    background-color: #074e68;
+    color: white;
+    height: 64px;
+    line-height: 32px;
+    border: 1px solid #042d3b;
+    border-radius: 8px;
+    padding: 0 16px;
+    font-weight: 700;
+    font-size: 16px;
     z-index: 2;
 }
 
+#ar-button:hover {
+    background-color: #0d6c92;
+}
+
 #ar-button:active {
-    background-color: #e8eaed;
+    background-color: #042633;
+}
+
+#ar-button img {
+    width: 28px;
+    height: 28px;
+    padding: 4px;
 }
 
 #ar-button:focus {

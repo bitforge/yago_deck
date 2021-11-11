@@ -100,6 +100,12 @@ export default class WebXr extends Vue {
     }
 
     public async activateXR(): Promise<void> {
+        // Bail out early if WebXR is not supported by browser
+        if (!navigator.xr) {
+            alert('Unfortunately, your browser does not support WebXR. 😥 💔 📵');
+            return;
+        }
+
         // Create WebGL rendering context
         const canvas = this.$refs.glcanvas as any;
         this.gl = canvas.getContext('webgl', {
