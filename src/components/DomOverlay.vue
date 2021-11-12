@@ -2,7 +2,7 @@
     <!-- Component must be use only once in document! -->
     <div id="domOverlay" v-show="showOverlay">
         <div class="touch" ref="touch" @click="placeModel"></div>
-        <div class="model-selector">
+        <div class="model-selector" v-show="modelCardsVisible">
             <model-cards />
         </div>
         <div class="toolbar">
@@ -10,8 +10,13 @@
                 <span class="material-icons">undo</span>
                 <span>Undo</span>
             </button>
-            <button @click="takeScreenshot" class="screenshot">
-                <span class="material-icons">camera</span>
+            <button @click="hideCards" v-if="modelCardsVisible">
+                <span class="material-icons">style</span>
+                <span class="material-icons">expand_more</span>
+            </button>
+            <button @click="showCards" v-if="!modelCardsVisible">
+                <span class="material-icons">expand_less</span>
+                <span class="material-icons">style</span>
             </button>
             <button @click="clearModels">
                 <span class="material-icons">delete</span>
@@ -34,26 +39,38 @@ import { Model } from '@/api';
 })
 export default class DomOverlay extends Vue {
     private selectedModel: Model | null = null;
+    private modelCardsVisible = true;
 
     public get showOverlay(): boolean {
-        // Uncomment to show overlay locally
-        // if (process.env.NODE_ENV === 'development') return true;
+        // Uncomment next line to show overlay for development
+        if (process.env.NODE_ENV === 'development') return true;
         return this.$store.state.xrActive;
     }
 
+    /** Place currently selected model on the plane */
     public placeModel(): void {
         const modelId = this.selectedModel?.id;
         this.$root.$emit(Messages.MODEL_PLACE, modelId);
     }
 
+    /** Remove last placed model */
     public undoLastModel(): void {
         this.$root.$emit(Messages.MODEL_UNDO);
     }
 
-    public takeScreenshot(): void {
-        this.$root.$emit(Messages.SAVE_SCREENSHOT);
+    /** Hide model selection cards */
+    public hideCards(): void {
+        this.modelCardsVisible = false;
+        this.$root.$emit(Messages.HIDE_CARDS);
     }
 
+    /** Show model selection cards */
+    public showCards(): void {
+        this.modelCardsVisible = true;
+        this.$root.$emit(Messages.SHOW_CARDS);
+    }
+
+    /** Remova ALL placed models */
     public clearModels(): void {
         this.$root.$emit(Messages.MODEL_CLEAR);
     }
@@ -102,12 +119,13 @@ export default class DomOverlay extends Vue {
 }
 
 .toolbar button {
+    width: 70px;
+    height: 70px;
     color: #fff;
-    background-color: rgba(0, 0, 0, 0.3);
     border: none;
     border-radius: 8px;
-    font-size: 14px;
     padding: 8px 16px;
+    background-color: rgba(0, 0, 0, 0.3);
 
     display: flex;
     flex-direction: column;
@@ -115,16 +133,15 @@ export default class DomOverlay extends Vue {
     align-items: center;
 }
 
+.toolbar button span:nth-child(1) {
+    font-size: 24px;
+}
+
+.toolbar button span:nth-child(2) {
+    font-size: 14px;
+}
+
 .toolbar .material-icons {
     margin: 4px;
-}
-
-.toolbar .screenshot {
-    padding: 4px 12px;
-    transform: scale(1.15);
-}
-
-.toolbar .screenshot .material-icons {
-    font-size: 36px;
 }
 </style>

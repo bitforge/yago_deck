@@ -11,7 +11,6 @@
   },
   "dependencies": {
     "core-js": "^3.6.5",
-    "file-saver": "^2.0.5",
     "qr-code-styling": "^1.6.0-rc.1",
     "three": "^0.133.1",
     "vue": "^2.6.11",

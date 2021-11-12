@@ -53,7 +53,6 @@ export default class WebXr extends Vue {
 
         // Subscribe to events
         this.$root.$on(Messages.LAUNCH_XR, this.onLaunchXR);
-        this.$root.$on(Messages.SAVE_SCREENSHOT, this.onSaveScreenshot);
         this.$root.$on(Messages.MODEL_PLACE, this.placeModel);
         this.$root.$on(Messages.MODEL_UNDO, this.removeLastModel);
         this.$root.$on(Messages.MODEL_CLEAR, this.removeAllModels);
@@ -130,12 +129,6 @@ export default class WebXr extends Vue {
                 this.scene.remove(child);
             }
         }
-    }
-
-    public onSaveScreenshot(): void {
-        this.renderer.domElement.toBlob((imgBlob: Blob) => {
-            saveAs(imgBlob, 'genie_webxr_screenshot.png');
-        });
     }
 
     public async onLaunchXR(): Promise<void> {
