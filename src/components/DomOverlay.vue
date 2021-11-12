@@ -18,7 +18,7 @@
             <div class="slides">
                 <div v-for="(model, index) in $store.state.models" :key="index" class="slide">
                     <button
-                        v-if="model.id == selectedModelId"
+                        v-if="model.id == selectedModel.id"
                         class="slide selected"
                         :style="{ backgroundImage: 'url(' + model.image + ')' }"></button>
                     <button
@@ -40,7 +40,6 @@ import { Model } from '@/api';
 @Component
 export default class DomOverlay extends Vue {
     private selectedModel: Model | null = null;
-    private selectedModelId = '';
 
     public mounted(): void {
         this.$root.$on(Messages.MODELS_LOADED, this.onModelsLoaded);
@@ -55,7 +54,7 @@ export default class DomOverlay extends Vue {
     }
 
     public placeModel(): void {
-        const modelId = this.selectedModel?.id || this.selectedModelId;
+        const modelId = this.selectedModel?.id;
         this.$root.$emit(Messages.MODEL_PLACE, modelId);
     }
 
@@ -68,7 +67,6 @@ export default class DomOverlay extends Vue {
     }
 
     public selectModel(modelId: string): void {
-        this.selectedModelId = modelId;
         this.selectedModel = this.$store.getters.getModelById(modelId) as Model;
         this.$root.$emit(Messages.MODEL_SELECT, modelId);
     }

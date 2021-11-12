@@ -160,6 +160,7 @@ export default class WebXr extends Vue {
             return;
         }
 
+        this.session.onend = this.onSessionEnded;
         this.session.updateRenderState({
             baseLayer: new XRWebGLLayer(this.session, this.gl),
         });
@@ -227,6 +228,12 @@ export default class WebXr extends Vue {
             // Render the scene with THREE.WebGLRenderer.
             this.renderer.render(this.scene, this.camera);
         }
+    }
+
+    private onSessionEnded(): void {
+        // Free resources
+        this.renderer?.dispose();
+        this.$store.commit('setXRActive', false);
     }
 
     private updatePreviewModel(): void {

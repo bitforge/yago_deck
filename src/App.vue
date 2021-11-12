@@ -1,7 +1,7 @@
 <template>
     <div id="app">
         <web-xr>
-            <dom-overlay />
+            <dom-overlay v-show="$store.state.xrActive" />
         </web-xr>
         <launcher />
     </div>
