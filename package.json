@@ -13,6 +13,7 @@
     "@types/three": "^0.132.2",
     "@types/webxr": "^0.2.3",
     "core-js": "^3.6.5",
+    "qr-code-styling": "^1.6.0-rc.1",
     "three": "^0.133.1",
     "three-gltf-loader": "^1.111.0",
     "three.js": "^0.77.1",

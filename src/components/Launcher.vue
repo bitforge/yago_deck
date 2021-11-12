@@ -7,14 +7,24 @@
             </button>
         </div>
         <div class="fallback-area" v-if="!xrSupported">
+            <h2>WebXR not supported.</h2>
             <h3>📵 🤳 🪴 💔 😢</h3>
-            <p>Unfortunately, it seems like your browser does not support the WebXR Standard.</p>
+            <h4>This Demo was made for Android devices.</h4>
+            <p>
+                Please scan the following QR Code with an <br />
+                <a href="https://developers.google.com/ar/devices" target="_blank">ARCore supported device</a>:
+            </p>
+            <div class="qr-element" ref="qrcode"></div>
+            <p>
+                <a class="qr-link" :href="qrUrl">{{ qrUrl }}</a>
+            </p>
         </div>
     </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
+import QRCodeStyling, { CornerDotType, CornerSquareType, DotType, DrawType } from 'qr-code-styling';
 import { Configuration, ModelsApi } from '@/api';
 import { Messages } from '@/Messaging';
 
@@ -26,13 +36,42 @@ export default class Launcher extends Vue {
 
     private xrSupported = false;
 
+    private qrUrl = 'https://webxr.genie-ar.ch';
+    private qrCode: QRCodeStyling | null = null;
+    private qrOptions = {
+        width: 250,
+        height: 250,
+        type: 'svg' as DrawType,
+        data: this.qrUrl,
+        dotsOptions: {
+            type: 'rounded' as DotType,
+            color: '#074e68',
+        },
+        cornersSquareOptions: {
+            type: 'dot' as CornerSquareType,
+            color: '#042633',
+        },
+        cornersDotOptions: {
+            type: 'dot' as CornerDotType,
+            color: '#042633',
+        },
+    };
+
     public mounted(): void {
         this.xrSupported = (navigator as any).xr !== undefined;
         this.$store.commit('setXRSupported', this.xrSupported);
         this.loadModels();
+        this.renderQRCode();
     }
 
-    public async loadModels(): Promise<void> {
+    private renderQRCode(): void {
+        this.qrUrl = window.location.toString();
+        this.qrCode = new QRCodeStyling(this.qrOptions);
+        this.qrCode.append(this.$refs.qrcode as HTMLElement);
+        this.qrCode?.update(this.qrOptions);
+    }
+
+    private async loadModels(): Promise<void> {
         try {
             const modelApi = new ModelsApi(new Configuration({ apiKey: this.apiKey }));
             const models = await modelApi.modelsList({ project: this.projectId });
@@ -63,7 +102,7 @@ export default class Launcher extends Vue {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #222222;
+    background-color: #333;
     z-index: 10;
 }
 
@@ -123,13 +162,52 @@ export default class Launcher extends Vue {
 
 .fallback-area {
     padding: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.fallback-area h2 {
+    font-size: 24px;
+    color: white;
 }
 
 .fallback-area h3 {
-    font-size: 28px;
+    font-size: 22px;
+    color: white;
+}
+
+.fallback-area h4 {
+    font-size: 18px;
+    color: white;
 }
 
 .fallback-area p {
     color: white;
+}
+
+.fallback-area a,
+.fallback-area a:hover,
+.fallback-area a:visited {
+    color: white;
+}
+
+.qr-element {
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    padding: 8px;
+    margin: 8px;
+    background: black;
+    border-radius: 8px;
+}
+
+.qr-element img {
+    display: block;
+}
+
+.qr-link {
+    text-decoration: none;
 }
 </style>
