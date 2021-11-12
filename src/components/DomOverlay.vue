@@ -29,15 +29,23 @@
                 </div>
             </div>
         </div>
+        <card-slider>
+
+        </card-slider>
     </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator';
+import CardSlider from '@/components/CardSlider.vue';
 import { Messages } from '@/messages';
 import { Model } from '@/api';
 
-@Component
+@Component({
+    components: {
+        CardSlider,
+    },
+})
 export default class DomOverlay extends Vue {
     private selectedModel: Model | null = null;
 
