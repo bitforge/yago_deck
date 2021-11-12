@@ -1,6 +1,9 @@
 <template>
     <!-- Component must be use only once in document! -->
     <div id="domOverlay">
+        <div class="touch" ref="touch" @click="placeModel">
+            <p>Tap anywhere to place!</p>
+        </div>
         <div class="toolbar">
             <button @click="undoLastModel">
                 <img src="~@/assets/img/undo.svg" />
@@ -10,9 +13,6 @@
                 <img src="~@/assets/img/delete.svg" />
                 <span>Clear</span>
             </button>
-        </div>
-        <div class="touch" ref="touch" @click="placeModel">
-            <p>Tap anywhere to place!</p>
         </div>
         <div class="slider" ref="slider">
             <div class="slides">
@@ -60,6 +60,23 @@ export default class DomOverlay extends Vue {
 </script>
 
 <style>
+.touch {
+    top: 100px;
+    left: 0;
+    right: 0;
+    bottom: 121px;
+    position: absolute;
+}
+
+.touch p {
+    position: absolute;
+    color: #fff;
+    font-size: 12px;
+    bottom: 10px;
+    right: 0;
+    left: 0;
+}
+
 .toolbar {
     display: flex;
     flex-direction: row;
@@ -94,27 +111,6 @@ export default class DomOverlay extends Vue {
     width: 24px;
     height: 24px;
     padding: 4px;
-}
-
-.touch {
-    top: 100px;
-    left: 0;
-    right: 0;
-    bottom: 121px;
-    position: absolute;
-}
-
-.touch p {
-    position: absolute;
-    color: #fff;
-    font-size: 12px;
-    bottom: 10px;
-    right: 0;
-    left: 0;
-}
-
-.touch button:active {
-    border: solid 2px #4285f4;
 }
 
 .slider {
