@@ -10,13 +10,9 @@
     "ngrok": "ngrok http -host-header=rewrite 8080"
   },
   "dependencies": {
-    "@types/three": "^0.132.2",
-    "@types/webxr": "^0.2.3",
     "core-js": "^3.6.5",
     "qr-code-styling": "^1.6.0-rc.1",
-    "swiper": "^7.2.0",
     "three": "^0.133.1",
-    "three.js": "^0.77.1",
     "vue": "^2.6.11",
     "vue-class-component": "^7.2.3",
     "vue-property-decorator": "^9.1.2",

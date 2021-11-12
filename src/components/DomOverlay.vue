@@ -1,62 +1,39 @@
 <template>
     <!-- Component must be use only once in document! -->
-    <div id="domOverlay">
-        <div class="touch" ref="touch" @click="placeModel">
-            <p v-show="showOverlay">Tap anywhere to place!</p>
+    <div id="domOverlay" v-show="showOverlay">
+        <div class="touch" ref="touch" @click="placeModel"></div>
+        <div class="model-selector">
+            <model-cards />
         </div>
-        <div class="toolbar" v-show="showOverlay">
+        <div class="toolbar">
             <button @click="undoLastModel">
-                <img src="~@/assets/img/undo.svg" />
+                <span class="material-icons">undo</span>
                 <span>Undo</span>
             </button>
+            <button @click="takeScreenshot" class="screenshot">
+                <span class="material-icons">camera</span>
+            </button>
             <button @click="clearModels">
-                <img src="~@/assets/img/delete.svg" />
+                <span class="material-icons">delete</span>
                 <span>Clear</span>
             </button>
         </div>
-        <div class="slider" ref="slider">
-            <div class="slides">
-                <div v-for="(model, index) in $store.state.models" :key="index" class="slide">
-                    <button
-                        v-if="model.id == selectedModel.id"
-                        class="slide selected"
-                        :style="{ backgroundImage: 'url(' + model.image + ')' }"></button>
-                    <button
-                        v-else
-                        class="slide"
-                        :style="{ backgroundImage: 'url(' + model.image + ')' }"
-                        @click="selectModel(model.id)"></button>
-                </div>
-            </div>
-        </div>
-        <card-slider>
-
-        </card-slider>
     </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch } from 'vue-property-decorator';
-import CardSlider from '@/components/CardSlider.vue';
+import { Component, Vue } from 'vue-property-decorator';
+import ModelCards from '@/components/ModelCards.vue';
 import { Messages } from '@/messages';
 import { Model } from '@/api';
 
 @Component({
     components: {
-        CardSlider,
+        ModelCards,
     },
 })
 export default class DomOverlay extends Vue {
     private selectedModel: Model | null = null;
-
-    @Watch('$store.state.models')
-    public onModelsLoaded(): void {
-        // Select first model
-        const models = this.$store.state.models as Model[];
-        if (models.length > 0) {
-            this.selectModel(models[0].id);
-        }
-    }
 
     public get showOverlay(): boolean {
         // Uncomment to show overlay locally
@@ -73,13 +50,12 @@ export default class DomOverlay extends Vue {
         this.$root.$emit(Messages.MODEL_UNDO);
     }
 
-    public clearModels(): void {
-        this.$root.$emit(Messages.MODEL_CLEAR);
+    public takeScreenshot(): void {
+        throw 'Not implemented yet';
     }
 
-    public selectModel(modelId: string): void {
-        this.selectedModel = this.$store.getters.getModelById(modelId) as Model;
-        this.$root.$emit(Messages.MODEL_SELECT, modelId);
+    public clearModels(): void {
+        this.$root.$emit(Messages.MODEL_CLEAR);
     }
 }
 </script>
@@ -111,11 +87,18 @@ export default class DomOverlay extends Vue {
     font-size: 12px;
 }
 
+.model-selector {
+    height: 235px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .toolbar {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    padding: 10px;
+    padding: 12px;
 }
 
 .toolbar button {
@@ -132,58 +115,16 @@ export default class DomOverlay extends Vue {
     align-items: center;
 }
 
-.toolButton img {
-    width: 24px;
-    height: 24px;
-    padding: 4px;
+.toolbar .material-icons {
+    margin: 4px;
 }
 
-.slider {
-    width: 100%;
-    height: 120px;
-    margin-top: 10px;
-    margin-bottom: env(safe-area-inset-bottom, 20px);
-    text-align: center;
-    overflow: hidden;
+.toolbar .screenshot {
+    padding: 4px 12px;
+    transform: scale(1.15);
 }
 
-.slides {
-    position: absolute;
-    left: 10px;
-    right: 0;
-    display: flex;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch;
-    display: hide;
-}
-
-.slide {
-    scroll-snap-align: start;
-    flex-shrink: 0;
-    width: 100px;
-    height: 100px;
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    background-color: #fff;
-    border-radius: 10px;
-    margin-right: 10px;
-    margin-bottom: 10px;
-    border: none;
-    display: flex;
-}
-
-.slide.selected {
-    border: 2px solid #4285f4;
-}
-
-.slide:focus {
-    outline: none;
-}
-
-.slide:focus-visible {
-    outline: 1px solid #4285f4;
+.toolbar .screenshot .material-icons {
+    font-size: 36px;
 }
 </style>
