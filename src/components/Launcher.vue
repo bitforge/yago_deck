@@ -26,14 +26,11 @@
 import { Component, Vue } from 'vue-property-decorator';
 import QRCodeStyling, { CornerDotType, CornerSquareType, DotType, DrawType } from 'qr-code-styling';
 import { Configuration, ModelsApi } from '@/api';
-import { Messages } from '@/Messaging';
+import { Messages } from '@/messages';
+import { APIKey, ProjectID } from '@/credentials';
 
 @Component
 export default class Launcher extends Vue {
-    private apiKey = 'Token bf51a81599630627c69dfb90561983627ef1e66f';
-    // Using feey plants as demo project
-    private projectId = '03d861a8-90fe-42bb-aeba-a4aead7917ea';
-
     private xrSupported = false;
 
     private qrUrl = 'https://webxr.genie-ar.ch';
@@ -73,8 +70,8 @@ export default class Launcher extends Vue {
 
     private async loadModels(): Promise<void> {
         try {
-            const modelApi = new ModelsApi(new Configuration({ apiKey: this.apiKey }));
-            const models = await modelApi.modelsList({ project: this.projectId });
+            const modelApi = new ModelsApi(new Configuration({ apiKey: APIKey }));
+            const models = await modelApi.modelsList({ project: ProjectID });
             this.$store.commit('setModels', models);
             this.$root.$emit(Messages.MODELS_LOADED);
         } catch (error: any) {
