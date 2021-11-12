@@ -253,10 +253,14 @@ export default class WebXr extends Vue {
                 const mesh = object as THREE.Mesh;
                 const material = mesh.material as THREE.MeshStandardMaterial;
                 if (material) {
-                    const transMat = material.clone();
+                    const transMat = new THREE.MeshStandardMaterial({
+                        color: 0xffffff,
+                        roughness: 0.5,
+                        metalness: 0.5,
+                    });
                     transMat.format = THREE.RGBAFormat;
                     transMat.transparent = true;
-                    transMat.opacity = 0.5;
+                    transMat.opacity = 0.3;
                     transMat.side = THREE.DoubleSide;
                     mesh.material = transMat;
                 }
