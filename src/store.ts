@@ -23,6 +23,11 @@ export default new Vuex.Store({
             state.models = models;
         },
     },
+    getters: {
+        getModelById: (state: MainState) => (id: string) => {
+            return state.models.find(model => model.id === id);
+        },
+    },
     actions: {},
     modules: {},
 });

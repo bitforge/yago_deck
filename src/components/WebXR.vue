@@ -23,6 +23,9 @@ import * as THREE from 'three';
 
 @Component
 export default class WebXr extends Vue {
+    // Current model
+    private selectedModel: Model | null = null;
+
     // WebXR & WebGL:
     private session: XRSession | null = null;
     private xrLightProbe: XRLightEstimate | null = null;
@@ -42,6 +45,11 @@ export default class WebXr extends Vue {
     private lightProbe = new THREE.LightProbe();
 
     public mounted(): void {
+        // Prepare Scene
+        this.initCamera();
+        this.addLightning();
+        this.loadNopsy();
+
         // Subscribe to events
         this.$root.$on(Messages.MODELS_LOADED, this.onModelsLoaded);
         this.$root.$on(Messages.LAUNCH_XR, this.onLaunchXR);
@@ -49,37 +57,6 @@ export default class WebXr extends Vue {
         this.$root.$on(Messages.MODEL_UNDO, this.removeLastModel);
         this.$root.$on(Messages.MODEL_CLEAR, this.removeAllModels);
         this.$root.$on(Messages.MODEL_SELECT, this.updateSelectedModelId);
-
-        // Prepare Scene
-        this.initCamera();
-        this.addLightning();
-        this.loadNopsy();
-    }
-
-    private onModelsLoaded() {
-        // setting first model as selected
-        const models = this.$store.state.models as Model[];
-        this.updateSelectedModelId(models[0].id);
-    }
-
-    private updateSelectedModelId(modelId: string): void {
-        this.selectedModelId = modelId;
-        // Load models on demand
-        if (!this.models3D[modelId]) {
-            this.loadModel(modelId);
-        }
-    }
-
-    private loadModel(modelId: string): void {
-        const models = this.$store.state.models as Model[];
-        const model = models.find(model => model.id === modelId);
-        if (!model || !model.glb) throw 'Cloud not find model infos for ' + modelId;
-
-        this.gltfLoader.load(model.glb, gltf => {
-            const object3D = gltf.scene;
-            object3D.name = `model-${model.id}`;
-            this.models3D[model.id] = object3D;
-        });
     }
 
     private initCamera(): void {
@@ -102,6 +79,29 @@ export default class WebXr extends Vue {
             this.nopsy.castShadow = false;
             this.nopsy.visible = false;
             this.scene.add(this.nopsy);
+        });
+    }
+
+    private onModelsLoaded() {
+        // setting first model as selected
+        const models = this.$store.state.models as Model[];
+        this.updateSelectedModelId(models[0].id);
+    }
+
+    private updateSelectedModelId(modelId: string): void {
+        // Load models on demand
+        this.selectedModel = this.$store.getters.getModelById(modelId) as Model;
+        if (!this.models3D[this.selectedModel.id]) {
+            this.loadModel(this.selectedModel);
+        }
+    }
+
+    private loadModel(model: Model): void {
+        if (!model || !model.glb) throw 'Cloud not find model infos for ' + model;
+        this.gltfLoader.load(model.glb, gltf => {
+            const object3D = gltf.scene;
+            object3D.name = `model-${model.id}`;
+            this.models3D[model.id] = object3D;
         });
     }
 
@@ -231,19 +231,17 @@ export default class WebXr extends Vue {
 
     private updatePreviewModel(): void {
         // Nopsy is absolutely required!
-        if (!this.nopsy) return;
+        if (!this.nopsy || !this.selectedModel) return;
 
         // Update preview model only when necessary
         const previewModelUpdateNeeded =
-            this.selectedModelId &&
-            this.models3D[this.selectedModelId] &&
-            this.previewModel?.name != `model-${this.selectedModelId}`;
+            this.models3D[this.selectedModel.id] && this.previewModel?.name != `model-${this.selectedModel.id}`;
 
         if (previewModelUpdateNeeded) {
             // Remove old version when present
             if (this.previewModel) this.nopsy.remove(this.previewModel);
             // Add new semi transparent clone
-            this.previewModel = this.models3D[this.selectedModelId].clone();
+            this.previewModel = this.models3D[this.selectedModel.id].clone();
             this.previewModel.traverse((object: THREE.Object3D<THREE.Event>) => {
                 const mesh = object as THREE.Mesh;
                 const material = mesh.material as THREE.MeshStandardMaterial;

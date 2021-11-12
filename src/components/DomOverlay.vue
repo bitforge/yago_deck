@@ -35,13 +35,28 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import { Messages } from '@/Messaging';
+import { Model } from '@/api';
 
 @Component
 export default class DomOverlay extends Vue {
-    public selectedModelId = '';
+    private selectedModel: Model | null = null;
+    private selectedModelId = '';
+
+    public mounted(): void {
+        this.$root.$on(Messages.MODELS_LOADED, this.onModelsLoaded);
+    }
+
+    private onModelsLoaded() {
+        // Select first model
+        const models = this.$store.state.models as Model[];
+        if (models.length > 0) {
+            this.selectModel(models[0].id);
+        }
+    }
 
     public placeModel(): void {
-        this.$root.$emit(Messages.MODEL_PLACE, this.selectedModelId);
+        const modelId = this.selectedModel?.id || this.selectedModelId;
+        this.$root.$emit(Messages.MODEL_PLACE, modelId);
     }
 
     public undoLastModel(): void {
@@ -54,6 +69,7 @@ export default class DomOverlay extends Vue {
 
     public selectModel(modelId: string): void {
         this.selectedModelId = modelId;
+        this.selectedModel = this.$store.getters.getModelById(modelId) as Model;
         this.$root.$emit(Messages.MODEL_SELECT, modelId);
     }
 }
