@@ -51,7 +51,7 @@ export default class DomOverlay extends Vue {
     }
 
     public takeScreenshot(): void {
-        throw 'Not implemented yet';
+        this.$root.$emit(Messages.SAVE_SCREENSHOT);
     }
 
     public clearModels(): void {
