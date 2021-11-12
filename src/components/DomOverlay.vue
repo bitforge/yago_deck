@@ -90,7 +90,7 @@ export default class DomOverlay extends Vue {
 }
 
 .touch {
-    margin-top: 10px;
+    margin-top: calc(env(safe-area-inset-top) + 20px);
     flex-grow: 1;
     display: flex;
     justify-content: center;
@@ -106,11 +106,7 @@ export default class DomOverlay extends Vue {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-
-    padding-top: calc(env(safe-area-inset-top) + 20px);
-    padding-left: 10px;
-    padding-right: 10px;
-    padding-bottom: 20px;
+    padding: 10px;
 }
 
 .toolbar button {
