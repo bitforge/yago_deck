@@ -15,7 +15,6 @@
     "core-js": "^3.6.5",
     "qr-code-styling": "^1.6.0-rc.1",
     "three": "^0.133.1",
-    "three-gltf-loader": "^1.111.0",
     "three.js": "^0.77.1",
     "vue": "^2.6.11",
     "vue-class-component": "^7.2.3",
