@@ -14,7 +14,7 @@
                 <span>Clear</span>
             </button>
         </div>
-        <div class="slider" ref="slider">
+        <!-- <div class="slider" ref="slider">
             <div class="slides">
                 <div v-for="(model, index) in $store.state.models" :key="index" class="slide">
                     <button
@@ -28,16 +28,29 @@
                         @click="selectModel(model.id)"></button>
                 </div>
             </div>
-        </div>
+        </div> -->
+        <swiper @swiper="onSwiperLoaded" @slideChange="onSlideChange">
+            <swiper-slide>Slide 1</swiper-slide>
+            <swiper-slide>Slide 2</swiper-slide>
+            <swiper-slide>Slide 3</swiper-slide>
+        </swiper>
     </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator';
+import { Swiper, SwiperSlide } from 'swiper/vue';
 import { Messages } from '@/messages';
 import { Model } from '@/api';
 
-@Component
+import 'swiper/swiper.scss';
+
+@Component({
+    components: {
+        Swiper,
+        SwiperSlide,
+    },
+})
 export default class DomOverlay extends Vue {
     private selectedModel: Model | null = null;
 
@@ -67,6 +80,14 @@ export default class DomOverlay extends Vue {
 
     public clearModels(): void {
         this.$root.$emit(Messages.MODEL_CLEAR);
+    }
+
+    public onSwiperLoaded() {
+        console.log('swiper loaded');
+    }
+
+    public onSlideChange(data: any) {
+        console.log(data);
     }
 
     public selectModel(modelId: string): void {
