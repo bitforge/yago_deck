@@ -1,12 +1,12 @@
 <template>
     <div class="launcher">
-        <div class="launch-area" v-if="xrSupported">
+        <div class="launch-area" v-if="xrSupported || devMode">
             <button slot="ar-button" id="ar-button" @click="launchXR">
                 <img src="~@/assets/img/ar_icon.svg" />
                 Launch Demo 🥳🤳🪴
             </button>
         </div>
-        <div class="fallback-area" v-if="!xrSupported">
+        <div class="fallback-area" v-if="!xrSupported && !devMode">
             <h2>WebXR not supported.</h2>
             <h3>📵 🤳 🪴 💔 😢</h3>
             <h4>This Demo was made for Android devices.</h4>
@@ -54,6 +54,10 @@ export default class Launcher extends Vue {
         },
     };
 
+    public devMode(): boolean {
+        return process.env.NODE_ENV === 'development';
+    }
+
     public mounted(): void {
         // Feature detect WebXR support
         this.xrSupported = (navigator as any).xr !== undefined;
@@ -82,6 +86,12 @@ export default class Launcher extends Vue {
     }
 
     public launchXR(): void {
+        // Show error when in dev mode
+        if (!this.xrSupported && this.devMode) {
+            alert('WebXR not supported. 😢');
+            return;
+        }
+
         // Everything is triggered via an event
         this.$root.$emit(Messages.LAUNCH_XR);
     }
