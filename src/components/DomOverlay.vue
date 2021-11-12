@@ -14,7 +14,7 @@
                 <span>Clear</span>
             </button>
         </div>
-        <div class="slider" ref="slider">
+        <!-- <div class="slider" ref="slider">
             <div class="slides">
                 <div v-for="(model, index) in $store.state.models" :key="index" class="slide">
                     <button
@@ -28,6 +28,17 @@
                         @click="selectModel(model.id)"></button>
                 </div>
             </div>
+        </div> -->
+        <div class="model-slider">
+            <vue-slick-carousel
+                ref="slick"
+                v-bind="slickOptions"
+                @afterChange="onSlideChanged"
+                v-if="$store.state.models.length > 0">
+                <div v-for="(model, index) in $store.state.models" :key="index" class="model">
+                    <img :src="model.image" :alt="model.name" />
+                </div>
+            </vue-slick-carousel>
         </div>
     </div>
 </template>
@@ -37,9 +48,28 @@ import { Component, Vue, Watch } from 'vue-property-decorator';
 import { Messages } from '@/messages';
 import { Model } from '@/api';
 
-@Component
+// Ugly but functional slider component
+// @ts-ignore
+import VueSlickCarousel from 'vue-slick-carousel';
+import 'vue-slick-carousel/dist/vue-slick-carousel.css';
+import 'vue-slick-carousel/dist/vue-slick-carousel-theme.css';
+
+@Component({
+    components: {
+        VueSlickCarousel,
+    },
+})
 export default class DomOverlay extends Vue {
     private selectedModel: Model | null = null;
+
+    public slickOptions = {
+        arrows: true,
+        dots: false,
+        centerMode: true,
+        focusOnSelect: true,
+        infinite: true,
+        slidesToShow: 5,
+    };
 
     @Watch('$store.state.models')
     public onModelsLoaded(): void {
@@ -48,6 +78,15 @@ export default class DomOverlay extends Vue {
         if (models.length > 0) {
             this.selectModel(models[0].id);
         }
+    }
+
+    private onInitCarousel() {
+        console.log('our carousel is ready');
+        console.log(this.$store.state.models);
+    }
+
+    public onSlideChanged(slideIndex: number): void {
+        console.log('Slide changed:', slideIndex);
     }
 
     public get showOverlay(): boolean {
@@ -130,52 +169,27 @@ export default class DomOverlay extends Vue {
     padding: 4px;
 }
 
-.slider {
-    width: 100%;
-    height: 120px;
-    margin-top: 10px;
-    margin-bottom: env(safe-area-inset-bottom, 20px);
-    text-align: center;
-    overflow: hidden;
-}
-
-.slides {
-    position: absolute;
-    left: 10px;
-    right: 0;
+.model-slider {
     display: flex;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch;
-    display: hide;
+    justify-content: center;
+    align-items: center;
 }
 
-.slide {
-    scroll-snap-align: start;
-    flex-shrink: 0;
-    width: 100px;
-    height: 100px;
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    background-color: #fff;
-    border-radius: 10px;
-    margin-right: 10px;
-    margin-bottom: 10px;
-    border: none;
-    display: flex;
+.slick-slider {
+    height: 300px;
+    width: 900px;
+    background-color: white;
+    border-radius: 16px;
 }
 
-.slide.selected {
-    border: 2px solid #4285f4;
+.slick-slider .model {
+    width: 260px;
+    height: 260px;
+    padding: 20px;
 }
 
-.slide:focus {
-    outline: none;
-}
-
-.slide:focus-visible {
-    outline: 1px solid #4285f4;
+.slick-slider .model img {
+    width: 260px;
+    height: 260px;
 }
 </style>
