@@ -1,9 +1,15 @@
 <template>
     <div class="launcher">
-        <button slot="ar-button" id="ar-button" @click="launchXR">
-            <img src="~@/assets/img/ar_icon.svg" />
-            👉 Launch Demo 👈 🥳🎉🤳🪴 👍
-        </button>
+        <div class="launch-area" v-if="xrSupported">
+            <button slot="ar-button" id="ar-button" @click="launchXR">
+                <img src="~@/assets/img/ar_icon.svg" />
+                Launch Demo 🥳🤳🪴
+            </button>
+        </div>
+        <div class="fallback-area" v-if="!xrSupported">
+            <h3>📵 🤳 🪴 💔 😢</h3>
+            <p>Unfortunately, it seems like your browser does not support the WebXR Standard.</p>
+        </div>
     </div>
 </template>
 
@@ -39,14 +45,10 @@ export default class Launcher extends Vue {
 
     public launchXR(): void {
         // Bail out early if WebXR is not supported by browser
-        if (!this.xrSupported) return this.onWebXRFail();
+        if (!this.xrSupported) return;
 
         // Start things off with an event
         this.$root.$emit(Messages.LAUNCH_XR);
-    }
-
-    private onWebXRFail(): void {
-        alert('Unfortunately, your browser does not support WebXR. 😥 💔 📵');
     }
 }
 </script>
@@ -117,5 +119,17 @@ export default class Launcher extends Vue {
 
 #ar-button:focus-visible {
     outline: 1px solid #4285f4;
+}
+
+.fallback-area {
+    padding: 10px;
+}
+
+.fallback-area h3 {
+    font-size: 28px;
+}
+
+.fallback-area p {
+    color: white;
 }
 </style>
