@@ -17,7 +17,6 @@
 
 import { Component, Vue, Watch } from 'vue-property-decorator';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { saveAs } from 'file-saver';
 import { Messages } from '@/messages';
 import { Model } from '@/api';
 import * as THREE from 'three';
@@ -46,7 +45,7 @@ export default class WebXr extends Vue {
     private lightProbe = new THREE.LightProbe();
 
     public mounted(): void {
-        // Prepare Scene
+        // Prepare THREE.js Scene
         this.initCamera();
         this.addLightning();
         this.loadNopsy();
@@ -57,6 +56,15 @@ export default class WebXr extends Vue {
         this.$root.$on(Messages.MODEL_UNDO, this.removeLastModel);
         this.$root.$on(Messages.MODEL_CLEAR, this.removeAllModels);
         this.$root.$on(Messages.MODEL_SELECT, this.updateSelectedModelId);
+    }
+
+    public beforeDestroy(): void {
+        // Unsubscribe from events
+        this.$root.$off(Messages.LAUNCH_XR, this.onLaunchXR);
+        this.$root.$off(Messages.MODEL_PLACE, this.placeModel);
+        this.$root.$off(Messages.MODEL_UNDO, this.removeLastModel);
+        this.$root.$off(Messages.MODEL_CLEAR, this.removeAllModels);
+        this.$root.$off(Messages.MODEL_SELECT, this.updateSelectedModelId);
     }
 
     private initCamera(): void {

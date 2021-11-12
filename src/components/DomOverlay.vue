@@ -1,7 +1,7 @@
 <template>
     <!-- Component must be use only once in document! -->
     <div id="domOverlay" v-show="showOverlay">
-        <div class="touch" ref="touch" @click="placeModel"></div>
+        <div class="touch" @click="placeModel"></div>
         <div class="model-selector" v-show="modelCardsVisible">
             <model-cards />
         </div>
@@ -38,8 +38,21 @@ import { Model } from '@/api';
     },
 })
 export default class DomOverlay extends Vue {
+    public modelCardsVisible = true;
+
     private selectedModel: Model | null = null;
-    private modelCardsVisible = true;
+
+    public mounted(): void {
+        this.$root.$on(Messages.MODEL_SELECT, this.onModelSelected);
+    }
+
+    public beforeDestroy(): void {
+        this.$root.$off(Messages.MODEL_SELECT, this.onModelSelected);
+    }
+
+    private onModelSelected(modelId: string) {
+        this.selectedModel = this.$store.getters.getModelById(modelId) as Model;
+    }
 
     public get showOverlay(): boolean {
         // Uncomment next line to show overlay for development
@@ -94,9 +107,7 @@ export default class DomOverlay extends Vue {
 .touch {
     margin-top: calc(env(safe-area-inset-top) + 20px);
     flex-grow: 1;
-    display: flex;
-    justify-content: center;
-    align-items: flex-end;
+    /* background-color: #000000aa; */
 }
 
 .touch p {
