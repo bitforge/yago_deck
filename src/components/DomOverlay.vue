@@ -60,21 +60,30 @@ export default class DomOverlay extends Vue {
 </script>
 
 <style>
-.touch {
-    top: 100px;
-    left: 0;
-    right: 0;
-    bottom: 121px;
+#domOverlay {
+    display: flex;
+    flex-direction: column;
+    justify-content: stretch;
+
     position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 0;
+}
+
+.touch {
+    margin-top: 10px;
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
 }
 
 .touch p {
-    position: absolute;
     color: #fff;
     font-size: 12px;
-    bottom: 10px;
-    right: 0;
-    left: 0;
 }
 
 .toolbar {
@@ -82,15 +91,10 @@ export default class DomOverlay extends Vue {
     flex-direction: row;
     justify-content: space-between;
 
-    position: absolute;
-    bottom: 140px;
-    left: 0;
-    right: 0;
-
-    padding-top: calc(env(safe-area-inset-top) + 10px);
+    padding-top: calc(env(safe-area-inset-top) + 20px);
     padding-left: 10px;
     padding-right: 10px;
-    padding-bottom: 10px;
+    padding-bottom: 20px;
 }
 
 .toolbar button {
@@ -116,9 +120,6 @@ export default class DomOverlay extends Vue {
 .slider {
     width: 100%;
     height: 120px;
-    position: absolute;
-    left: 0;
-    right: 0;
     bottom: env(safe-area-inset-bottom, 20px);
     text-align: center;
     overflow: hidden;

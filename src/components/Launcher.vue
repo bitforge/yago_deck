@@ -62,6 +62,7 @@ export default class Launcher extends Vue {
     justify-content: center;
     align-items: center;
     background-color: #222222;
+    z-index: 10;
 }
 
 @keyframes vibrant {
