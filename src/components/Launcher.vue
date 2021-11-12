@@ -55,8 +55,11 @@ export default class Launcher extends Vue {
     };
 
     public mounted(): void {
+        // Feature detect WebXR support
         this.xrSupported = (navigator as any).xr !== undefined;
         this.$store.commit('setXRSupported', this.xrSupported);
+
+        // Initialize
         this.loadModels();
         this.renderQRCode();
     }
@@ -73,17 +76,13 @@ export default class Launcher extends Vue {
             const modelApi = new ModelsApi(new Configuration({ apiKey: APIKey }));
             const models = await modelApi.modelsList({ project: ProjectID });
             this.$store.commit('setModels', models);
-            this.$root.$emit(Messages.MODELS_LOADED);
         } catch (error: any) {
             console.log(error);
         }
     }
 
     public launchXR(): void {
-        // Bail out early if WebXR is not supported by browser
-        if (!this.xrSupported) return;
-
-        // Start things off with an event
+        // Everything is triggered via an event
         this.$root.$emit(Messages.LAUNCH_XR);
     }
 }

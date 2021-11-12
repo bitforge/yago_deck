@@ -15,9 +15,9 @@
 
 // @ts-nocheck
 
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Watch } from 'vue-property-decorator';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { Messages } from '@/Messaging';
+import { Messages } from '@/messages';
 import { Model } from '@/api';
 import * as THREE from 'three';
 
@@ -51,7 +51,6 @@ export default class WebXr extends Vue {
         this.loadNopsy();
 
         // Subscribe to events
-        this.$root.$on(Messages.MODELS_LOADED, this.onModelsLoaded);
         this.$root.$on(Messages.LAUNCH_XR, this.onLaunchXR);
         this.$root.$on(Messages.MODEL_PLACE, this.placeModel);
         this.$root.$on(Messages.MODEL_UNDO, this.removeLastModel);
@@ -82,7 +81,8 @@ export default class WebXr extends Vue {
         });
     }
 
-    private onModelsLoaded() {
+    @Watch('$store.state.models')
+    public onModelsLoaded(): void {
         // setting first model as selected
         const models = this.$store.state.models as Model[];
         this.updateSelectedModelId(models[0].id);
@@ -294,10 +294,10 @@ export default class WebXr extends Vue {
 <style scoped>
 .webxr {
     position: absolute;
+    left: 0;
     top: 0;
     right: 0;
     bottom: 0;
-    left: 0;
     overflow-x: hidden;
 }
 

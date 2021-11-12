@@ -2,9 +2,9 @@
     <!-- Component must be use only once in document! -->
     <div id="domOverlay">
         <div class="touch" ref="touch" @click="placeModel">
-            <p>Tap anywhere to place!</p>
+            <p v-show="showOverlay">Tap anywhere to place!</p>
         </div>
-        <div class="toolbar">
+        <div class="toolbar" v-show="showOverlay">
             <button @click="undoLastModel">
                 <img src="~@/assets/img/undo.svg" />
                 <span>Undo</span>
@@ -33,24 +33,27 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
-import { Messages } from '@/Messaging';
+import { Component, Vue, Watch } from 'vue-property-decorator';
+import { Messages } from '@/messages';
 import { Model } from '@/api';
 
 @Component
 export default class DomOverlay extends Vue {
     private selectedModel: Model | null = null;
 
-    public mounted(): void {
-        this.$root.$on(Messages.MODELS_LOADED, this.onModelsLoaded);
-    }
-
-    private onModelsLoaded() {
+    @Watch('$store.state.models')
+    public onModelsLoaded(): void {
         // Select first model
         const models = this.$store.state.models as Model[];
         if (models.length > 0) {
             this.selectModel(models[0].id);
         }
+    }
+
+    public get showOverlay(): boolean {
+        // Uncomment to show overlay locally
+        // if (process.env.NODE_ENV === 'development') return true;
+        return this.$store.state.xrActive;
     }
 
     public placeModel(): void {
@@ -80,11 +83,11 @@ export default class DomOverlay extends Vue {
     justify-content: stretch;
 
     position: absolute;
+    left: 0;
     top: 0;
     right: 0;
     bottom: 0;
-    left: 0;
-    z-index: 0;
+    z-index: 100;
 }
 
 .touch {
@@ -130,7 +133,8 @@ export default class DomOverlay extends Vue {
 .slider {
     width: 100%;
     height: 120px;
-    bottom: env(safe-area-inset-bottom, 20px);
+    margin-top: 10px;
+    margin-bottom: env(safe-area-inset-bottom, 20px);
     text-align: center;
     overflow: hidden;
 }
