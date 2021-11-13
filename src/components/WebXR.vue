@@ -26,6 +26,9 @@ export default class WebXr extends Vue {
     // Current model
     private selectedModel: Model | null = null;
 
+    // Nopsy and preview model are hidden in silent mode
+    private silentMode = false;
+
     // WebXR & WebGL:
     private session: XRSession | null = null;
     private xrLightProbe: XRLightEstimate | null = null;
@@ -53,6 +56,8 @@ export default class WebXr extends Vue {
 
         // Subscribe to events
         this.$root.$on(Messages.LAUNCH_XR, this.onLaunchXR);
+        this.$root.$on(Messages.SILENCE_ENTER, this.enterSilentMode);
+        this.$root.$on(Messages.SILENCE_EXIT, this.exitSilentMode);
         this.$root.$on(Messages.MODEL_PLACE, this.placeModel);
         this.$root.$on(Messages.MODEL_UNDO, this.removeLastModel);
         this.$root.$on(Messages.MODEL_CLEAR, this.removeAllModels);
@@ -104,6 +109,14 @@ export default class WebXr extends Vue {
         if (!this.models3D[this.selectedModel.id]) {
             this.loadModel(this.selectedModel);
         }
+    }
+
+    private enterSilentMode(): void {
+        this.silentMode = true;
+    }
+
+    private exitSilentMode(): void {
+        this.silentMode = false;
     }
 
     private loadModel(model: Model): void {
@@ -219,20 +232,11 @@ export default class WebXr extends Vue {
             this.camera.projectionMatrix.fromArray(view.projectionMatrix);
             this.camera.updateMatrixWorld(true);
 
-            // Check if viewport center has a hit test and update nopsy position
-            const hitTestResults = frame.getHitTestResults(this.hitTestSource);
-            if (hitTestResults.length > 0 && this.nopsy) {
-                const hitPose = hitTestResults[0].getPose(this.referenceSpace);
-                if (hitPose) {
-                    this.nopsy.visible = true;
-                    const pos = hitPose.transform.position;
-                    this.nopsy.position.set(pos.x, pos.y, pos.z);
-                }
-
-                // Update semi transparent preview model
-                this.updatePreviewModel();
-
-                this.nopsy.updateMatrixWorld(true);
+            // Update cursor and preview model in active mode
+            if (!this.silentMode) {
+                this.runHitTestAndUpdateCursor(frame);
+            } else {
+                this.nopsy.visible = false;
             }
 
             // Render the scene with THREE.WebGLRenderer.
@@ -244,6 +248,26 @@ export default class WebXr extends Vue {
         // Free resources
         this.renderer?.dispose();
         this.$store.commit('setXRActive', false);
+    }
+
+    private runHitTestAndUpdateCursor(frame: XRFrame) {
+        // Check if viewport center has a hit test and update nopsy position
+        const hitTestResults = frame.getHitTestResults(this.hitTestSource);
+        if (hitTestResults.length > 0 && this.nopsy) {
+            const hitPose = hitTestResults[0].getPose(this.referenceSpace);
+            if (hitPose) {
+                this.nopsy.visible = true;
+                const pos = hitPose.transform.position;
+                this.nopsy.position.set(pos.x, pos.y, pos.z);
+            } else {
+                this.nopsy.visible = false;
+            }
+
+            this.nopsy.updateMatrixWorld(true);
+
+            // Update semi transparent preview model
+            this.updatePreviewModel();
+        }
     }
 
     private updatePreviewModel(): void {
@@ -273,7 +297,7 @@ export default class WebXr extends Vue {
     }
 
     private getPreviewMaterial(): THREE.MeshStandardMaterial {
-        // Only create onces
+        // Only create once
         if (this.previewMaterial) return this.previewMaterial;
 
         // Create and keep preview material
