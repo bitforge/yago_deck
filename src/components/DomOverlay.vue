@@ -1,7 +1,7 @@
 <template>
-    <!-- Component must be use only once in document! -->
-    <div id="domOverlay" v-show="showOverlay" :class="{ silent: isSilent }">
-        <div class="touch" @click="placeModel"></div>
+    <!-- This is the UI that gets rendered on top of WebXR session -->
+    <div class="domOverlay" v-show="showOverlay" :class="{ silent: isSilent }">
+        <div class="touch-area" @click="placeModel"></div>
         <div class="model-selector">
             <model-cards />
         </div>
@@ -38,6 +38,7 @@ import { Model } from '@/api';
     },
 })
 export default class DomOverlay extends Vue {
+    // In silent Mode, model cards and unneeded buttons are hidden
     public isSilent = false;
 
     private selectedModel: Model | null = null;
@@ -91,7 +92,7 @@ export default class DomOverlay extends Vue {
 </script>
 
 <style>
-#domOverlay {
+.domOverlay {
     display: flex;
     flex-direction: column;
     justify-content: stretch;
@@ -104,31 +105,26 @@ export default class DomOverlay extends Vue {
     z-index: 100;
 }
 
-#domOverlay .hideable {
+.domOverlay .hideable {
     transition: transform 0.3s ease-in-out;
 }
 
-#domOverlay .swiper.hideable {
+.domOverlay .swiper.hideable {
     transition: transform 0.5s ease-in-out;
 }
 
-#domOverlay.silent .hideable {
+.domOverlay.silent .hideable {
     transform: translateY(100px);
 }
 
-#domOverlay.silent .swiper.hideable {
+.domOverlay.silent .swiper.hideable {
     transform: translateY(320px);
 }
 
-.touch {
+.touch-area {
     margin-top: calc(env(safe-area-inset-top) + 20px);
     flex-grow: 1;
     /* background-color: #000000aa; */
-}
-
-.touch p {
-    color: #fff;
-    font-size: 12px;
 }
 
 .model-selector {

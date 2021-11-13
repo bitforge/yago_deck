@@ -35,6 +35,21 @@ export default class ModelCards extends Vue {
         // Attach swiper events
         this.swiper.on('slideChange', this.onSlideChanged);
         this.swiper.on('tap', this.onSliderTapped);
+
+        // Subscribe to global events
+        this.$root.$on(Messages.SILENCE_ENTER, this.enterSilentMode);
+        this.$root.$on(Messages.SILENCE_EXIT, this.exitSilentMode);
+    }
+
+    public beforeDestory(): void {
+        // Detach swiper events
+        this.swiper.off('slideChange', this.onSlideChanged);
+        this.swiper.off('tap', this.onSliderTapped);
+        this.swiper = null;
+
+        // Unsubscribe from global events
+        this.$root.$off(Messages.SILENCE_ENTER, this.enterSilentMode);
+        this.$root.$off(Messages.SILENCE_EXIT, this.exitSilentMode);
     }
 
     @Watch('$store.state.models')
@@ -66,6 +81,14 @@ export default class ModelCards extends Vue {
         if (!model) return;
         this.$root.$emit(Messages.MODEL_PLACE, model.id);
     }
+
+    private enterSilentMode(): void {
+        this.swiper.disable();
+    }
+
+    private exitSilentMode(): void {
+        this.swiper.enable();
+    }
 }
 </script>
 
@@ -95,7 +118,6 @@ export default class ModelCards extends Vue {
     color: #fff;
     font-weight: bold;
     text-shadow: 1px 1px 5px #222;
-
 }
 
 /* Distinct color set from Sasha Trubetskoy: */

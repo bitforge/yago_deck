@@ -67,6 +67,8 @@ export default class WebXr extends Vue {
     public beforeDestroy(): void {
         // Unsubscribe from events
         this.$root.$off(Messages.LAUNCH_XR, this.onLaunchXR);
+        this.$root.$off(Messages.SILENCE_ENTER, this.enterSilentMode);
+        this.$root.$off(Messages.SILENCE_EXIT, this.exitSilentMode);
         this.$root.$off(Messages.MODEL_PLACE, this.placeModel);
         this.$root.$off(Messages.MODEL_UNDO, this.removeLastModel);
         this.$root.$off(Messages.MODEL_CLEAR, this.removeAllModels);
@@ -171,7 +173,7 @@ export default class WebXr extends Vue {
 
         // Session
         const xr = (navigator as any).xr;
-        const domOverlay = document.querySelector('#domOverlay');
+        const domOverlay = document.querySelector('.domOverlay');
         this.session = await xr.requestSession('immersive-ar', {
             requiredFeatures: ['hit-test', 'light-estimation'],
             optionalFeatures: ['dom-overlay'],
