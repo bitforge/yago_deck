@@ -1,6 +1,6 @@
 <template>
     <!-- This is the UI that gets rendered on top of WebXR session -->
-    <div class="domOverlay" :class="{ silent: isSilent }">
+    <div class="domOverlay" :class="{ viewOnly: $store.state.viewOnlyMode }">
         <div class="models-deck" v-show="showDeck">
             <model-cards />
         </div>
@@ -9,11 +9,11 @@
                 <span class="material-icons">undo</span>
                 <span>Undo</span>
             </button>
-            <button @click="hideCards" v-if="!isSilent">
+            <button @click="hideCards" v-if="!$store.state.viewOnlyMode">
                 <span class="material-icons">style</span>
                 <span class="material-icons">expand_more</span>
             </button>
-            <button @click="showCards" v-if="isSilent">
+            <button @click="showCards" v-if="$store.state.viewOnlyMode">
                 <span class="material-icons">expand_less</span>
                 <span class="material-icons">style</span>
             </button>
@@ -37,9 +37,6 @@ import { Model } from '@/api';
     },
 })
 export default class DomOverlay extends Vue {
-    // In silent Mode, model cards and unneeded buttons are hidden
-    public isSilent = false;
-
     private selectedModel: Model | null = null;
 
     public mounted(): void {
@@ -79,14 +76,12 @@ export default class DomOverlay extends Vue {
 
     /** Hide model selection cards */
     public hideCards(): void {
-        this.isSilent = true;
-        this.$root.$emit(Messages.SILENCE_ENTER);
+        this.$store.commit('setViewOnlyMode', true);
     }
 
     /** Show model selection cards */
     public showCards(): void {
-        this.isSilent = false;
-        this.$root.$emit(Messages.SILENCE_EXIT);
+        this.$store.commit('setViewOnlyMode', false);
     }
 
     /** Remova ALL placed models */
@@ -122,11 +117,11 @@ export default class DomOverlay extends Vue {
     transition: transform 0.5s ease-in-out;
 }
 
-.domOverlay.silent .hideable {
+.domOverlay.viewOnly .hideable {
     transform: translateY(100px);
 }
 
-.domOverlay.silent .swiper.hideable {
+.domOverlay.viewOnly .swiper.hideable {
     transform: translateY(320px);
 }
 

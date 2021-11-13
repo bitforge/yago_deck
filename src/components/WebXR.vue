@@ -26,9 +26,6 @@ export default class WebXr extends Vue {
     // Current model
     private selectedModel: Model | null = null;
 
-    // Nopsy and preview model are hidden in silent mode
-    private silentMode = false;
-
     // WebXR & WebGL:
     private session: XRSession | null = null;
     private xrLightProbe: XRLightEstimate | null = null;
@@ -56,8 +53,6 @@ export default class WebXr extends Vue {
 
         // Subscribe to events
         this.$root.$on(Messages.LAUNCH_XR, this.onLaunchXR);
-        this.$root.$on(Messages.SILENCE_ENTER, this.enterSilentMode);
-        this.$root.$on(Messages.SILENCE_EXIT, this.exitSilentMode);
         this.$root.$on(Messages.MODEL_PLACE, this.placeModel);
         this.$root.$on(Messages.MODEL_UNDO, this.removeLastModel);
         this.$root.$on(Messages.MODEL_CLEAR, this.removeAllModels);
@@ -67,8 +62,6 @@ export default class WebXr extends Vue {
     public beforeDestroy(): void {
         // Unsubscribe from events
         this.$root.$off(Messages.LAUNCH_XR, this.onLaunchXR);
-        this.$root.$off(Messages.SILENCE_ENTER, this.enterSilentMode);
-        this.$root.$off(Messages.SILENCE_EXIT, this.exitSilentMode);
         this.$root.$off(Messages.MODEL_PLACE, this.placeModel);
         this.$root.$off(Messages.MODEL_UNDO, this.removeLastModel);
         this.$root.$off(Messages.MODEL_CLEAR, this.removeAllModels);
@@ -111,14 +104,6 @@ export default class WebXr extends Vue {
         if (!this.models3D[this.selectedModel.id]) {
             this.loadModel(this.selectedModel);
         }
-    }
-
-    private enterSilentMode(): void {
-        this.silentMode = true;
-    }
-
-    private exitSilentMode(): void {
-        this.silentMode = false;
     }
 
     private loadModel(model: Model): void {
@@ -235,7 +220,8 @@ export default class WebXr extends Vue {
             this.camera.updateMatrixWorld(true);
 
             // Update cursor and preview model in active mode
-            if (!this.silentMode) {
+            const hitTestEnabled = !this.$store.state.viewOnlyMode;
+            if (hitTestEnabled) {
                 this.runHitTestAndUpdateCursor(frame);
             } else {
                 this.nopsy.visible = false;
