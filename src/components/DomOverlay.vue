@@ -105,7 +105,7 @@ export default class DomOverlay extends Vue {
 }
 
 #domOverlay .hideable {
-    transition: transform 0.3s easeInOutBounce;
+    transition: transform 0.3s ease-in-out;
 }
 
 #domOverlay .swiper.hideable {
@@ -113,7 +113,7 @@ export default class DomOverlay extends Vue {
 }
 
 #domOverlay.silent .hideable {
-    transform: translateY(1000px);
+    transform: translateY(100px);
 }
 
 #domOverlay.silent .swiper.hideable {
