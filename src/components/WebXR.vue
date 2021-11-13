@@ -277,9 +277,8 @@ export default class WebXr extends Vue {
         if (!this.nopsy || !this.selectedModel) return;
         const isSelectedModel = this.previewModel?.name == `model-${this.selectedModel?.id}`;
 
-        // Remove preview model when 3D Model is loaded yet
-        const removePreviewModel = !isSelectedModel && !this.models3D[this.selectedModel?.id];
-        if (removePreviewModel && this.previewModel) {
+        // Remove preview when it's not the current model
+        if (this.previewModel && !isSelectedModel) {
             this.nopsy.remove(this.previewModel);
             this.previewModel = null;
         }
