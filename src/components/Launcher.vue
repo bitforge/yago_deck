@@ -27,7 +27,6 @@ import { Component, Vue } from 'vue-property-decorator';
 import QRCodeStyling, { CornerDotType, CornerSquareType, DotType, DrawType } from 'qr-code-styling';
 import { Configuration, ModelsApi, ModelsListStatusEnum } from '@/api';
 import { Messages } from '@/messages';
-import { APIKey, ProjectID } from '@/credentials';
 
 @Component
 export default class Launcher extends Vue {
@@ -77,16 +76,21 @@ export default class Launcher extends Vue {
 
     private async loadModels(): Promise<void> {
         try {
-            const modelApi = new ModelsApi(new Configuration({ apiKey: APIKey }));
+            const modelApi = new ModelsApi(new Configuration({ apiKey: process.env.VUE_APP_API_KEY }));
             // TODO: Filter for status READY and ONLINE
             // Unfortunately no possible with generated api atm.
             const models = await modelApi.modelsList({
-                project: ProjectID,
+                project: process.env.VUE_APP_PROJECT_ID,
                 status: ModelsListStatusEnum.Ready,
             });
             this.$store.commit('setModels', models);
         } catch (error: any) {
-            console.log(error);
+            let errorMsg = error.toString();
+            if (error instanceof Response) {
+                errorMsg = `Status ${error.status} ${error.statusText}`;
+            }
+            alert(`Failed to load models: ${errorMsg}`);
+            console.error(error);
         }
     }
 
