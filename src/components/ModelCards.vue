@@ -1,5 +1,5 @@
 <template>
-    <div class="swiper">
+    <div class="swiper hideable">
         <div class="swiper-wrapper">
             <div v-for="(model, index) in $store.state.models" :key="index" class="swiper-slide">
                 <h2>{{ model.name }}</h2>

@@ -4,8 +4,8 @@
 
 export enum Messages {
     LAUNCH_XR = 'launchXR',
-    HIDE_CARDS = 'hideCards',
-    SHOW_CARDS = 'showCards',
+    SILENCE_ENTER = 'enterSilence',
+    SILENCE_EXIT = 'exitSilence',
     MODEL_PLACE = 'placeModel',
     MODEL_SELECT = 'selectModel',
     MODEL_UNDO = 'removeLastModel',

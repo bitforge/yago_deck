@@ -1,24 +1,24 @@
 <template>
     <!-- Component must be use only once in document! -->
-    <div id="domOverlay" v-show="showOverlay">
+    <div id="domOverlay" v-show="showOverlay" :class="{ silent: isSilent }">
         <div class="touch" @click="placeModel"></div>
-        <div class="model-selector" v-show="modelCardsVisible">
+        <div class="model-selector">
             <model-cards />
         </div>
         <div class="toolbar">
-            <button @click="undoLastModel">
+            <button @click="undoLastModel" class="hideable">
                 <span class="material-icons">undo</span>
                 <span>Undo</span>
             </button>
-            <button @click="hideCards" v-if="modelCardsVisible">
+            <button @click="hideCards" v-if="!isSilent">
                 <span class="material-icons">style</span>
                 <span class="material-icons">expand_more</span>
             </button>
-            <button @click="showCards" v-if="!modelCardsVisible">
+            <button @click="showCards" v-if="isSilent">
                 <span class="material-icons">expand_less</span>
                 <span class="material-icons">style</span>
             </button>
-            <button @click="clearModels">
+            <button @click="clearModels" class="hideable">
                 <span class="material-icons">delete</span>
                 <span>Clear</span>
             </button>
@@ -38,7 +38,7 @@ import { Model } from '@/api';
     },
 })
 export default class DomOverlay extends Vue {
-    public modelCardsVisible = true;
+    public isSilent = false;
 
     private selectedModel: Model | null = null;
 
@@ -73,14 +73,14 @@ export default class DomOverlay extends Vue {
 
     /** Hide model selection cards */
     public hideCards(): void {
-        this.modelCardsVisible = false;
-        this.$root.$emit(Messages.HIDE_CARDS);
+        this.isSilent = true;
+        this.$root.$emit(Messages.SILENCE_ENTER);
     }
 
     /** Show model selection cards */
     public showCards(): void {
-        this.modelCardsVisible = true;
-        this.$root.$emit(Messages.SHOW_CARDS);
+        this.isSilent = false;
+        this.$root.$emit(Messages.SILENCE_EXIT);
     }
 
     /** Remova ALL placed models */
@@ -102,6 +102,22 @@ export default class DomOverlay extends Vue {
     right: 0;
     bottom: 0;
     z-index: 100;
+}
+
+#domOverlay .hideable {
+    transition: transform 0.3s easeInOutBounce;
+}
+
+#domOverlay .swiper.hideable {
+    transition: transform 0.5s ease-in-out;
+}
+
+#domOverlay.silent .hideable {
+    transform: translateY(1000px);
+}
+
+#domOverlay.silent .swiper.hideable {
+    transform: translateY(320px);
 }
 
 .touch {
@@ -127,6 +143,7 @@ export default class DomOverlay extends Vue {
     flex-direction: row;
     justify-content: space-between;
     padding: 12px;
+    z-index: 150;
 }
 
 .toolbar button {
