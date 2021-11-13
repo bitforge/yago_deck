@@ -29,6 +29,8 @@ models/ModelStatus.ts
 models/ModelUpdate.ts
 models/Nested.ts
 models/NewSubscription.ts
+models/PasswordReset.ts
+models/PasswordResetConfirm.ts
 models/PatchedAddress.ts
 models/PatchedModelUpdate.ts
 models/PatchedProjectUpdate.ts

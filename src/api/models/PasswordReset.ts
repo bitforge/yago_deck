@@ -14,34 +14,34 @@
 
 import { exists, mapValues } from '../runtime';
 /**
- * 
+ * Serializer for requesting a password reset e-mail.
  * @export
- * @interface ProjectCreate
+ * @interface PasswordReset
  */
-export interface ProjectCreate {
+export interface PasswordReset {
     /**
      * 
      * @type {string}
-     * @memberof ProjectCreate
+     * @memberof PasswordReset
      */
-    name: string;
+    email: string;
 }
 
-export function ProjectCreateFromJSON(json: any): ProjectCreate {
-    return ProjectCreateFromJSONTyped(json, false);
+export function PasswordResetFromJSON(json: any): PasswordReset {
+    return PasswordResetFromJSONTyped(json, false);
 }
 
-export function ProjectCreateFromJSONTyped(json: any, ignoreDiscriminator: boolean): ProjectCreate {
+export function PasswordResetFromJSONTyped(json: any, ignoreDiscriminator: boolean): PasswordReset {
     if ((json === undefined) || (json === null)) {
         return json;
     }
     return {
         
-        'name': json['name'],
+        'email': json['email'],
     };
 }
 
-export function ProjectCreateToJSON(value?: ProjectCreate | null): any {
+export function PasswordResetToJSON(value?: PasswordReset | null): any {
     if (value === undefined) {
         return undefined;
     }
@@ -50,7 +50,7 @@ export function ProjectCreateToJSON(value?: ProjectCreate | null): any {
     }
     return {
         
-        'name': value.name,
+        'email': value.email,
     };
 }
 

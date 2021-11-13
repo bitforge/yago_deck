@@ -2,7 +2,7 @@
 /* eslint-disable */
 /**
  * Genie API
- * Augement Reality for E-commerce made simple.
+ * Augemented Reality Made Easy.
  *
  * The version of the OpenAPI document: 1.0.0
  * Contact: hello@genie-ar.ch
@@ -18,6 +18,12 @@ import {
     GoogleIdToken,
     GoogleIdTokenFromJSON,
     GoogleIdTokenToJSON,
+    PasswordReset,
+    PasswordResetFromJSON,
+    PasswordResetToJSON,
+    PasswordResetConfirm,
+    PasswordResetConfirmFromJSON,
+    PasswordResetConfirmToJSON,
     TokenObtainRequest,
     TokenObtainRequestFromJSON,
     TokenObtainRequestToJSON,
@@ -41,6 +47,14 @@ export interface AuthCreateRequest {
 
 export interface AuthGoogleCreateRequest {
     googleIdToken: GoogleIdToken;
+}
+
+export interface AuthPasswordResetConfirmCreateRequest {
+    passwordResetConfirm: PasswordResetConfirm;
+}
+
+export interface AuthPasswordResetCreateRequest {
+    passwordReset: PasswordReset;
 }
 
 export interface AuthRefreshCreateRequest {
@@ -119,6 +133,72 @@ export class AuthApi extends runtime.BaseAPI {
      */
     async authGoogleCreate(requestParameters: AuthGoogleCreateRequest, initOverrides?: RequestInit): Promise<TokenObtainResponse> {
         const response = await this.authGoogleCreateRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Password reset e-mail link is confirmed, reset the user\'s password.
+     */
+    async authPasswordResetConfirmCreateRaw(requestParameters: AuthPasswordResetConfirmCreateRequest, initOverrides?: RequestInit): Promise<runtime.ApiResponse<PasswordResetConfirm>> {
+        if (requestParameters.passwordResetConfirm === null || requestParameters.passwordResetConfirm === undefined) {
+            throw new runtime.RequiredError('passwordResetConfirm','Required parameter requestParameters.passwordResetConfirm was null or undefined when calling authPasswordResetConfirmCreate.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/api/auth/password/reset/confirm/`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: PasswordResetConfirmToJSON(requestParameters.passwordResetConfirm),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => PasswordResetConfirmFromJSON(jsonValue));
+    }
+
+    /**
+     * Password reset e-mail link is confirmed, reset the user\'s password.
+     */
+    async authPasswordResetConfirmCreate(requestParameters: AuthPasswordResetConfirmCreateRequest, initOverrides?: RequestInit): Promise<PasswordResetConfirm> {
+        const response = await this.authPasswordResetConfirmCreateRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Request password reset. Send an email to the user first.
+     */
+    async authPasswordResetCreateRaw(requestParameters: AuthPasswordResetCreateRequest, initOverrides?: RequestInit): Promise<runtime.ApiResponse<PasswordReset>> {
+        if (requestParameters.passwordReset === null || requestParameters.passwordReset === undefined) {
+            throw new runtime.RequiredError('passwordReset','Required parameter requestParameters.passwordReset was null or undefined when calling authPasswordResetCreate.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/api/auth/password/reset/`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: PasswordResetToJSON(requestParameters.passwordReset),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => PasswordResetFromJSON(jsonValue));
+    }
+
+    /**
+     * Request password reset. Send an email to the user first.
+     */
+    async authPasswordResetCreate(requestParameters: AuthPasswordResetCreateRequest, initOverrides?: RequestInit): Promise<PasswordReset> {
+        const response = await this.authPasswordResetCreateRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

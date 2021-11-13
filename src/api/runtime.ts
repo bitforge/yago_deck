@@ -2,7 +2,7 @@
 /* eslint-disable */
 /**
  * Genie API
- * Augement Reality for E-commerce made simple.
+ * Augemented Reality Made Easy.
  *
  * The version of the OpenAPI document: 1.0.0
  * Contact: hello@genie-ar.ch
@@ -13,7 +13,7 @@
  */
 
 
-export const BASE_PATH = "https://genie-ar.ch/".replace(/\/+$/, "");
+export const BASE_PATH = "https://genie-ar.ch".replace(/\/+$/, "");
 
 const isBlob = (value: any) => typeof Blob !== 'undefined' && value instanceof Blob;
 

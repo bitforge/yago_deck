@@ -18,6 +18,8 @@ export * from './ModelStatus';
 export * from './ModelUpdate';
 export * from './Nested';
 export * from './NewSubscription';
+export * from './PasswordReset';
+export * from './PasswordResetConfirm';
 export * from './PatchedAddress';
 export * from './PatchedModelUpdate';
 export * from './PatchedProjectUpdate';
