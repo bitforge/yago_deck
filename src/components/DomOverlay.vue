@@ -1,11 +1,13 @@
 <template>
     <!-- This is the UI that gets rendered on top of WebXR session -->
-    <div class="domOverlay" v-show="showOverlay" :class="{ silent: isSilent }">
-        <div class="touch-area" @click="placeModel"></div>
-        <div class="model-selector">
+    <div class="domOverlay" :class="{ silent: isSilent }">
+        <div class="touch-area" @click="placeModel">
+            <!-- Click will trigger model placement -->
+        </div>
+        <div class="models-deck" v-show="showDeck">
             <model-cards />
         </div>
-        <div class="toolbar">
+        <div class="toolbar" v-show="showToolbar">
             <button @click="undoLastModel" class="hideable">
                 <span class="material-icons">undo</span>
                 <span>Undo</span>
@@ -55,9 +57,15 @@ export default class DomOverlay extends Vue {
         this.selectedModel = this.$store.getters.getModelById(modelId) as Model;
     }
 
-    public get showOverlay(): boolean {
-        // Uncomment next line to show overlay for development
-        if (process.env.NODE_ENV === 'development') return true;
+    public get showDeck(): void {
+        // Card are visible when WebXR is supported and in dev mode
+        const devMode = process.env.NODE_ENV === 'development';
+        return this.$store.state.xrSupported || devMode;
+    }
+
+    public get showToolbar(): boolean {
+        // Uncomment next line to show toolbar in development
+        // if (process.env.NODE_ENV === 'development') return true;
         return this.$store.state.xrActive;
     }
 
@@ -127,7 +135,7 @@ export default class DomOverlay extends Vue {
     /* background-color: #000000aa; */
 }
 
-.model-selector {
+.models-deck {
     height: 235px;
     display: flex;
     justify-content: center;

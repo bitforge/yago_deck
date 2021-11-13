@@ -12,7 +12,9 @@
             <h4>This Demo was made for Android devices.</h4>
             <p>
                 Please scan the following QR Code with an <br />
-                <a href="https://developers.google.com/ar/devices" target="_blank">ARCore supported device</a>:
+                <a href="https://developers.google.com/ar/devices" target="_blank" class="external">
+                    ARCore supported device.
+                </a>
             </p>
             <div class="qr-element" ref="qrcode"></div>
             <p>
@@ -53,7 +55,9 @@ export default class Launcher extends Vue {
         },
     };
 
-    public devMode(): boolean {
+    public get devMode(): boolean {
+        // Toggle lines to show WebXR compatiblity message in dev
+        // return false;
         return process.env.NODE_ENV === 'development';
     }
 
