@@ -1,6 +1,11 @@
 <template>
     <div class="launcher">
+        <div class="branding">
+            <img src="~@/assets/img/genie_white.png" alt="Genie" class="genie" />
+            <img src="~@/assets/img/logo_white.svg" alt="deck" class="deck" />
+        </div>
         <div class="launch-area" v-if="xrSupported || devMode">
+            <p>Place models anywhere. Play your cards well!</p>
             <button slot="ar-button" id="ar-button" @click="launchXR">
                 <img src="~@/assets/img/ar_icon.svg" />
                 Launch Demo 🥳🤳🪴
@@ -119,10 +124,15 @@ export default class Launcher extends Vue {
     bottom: 0;
     left: 0;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    background-color: #333;
+    background-color: rgb(42, 44, 48);
     z-index: 10;
+}
+
+.launcher p {
+    color: white;
 }
 
 @keyframes vibrant {
@@ -140,12 +150,38 @@ export default class Launcher extends Vue {
     }
 }
 
+.branding {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 4px;
+}
+
+.branding img.genie {
+    width: 140px;
+    margin: 8px;
+}
+
+.branding img.deck {
+    width: 140px;
+    margin: 8px;
+}
+
+.launch-area {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
 #ar-button {
     animation: vibrant 0.8s infinite;
     display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: center;
+    margin: 16px 0;
     background-color: #074e68;
     color: white;
     height: 64px;
@@ -199,10 +235,6 @@ export default class Launcher extends Vue {
 
 .fallback-area h4 {
     font-size: 18px;
-    color: white;
-}
-
-.fallback-area p {
     color: white;
 }
 
