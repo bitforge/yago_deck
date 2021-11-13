@@ -1,9 +1,6 @@
 <template>
     <!-- This is the UI that gets rendered on top of WebXR session -->
     <div class="domOverlay" :class="{ silent: isSilent }">
-        <div class="touch-area" @click="placeModel">
-            <!-- Click will trigger model placement -->
-        </div>
         <div class="models-deck" v-show="showDeck">
             <model-cards />
         </div>
@@ -103,7 +100,8 @@ export default class DomOverlay extends Vue {
 .domOverlay {
     display: flex;
     flex-direction: column;
-    justify-content: stretch;
+    justify-content: end;
+    align-items: stretch;
 
     position: absolute;
     left: 0;
@@ -111,6 +109,9 @@ export default class DomOverlay extends Vue {
     right: 0;
     bottom: 0;
     z-index: 100;
+
+    padding-top: calc(env(safe-area-inset-top) + 20px);
+    padding-bottom: env(safe-area-inset-bottom);
 }
 
 .domOverlay .hideable {
@@ -127,12 +128,6 @@ export default class DomOverlay extends Vue {
 
 .domOverlay.silent .swiper.hideable {
     transform: translateY(320px);
-}
-
-.touch-area {
-    margin-top: calc(env(safe-area-inset-top) + 20px);
-    flex-grow: 1;
-    /* background-color: #000000aa; */
 }
 
 .models-deck {
