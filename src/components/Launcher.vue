@@ -73,7 +73,7 @@ export default class Launcher extends Vue {
         this.$store.commit('setXRSupported', this.xrSupported);
 
         // Initialize
-        if (this.xrSupported) {
+        if (this.xrSupported || this.devMode) {
             this.loadModels();
         } else {
             this.renderQRCode();

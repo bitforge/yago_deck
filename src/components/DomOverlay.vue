@@ -5,22 +5,30 @@
             <model-cards />
         </div>
         <div class="toolbar" v-show="showToolbar">
-            <button @click="undoLastModel" class="hideable">
-                <span class="material-icons">undo</span>
-                <span>Undo</span>
-            </button>
-            <button @click="hideCards" v-if="!$store.state.viewOnlyMode">
-                <span class="material-icons">style</span>
-                <span class="material-icons">expand_more</span>
-            </button>
-            <button @click="showCards" v-if="$store.state.viewOnlyMode">
-                <span class="material-icons">expand_less</span>
-                <span class="material-icons">style</span>
-            </button>
-            <button @click="clearModels" class="hideable">
-                <span class="material-icons">delete</span>
-                <span>Clear</span>
-            </button>
+            <toolbar-button
+                v-show="enabledDeleteButtons"
+                icon="undo"
+                text="Undo"
+                @click="undoLastModel"
+                :hideable="true" />
+            <toolbar-button
+                v-show="!$store.state.viewOnlyMode"
+                icon="style"
+                action="expand_more"
+                @click="hideCards"
+                :hideable="false" />
+            <toolbar-button
+                v-show="$store.state.viewOnlyMode"
+                icon="expand_less"
+                action="style"
+                @click="showCards"
+                :hideable="false" />
+            <toolbar-button
+                v-show="enabledDeleteButtons"
+                icon="delete"
+                text="Undo"
+                @click="clearModels"
+                :hideable="true" />
         </div>
     </div>
 </template>
@@ -28,12 +36,14 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import ModelCards from '@/components/ModelCards.vue';
+import ToolbarButton from '@/components/ToolbarButton.vue';
 import { Messages } from '@/messages';
 import { Model } from '@/api';
 
 @Component({
     components: {
         ModelCards,
+        ToolbarButton,
     },
 })
 export default class DomOverlay extends Vue {
@@ -51,16 +61,27 @@ export default class DomOverlay extends Vue {
         this.selectedModel = this.$store.getters.getModelById(modelId) as Model;
     }
 
+    public get devMode(): boolean {
+        return process.env.NODE_ENV === 'development';
+    }
+
     public get showDeck(): void {
         // Card are visible when WebXR is supported and in dev mode
-        const devMode = process.env.NODE_ENV === 'development';
-        return this.$store.state.xrSupported || devMode;
+        return this.$store.state.xrSupported || this.devMode;
     }
 
     public get showToolbar(): boolean {
-        // Uncomment next line to show toolbar in development
-        // if (process.env.NODE_ENV === 'development') return true;
-        return this.$store.state.xrActive;
+        // Allways show toolbar in development
+        if (process.env.NODE_ENV === 'development') {
+            return true;
+        } else {
+            return this.$store.state.xrSupported;
+        }
+    }
+
+    public get enabledDeleteButtons(): boolean {
+        // TODO: Buttons should only be enabled when a model is placed
+        return true;
     }
 
     /** Place currently selected model on the plane */
@@ -131,14 +152,14 @@ export default class DomOverlay extends Vue {
     display: flex;
     justify-content: center;
     align-items: center;
-    pointer-events: all;
+    pointer-events: auto;
 }
 
 .toolbar {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    pointer-events: all;
+    pointer-events: auto;
     padding: 12px;
     z-index: 150;
 }
