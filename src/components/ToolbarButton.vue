@@ -1,5 +1,5 @@
 <template>
-    <button @click="onClick" :class="{ 'toolbar-button': true, hideable: hideable }">
+    <button @click="onClick" :class="{ 'toolbar-button': true, hideable: hideable, disabled: disabled }">
         <span class="material-icons">{{ icon }}</span>
         <span :class="{ 'material-icons': action }">{{ action || text }}</span>
     </button>
@@ -18,6 +18,9 @@ export default class ToolbarButton extends Vue {
 
     @Prop({ default: '' })
     public action!: string;
+
+    @Prop({ default: false })
+    public disabled!: boolean;
 
     @Prop({ default: true })
     public hideable!: boolean;
@@ -42,6 +45,10 @@ export default class ToolbarButton extends Vue {
     flex-direction: column;
     justify-content: center;
     align-items: center;
+}
+
+.toolbar-button.disabled {
+    color: #fff9;
 }
 
 .toolbar-button span:nth-child(1) {

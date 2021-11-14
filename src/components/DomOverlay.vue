@@ -6,11 +6,11 @@
         </div>
         <div class="toolbar" v-show="showToolbar">
             <toolbar-button
-                v-show="enabledDeleteButtons"
                 icon="undo"
                 text="Undo"
                 @click="undoLastModel"
-                :hideable="true" />
+                :hideable="true"
+                :disabled="disableDeleteButtons" />
             <toolbar-button
                 v-show="!$store.state.viewOnlyMode"
                 icon="style"
@@ -24,11 +24,11 @@
                 @click="showCards"
                 :hideable="false" />
             <toolbar-button
-                v-show="enabledDeleteButtons"
                 icon="delete"
                 text="Clear"
                 @click="clearModels"
-                :hideable="true" />
+                :hideable="true"
+                :disabled="disableDeleteButtons" />
         </div>
     </div>
 </template>
@@ -80,9 +80,9 @@ export default class DomOverlay extends Vue {
         }
     }
 
-    public get enabledDeleteButtons(): boolean {
-        // TODO: Buttons should only be enabled when a model is placed
-        return true;
+    public get disableDeleteButtons(): boolean {
+        // Buttons are enabled when a model is placed
+        return this.$store.state.placed.length == 0;
     }
 
     /** Place currently selected model on the plane */
