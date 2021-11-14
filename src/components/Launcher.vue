@@ -6,10 +6,11 @@
         </div>
         <div class="launch-area" v-if="xrSupported || devMode">
             <p>Place models anywhere. Play your cards well!</p>
-            <button slot="ar-button" id="ar-button" @click="launchXR">
+            <button class="xr-button" @click="launchXR">
                 <img src="~@/assets/img/ar_icon.svg" />
                 Launch Demo 🥳🤳🪴
             </button>
+            <div class="spacer"></div>
         </div>
         <div class="fallback-area" v-if="!xrSupported && !devMode">
             <h2>WebXR not supported.</h2>
@@ -175,7 +176,7 @@ export default class Launcher extends Vue {
     align-items: center;
 }
 
-#ar-button {
+.xr-button {
     animation: vibrant 0.8s infinite;
     display: flex;
     flex-direction: row;
@@ -193,26 +194,30 @@ export default class Launcher extends Vue {
     font-size: 16px;
 }
 
-#ar-button:hover {
+.xr-button:hover {
     background-color: #0d6c92;
 }
 
-#ar-button:active {
+.xr-button:active {
     background-color: #042633;
 }
 
-#ar-button img {
+.xr-button img {
     width: 28px;
     height: 28px;
     padding: 4px;
 }
 
-#ar-button:focus {
+.xr-button:focus {
     outline: none;
 }
 
-#ar-button:focus-visible {
+.xr-button:focus-visible {
     outline: 1px solid #4285f4;
+}
+
+.spacer {
+    height: 140px;
 }
 
 .fallback-area {
