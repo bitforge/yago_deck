@@ -6,15 +6,6 @@
 </template>
 
 <script lang="ts">
-// Typescript and WebXR unfortunately are not in a love relation yet
-// Disabling checks is required to build this project, but missing out on all benefits of ts :(
-
-// When you feel brave: try to find or create a good WebXR type definition
-// If you fail to make it work, please increase this counter:
-// FAILED_ATTEMPTS_TO_MARRY_TYPESCRIPT_AND_WEBXR = 2
-
-// @ts-nocheck
-
 import { Component, Vue, Watch } from 'vue-property-decorator';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { Events } from '@/events';
@@ -28,11 +19,11 @@ export default class WebXr extends Vue {
     private selectedModel: Model | null = null;
 
     // WebXR & WebGL:
-    private session: XRSession | null = null;
-    private xrLightProbe: XRLightEstimate | null = null;
-    private referenceSpace: XRReferenceSpace | null = null;
-    private hitTestSource: XRHitTestSource | null = null;
-    private gl: WebGLRenderingContext | null = null;
+    private session: XRSession | undefined;
+    private xrLightProbe: XRLightProbe | undefined;
+    private referenceSpace: XRReferenceSpace | undefined;
+    private hitTestSource: XRHitTestSource | undefined;
+    private gl: WebGLRenderingContext | undefined;
 
     // THREE.js
     private renderer: THREE.WebGLRenderer | null = null;
@@ -56,8 +47,8 @@ export default class WebXr extends Vue {
         this.$root.$on(Events.LaunchXR, this.onLaunchXR);
         this.$root.$on(Events.SelectModel, this.onSelectModel);
         this.$root.$on(Events.PlaceModel, this.onPlaceModel);
-        this.$root.$on(Events.UndoModel, this.onUnplaceModel);
-        this.$root.$on(Events.ClearModels, this.onClearModels);
+        this.$root.$on(Events.UnplaceModel, this.onUnplaceModel);
+        this.$root.$on(Events.ClearPlaced, this.onClearModels);
     }
 
     public beforeDestroy(): void {
@@ -65,8 +56,8 @@ export default class WebXr extends Vue {
         this.$root.$off(Events.LaunchXR, this.onLaunchXR);
         this.$root.$off(Events.SelectModel, this.onSelectModel);
         this.$root.$off(Events.PlaceModel, this.onPlaceModel);
-        this.$root.$off(Events.UndoModel, this.onUnplaceModel);
-        this.$root.$off(Events.ClearModels, this.onClearModels);
+        this.$root.$off(Events.UnplaceModel, this.onUnplaceModel);
+        this.$root.$off(Events.ClearPlaced, this.onClearModels);
     }
 
     private initCamera(): void {
@@ -127,6 +118,7 @@ export default class WebXr extends Vue {
     }
 
     public onUnplaceModel(): void {
+        // @ts-ignore: Reverse indexing an array with at is possible
         const lastModel = this.scene.children.at(-1) as THREE.Object3D;
         if (lastModel && lastModel.name.startsWith('model')) {
             this.scene.remove(lastModel);
@@ -226,7 +218,7 @@ export default class WebXr extends Vue {
             if (hitTestEnabled) {
                 this.runHitTestAndUpdateCursor(frame);
             } else {
-                this.nopsy.visible = false;
+                if (this.nopsy) this.nopsy.visible = false;
             }
 
             // Render the scene with THREE.WebGLRenderer.
@@ -242,6 +234,8 @@ export default class WebXr extends Vue {
 
     private runHitTestAndUpdateCursor(frame: XRFrame) {
         // Check if viewport center has a hit test and update nopsy position
+        if (!this.hitTestSource || !this.referenceSpace) return;
+
         const hitTestResults = frame.getHitTestResults(this.hitTestSource);
         if (hitTestResults.length > 0 && this.nopsy) {
             const hitPose = hitTestResults[0].getPose(this.referenceSpace);
@@ -304,7 +298,8 @@ export default class WebXr extends Vue {
     }
 
     private updateLightningEstimate(frame: XRFrame): void {
-        // Get light estimate from XRFrame
+        // Get light estimate from XRFrame when possible
+        if (!this.xrLightProbe) return;
         const lightEstimate = frame.getLightEstimate(this.xrLightProbe);
         if (!lightEstimate) return;
 
