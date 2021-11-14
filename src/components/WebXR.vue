@@ -17,7 +17,7 @@
 
 import { Component, Vue, Watch } from 'vue-property-decorator';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { Messages } from '@/messages';
+import { Events } from '@/events';
 import { Model } from '@/api';
 import * as THREE from 'three';
 import { Actions } from '@/store';
@@ -53,20 +53,20 @@ export default class WebXr extends Vue {
         this.loadNopsy();
 
         // Subscribe to events
-        this.$root.$on(Messages.LAUNCH_XR, this.onLaunchXR);
-        this.$root.$on(Messages.MODEL_PLACE, this.placeModel);
-        this.$root.$on(Messages.MODEL_UNDO, this.removeLastModel);
-        this.$root.$on(Messages.MODEL_CLEAR, this.removeAllModels);
-        this.$root.$on(Messages.MODEL_SELECT, this.updateSelectedModelId);
+        this.$root.$on(Events.LaunchXR, this.onLaunchXR);
+        this.$root.$on(Events.PlaceModel, this.placeModel);
+        this.$root.$on(Events.UndoModel, this.removeLastModel);
+        this.$root.$on(Events.ClearModels, this.removeAllModels);
+        this.$root.$on(Events.SelectModel, this.updateSelectedModelId);
     }
 
     public beforeDestroy(): void {
         // Unsubscribe from events
-        this.$root.$off(Messages.LAUNCH_XR, this.onLaunchXR);
-        this.$root.$off(Messages.MODEL_PLACE, this.placeModel);
-        this.$root.$off(Messages.MODEL_UNDO, this.removeLastModel);
-        this.$root.$off(Messages.MODEL_CLEAR, this.removeAllModels);
-        this.$root.$off(Messages.MODEL_SELECT, this.updateSelectedModelId);
+        this.$root.$off(Events.LaunchXR, this.onLaunchXR);
+        this.$root.$off(Events.PlaceModel, this.placeModel);
+        this.$root.$off(Events.UndoModel, this.removeLastModel);
+        this.$root.$off(Events.ClearModels, this.removeAllModels);
+        this.$root.$off(Events.SelectModel, this.updateSelectedModelId);
     }
 
     private initCamera(): void {

@@ -34,7 +34,7 @@
 import { Component, Vue } from 'vue-property-decorator';
 import QRCodeStyling, { CornerDotType, CornerSquareType, DotType, DrawType } from 'qr-code-styling';
 import { Configuration, ModelsApi, ModelsListStatusEnum } from '@/api';
-import { Messages } from '@/messages';
+import { Events } from '@/events';
 import { Actions } from '@/store';
 
 @Component
@@ -119,7 +119,7 @@ export default class Launcher extends Vue {
         }
 
         // Everything is triggered via an event
-        this.$root.$emit(Messages.LAUNCH_XR);
+        this.$root.$emit(Events.LaunchXR);
     }
 }
 </script>

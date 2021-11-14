@@ -37,7 +37,7 @@
 import { Component, Vue } from 'vue-property-decorator';
 import ModelCards from '@/components/ModelCards.vue';
 import ToolbarButton from '@/components/ToolbarButton.vue';
-import { Messages } from '@/messages';
+import { Events } from '@/events';
 import { Model } from '@/api';
 import { Actions } from '@/store';
 
@@ -51,11 +51,11 @@ export default class DomOverlay extends Vue {
     private selectedModel: Model | null = null;
 
     public mounted(): void {
-        this.$root.$on(Messages.MODEL_SELECT, this.onModelSelected);
+        this.$root.$on(Events.SelectModel, this.onModelSelected);
     }
 
     public beforeDestroy(): void {
-        this.$root.$off(Messages.MODEL_SELECT, this.onModelSelected);
+        this.$root.$off(Events.SelectModel, this.onModelSelected);
     }
 
     private onModelSelected(modelId: string) {
@@ -88,13 +88,13 @@ export default class DomOverlay extends Vue {
     /** Place currently selected model on the plane */
     public placeModel(): void {
         const modelId = this.selectedModel?.id;
-        this.$root.$emit(Messages.MODEL_PLACE, modelId);
+        this.$root.$emit(Events.PlaceModel, modelId);
     }
 
     /** Remove last placed model */
     public undoLastModel(): void {
         this.$store.commit(Actions.UnplaceModel);
-        this.$root.$emit(Messages.MODEL_UNDO);
+        this.$root.$emit(Events.UndoModel);
     }
 
     /** Hide model selection cards */
@@ -110,7 +110,7 @@ export default class DomOverlay extends Vue {
     /** Remova ALL placed models */
     public clearModels(): void {
         this.$store.commit(Actions.ClearPlaced);
-        this.$root.$emit(Messages.MODEL_CLEAR);
+        this.$root.$emit(Events.ClearModels);
     }
 }
 </script>

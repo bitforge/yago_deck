@@ -11,7 +11,7 @@
 
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator';
-import { Messages } from '@/messages';
+import { Events } from '@/events';
 import { Model } from '@/api';
 import { Actions } from '@/store';
 
@@ -65,7 +65,7 @@ export default class ModelCards extends Vue {
     private selectFirstModel(): void {
         const models = this.$store.state.models as Model[];
         if (models.length > 0) {
-            this.$root.$emit(Messages.MODEL_SELECT, models[0].id);
+            this.$root.$emit(Events.SelectModel, models[0].id);
         }
     }
 
@@ -73,7 +73,7 @@ export default class ModelCards extends Vue {
         const index = this.swiper.activeIndex;
         const model = this.$store.state.models[index];
         if (!model) return;
-        this.$root.$emit(Messages.MODEL_SELECT, model.id);
+        this.$root.$emit(Events.SelectModel, model.id);
     }
 
     private onSliderTapped() {
@@ -81,7 +81,8 @@ export default class ModelCards extends Vue {
         const model = this.$store.state.models[index];
         if (!model) return;
         this.$store.commit(Actions.PlaceModel, model);
-        this.$root.$emit(Messages.MODEL_PLACE, model.id);
+        this.$root.$emit(Events.PlaceModel, model.id);
+
     }
 }
 </script>
