@@ -62,22 +62,14 @@ export default class DomOverlay extends Vue {
         this.selectedModel = this.$store.getters.getModelById(modelId) as Model;
     }
 
-    public get devMode(): boolean {
-        return process.env.NODE_ENV === 'development';
-    }
-
     public get showDeck(): void {
-        // Card are visible when WebXR is supported and in dev mode
-        return this.$store.state.xrSupported || this.devMode;
+        // Card are visible when WebXR is supported
+        return this.$store.state.xrSupported;
     }
 
     public get showToolbar(): boolean {
-        // Allways show toolbar in development
-        if (process.env.NODE_ENV === 'development') {
-            return true;
-        } else {
-            return this.$store.state.xrSupported;
-        }
+        // Show toolbar when XR session is active and in dev mode
+        return this.$store.state.xrActive || this.$store.state.devMode;
     }
 
     public get disableDeleteButtons(): boolean {

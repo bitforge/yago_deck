@@ -1,0 +1,111 @@
+<template>
+    <div class="fallback-content">
+        <h2>WebXR not supported.</h2>
+        <h3>📵 🤳 🪴 💔 😢</h3>
+        <h4>This Demo was made for Android devices.</h4>
+        <p>
+            Please scan the following QR Code with an <br />
+            <a href="https://developers.google.com/ar/devices" target="_blank" class="external">
+                ARCore supported device.
+            </a>
+        </p>
+        <div class="qr-element"></div>
+        <p>
+            <a class="qr-link" :href="qrUrl">{{ qrUrl }}</a>
+        </p>
+    </div>
+</template>
+
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator';
+import QRCodeStyling, { CornerDotType, CornerSquareType, DotType, DrawType } from 'qr-code-styling';
+
+@Component
+export default class FallbackContent extends Vue {
+    // QR Code styling options
+    private qrUrl = 'https://webxr.genie-ar.ch';
+    private qrCode: QRCodeStyling | null = null;
+    private qrOptions = {
+        width: 250,
+        height: 250,
+        type: 'svg' as DrawType,
+        data: this.qrUrl,
+        dotsOptions: {
+            type: 'rounded' as DotType,
+            color: '#074e68',
+        },
+        cornersSquareOptions: {
+            type: 'dot' as CornerSquareType,
+            color: '#042633',
+        },
+        cornersDotOptions: {
+            type: 'dot' as CornerDotType,
+            color: '#042633',
+        },
+    };
+
+    public mounted(): void {
+        // Render QR code when WebXR is not supported
+        if (!this.$store.state.xrSupported) this.renderQRCode();
+    }
+
+    private renderQRCode(): void {
+        const qrElement = document.querySelector('.qr-element') as HTMLElement;
+        if (!qrElement) return;
+
+        this.qrUrl = window.location.toString();
+        this.qrCode = new QRCodeStyling(this.qrOptions);
+        this.qrCode.append(qrElement);
+        this.qrCode?.update(this.qrOptions);
+    }
+}
+</script>
+
+<style>
+.fallback-content {
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.fallback-content h2 {
+    font-size: 24px;
+    color: white;
+}
+
+.fallback-content h3 {
+    font-size: 22px;
+    color: white;
+}
+
+.fallback-content h4 {
+    font-size: 18px;
+    color: white;
+}
+
+.fallback-content a,
+.fallback-content a:hover,
+.fallback-content a:visited {
+    color: white;
+}
+
+.qr-element {
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    padding: 8px;
+    margin: 8px;
+    background: black;
+    border-radius: 8px;
+}
+
+.qr-element img {
+    display: block;
+}
+
+.qr-link {
+    text-decoration: none;
+}
+</style>

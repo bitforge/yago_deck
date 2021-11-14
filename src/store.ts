@@ -5,6 +5,8 @@ import { Model } from '@/api';
 Vue.use(Vuex);
 
 const state: MainState = {
+    // Toggles visiblity of UI elements in dev
+    devMode: process.env.NODE_ENV === 'development',
     // True when WebXR is supported
     xrSupported: false,
     // True when WebXR session is active
@@ -62,6 +64,7 @@ export default new Vuex.Store({
 });
 
 interface MainState {
+    devMode: boolean;
     xrSupported: boolean;
     xrActive: boolean;
     viewOnlyMode: boolean;

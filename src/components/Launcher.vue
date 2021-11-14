@@ -4,7 +4,7 @@
             <img src="~@/assets/img/genie_white.png" alt="Genie" class="genie" />
             <img src="~@/assets/img/logo_white.svg" alt="deck" class="deck" />
         </div>
-        <div class="launch-area" v-if="xrSupported || devMode">
+        <div class="launch-area" v-if="xrSupported">
             <p>It's all one big session.</p>
             <button class="xr-button" @click="launchXR">
                 <img src="~@/assets/img/ar_icon.svg" />
@@ -12,83 +12,38 @@
             </button>
             <div class="spacer"></div>
         </div>
-        <div class="fallback-area" v-if="!xrSupported && !devMode">
-            <h2>WebXR not supported.</h2>
-            <h3>📵 🤳 🪴 💔 😢</h3>
-            <h4>This Demo was made for Android devices.</h4>
-            <p>
-                Please scan the following QR Code with an <br />
-                <a href="https://developers.google.com/ar/devices" target="_blank" class="external">
-                    ARCore supported device.
-                </a>
-            </p>
-            <div class="qr-element"></div>
-            <p>
-                <a class="qr-link" :href="qrUrl">{{ qrUrl }}</a>
-            </p>
-        </div>
+        <!-- Show QR Code with link to app when XR is not supported -->
+        <fallback-content v-if="!xrSupported" />
     </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import QRCodeStyling, { CornerDotType, CornerSquareType, DotType, DrawType } from 'qr-code-styling';
+import FallbackContent from '@/components/FallbackContent.vue';
 import { Configuration, ModelsApi, ModelsListStatusEnum } from '@/api';
 import { Events } from '@/events';
 import { Actions } from '@/store';
 
-@Component
+@Component({
+    components: {
+        FallbackContent,
+    },
+})
 export default class Launcher extends Vue {
     private xrSupported = false;
-
-    private qrUrl = 'https://webxr.genie-ar.ch';
-    private qrCode: QRCodeStyling | null = null;
-    private qrOptions = {
-        width: 250,
-        height: 250,
-        type: 'svg' as DrawType,
-        data: this.qrUrl,
-        dotsOptions: {
-            type: 'rounded' as DotType,
-            color: '#074e68',
-        },
-        cornersSquareOptions: {
-            type: 'dot' as CornerSquareType,
-            color: '#042633',
-        },
-        cornersDotOptions: {
-            type: 'dot' as CornerDotType,
-            color: '#042633',
-        },
-    };
-
-    public get devMode(): boolean {
-        // Toggle lines to show WebXR compatiblity message in dev
-        // return false;
-        return process.env.NODE_ENV === 'development';
-    }
 
     public mounted(): void {
         // Feature detect WebXR support
         this.xrSupported = (navigator as any).xr !== undefined;
+        // Fake WebXR support in local dev mode
+        // Uncomment this work on fallback view
+        if (this.$store.state.devMode) this.xrSupported = true;
         this.$store.commit('setXRSupported', this.xrSupported);
 
-        // Initialize
-        if (this.xrSupported || this.devMode) {
+        // Load models when we have support for WebXR
+        if (this.xrSupported || this.$store.state.devMode) {
             this.loadModels();
-        } else {
-            this.renderQRCode();
         }
-    }
-
-    private renderQRCode(): void {
-        const qrElement = document.querySelector('.qr-element') as HTMLElement;
-        if (!qrElement) return;
-
-        this.qrUrl = window.location.toString();
-        this.qrCode = new QRCodeStyling(this.qrOptions);
-        this.qrCode.append(qrElement);
-        this.qrCode?.update(this.qrOptions);
     }
 
     private async loadModels(): Promise<void> {
@@ -112,8 +67,9 @@ export default class Launcher extends Vue {
     }
 
     public launchXR(): void {
-        // Show error when in dev mode
-        if (!this.xrSupported && this.devMode) {
+        // Check WebXR availability again
+        const xrAvailable = (navigator as any).xr !== undefined;
+        if (!xrAvailable) {
             alert('WebXR not supported. 😢');
             return;
         }
@@ -225,52 +181,5 @@ export default class Launcher extends Vue {
 
 .spacer {
     height: 140px;
-}
-
-.fallback-area {
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
-
-.fallback-area h2 {
-    font-size: 24px;
-    color: white;
-}
-
-.fallback-area h3 {
-    font-size: 22px;
-    color: white;
-}
-
-.fallback-area h4 {
-    font-size: 18px;
-    color: white;
-}
-
-.fallback-area a,
-.fallback-area a:hover,
-.fallback-area a:visited {
-    color: white;
-}
-
-.qr-element {
-    display: flex;
-    justify-content: center;
-    align-content: center;
-    padding: 8px;
-    margin: 8px;
-    background: black;
-    border-radius: 8px;
-}
-
-.qr-element img {
-    display: block;
-}
-
-.qr-link {
-    text-decoration: none;
 }
 </style>
