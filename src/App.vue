@@ -9,9 +9,9 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import Launcher from './components/Launcher.vue';
+import Launcher from './views/Launcher.vue';
 import DomOverlay from './components/DomOverlay.vue';
-import WebXr from './components/WebXR.vue';
+import WebXr from './views/WebXR.vue';
 @Component({
     components: {
         Launcher,

@@ -13,20 +13,20 @@
             <div class="spacer"></div>
         </div>
         <!-- Show QR Code with link to app when XR is not supported -->
-        <fallback-content v-if="!xrSupported" />
+        <fallback v-if="!xrSupported" />
     </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import FallbackContent from '@/components/FallbackContent.vue';
+import Fallback from '@/views/Fallback.vue';
 import { Configuration, ModelsApi, Model, ModelStatus } from '@/api';
 import { Events } from '@/events';
 import { Actions } from '@/store';
 
 @Component({
     components: {
-        FallbackContent,
+        Fallback,
     },
 })
 export default class Launcher extends Vue {

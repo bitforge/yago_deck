@@ -158,31 +158,4 @@ export default class DomOverlay extends Vue {
     padding: 12px;
     z-index: 150;
 }
-
-.toolbar button {
-    width: 70px;
-    height: 70px;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    padding: 8px 16px;
-    background-color: rgba(0, 0, 0, 0.3);
-
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
-
-.toolbar button span:nth-child(1) {
-    font-size: 24px;
-}
-
-.toolbar button span:nth-child(2) {
-    font-size: 14px;
-}
-
-.toolbar .material-icons {
-    margin: 4px;
-}
 </style>
