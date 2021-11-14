@@ -109,11 +109,11 @@ export default class DomOverlay extends Vue {
 }
 
 .domOverlay .hideable {
-    transition: transform 0.3s ease-in-out;
+    transition: transform 0.3s cubic-bezier(0.68, -0.6, 0.32, 1.6);
 }
 
 .domOverlay .swiper.hideable {
-    transition: transform 0.5s ease-in-out;
+    transition: transform 0.5s cubic-bezier(0.68, -0.6, 0.32, 1.6);
 }
 
 .domOverlay.viewOnly .hideable {
