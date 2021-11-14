@@ -4,46 +4,22 @@
         <div class="models-deck" v-show="showDeck">
             <model-cards />
         </div>
-        <div class="toolbar" v-show="showToolbar">
-            <toolbar-button
-                icon="undo"
-                text="Undo"
-                @click="unplaceModel"
-                :hideable="true"
-                :disabled="disableDeleteButtons" />
-            <toolbar-button
-                v-show="!$store.state.viewOnlyMode"
-                icon="style"
-                action="expand_more"
-                @click="enableViewOnlyMode"
-                :hideable="false" />
-            <toolbar-button
-                v-show="$store.state.viewOnlyMode"
-                icon="expand_less"
-                action="style"
-                @click="disableViewOnlyMode"
-                :hideable="false" />
-            <toolbar-button
-                icon="delete"
-                text="Clear"
-                @click="clearModels"
-                :hideable="true"
-                :disabled="disableDeleteButtons" />
-        </div>
+        <toolbar v-show="showToolbar" />
     </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import ModelCards from '@/components/ModelCards.vue';
+import Toolbar from '@/components/Toolbar.vue';
 import ToolbarButton from '@/components/ToolbarButton.vue';
 import { Events } from '@/events';
 import { Model } from '@/api';
-import { Actions } from '@/store';
 
 @Component({
     components: {
         ModelCards,
+        Toolbar,
         ToolbarButton,
     },
 })
@@ -68,41 +44,8 @@ export default class DomOverlay extends Vue {
     }
 
     public get showToolbar(): boolean {
-        // Show toolbar when XR session is active and in dev mode
+        // Show toolbar when XR session is active or in dev mode
         return this.$store.state.xrActive || this.$store.state.devMode;
-    }
-
-    public get disableDeleteButtons(): boolean {
-        // Buttons are enabled when a model is placed
-        return this.$store.state.placed.length == 0;
-    }
-
-    /** Place currently selected model on the plane */
-    public placeModel(): void {
-        const modelId = this.selectedModel?.id;
-        this.$root.$emit(Events.PlaceModel, modelId);
-    }
-
-    /** Remove last placed model */
-    public unplaceModel(): void {
-        this.$store.commit(Actions.UnplaceModel);
-        this.$root.$emit(Events.UnplaceModel);
-    }
-
-    /** Hide model selection cards */
-    public enableViewOnlyMode(): void {
-        this.$store.commit(Actions.SetViewOnlyMode, true);
-    }
-
-    /** Show model selection cards */
-    public disableViewOnlyMode(): void {
-        this.$store.commit(Actions.SetViewOnlyMode, false);
-    }
-
-    /** Remova ALL placed models */
-    public clearModels(): void {
-        this.$store.commit(Actions.ClearPlaced);
-        this.$root.$emit(Events.ClearPlaced);
     }
 }
 </script>
@@ -148,14 +91,5 @@ export default class DomOverlay extends Vue {
     justify-content: center;
     align-items: center;
     pointer-events: auto;
-}
-
-.toolbar {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    pointer-events: auto;
-    padding: 12px;
-    z-index: 150;
 }
 </style>
