@@ -5,8 +5,9 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
+    "release": "vue-cli-service build --modern --non-interactive && yarn deploy",
     "lint": "vue-cli-service lint",
-    "deploy": "gsutil -m -h \"Cache-Control: no-store\" rsync -d -r dist gs://webxr-demo/",
+    "deploy": "gsutil -m -h \"Cache-Control: no-store\" rsync -d -r dist gs://genie-deck/",
     "ngrok": "ngrok http -host-header=rewrite 8080"
   },
   "dependencies": {
