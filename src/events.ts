@@ -2,12 +2,12 @@
 export enum Events {
     // Start WebXR session
     LaunchXR = 'launchXR',
-    // Place selected model on cursor position
-    PlaceModel = 'placeModel',
     // Change selected model
     SelectModel = 'selectModel',
+    // Place selected model on cursor position
+    PlaceModel = 'placeModel',
     // Remove last placed model
-    UndoModel = 'removeLastModel',
+    UnplaceModel = 'unplaceModel',
     // Remove all models
-    ClearModels = 'removeAllModels',
+    ClearPlaced = 'clearPlace',
 }

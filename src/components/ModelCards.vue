@@ -82,7 +82,6 @@ export default class ModelCards extends Vue {
         if (!model) return;
         this.$store.commit(Actions.PlaceModel, model);
         this.$root.$emit(Events.PlaceModel, model.id);
-
     }
 }
 </script>

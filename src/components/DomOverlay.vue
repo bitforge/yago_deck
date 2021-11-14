@@ -8,20 +8,20 @@
             <toolbar-button
                 icon="undo"
                 text="Undo"
-                @click="undoLastModel"
+                @click="unplaceModel"
                 :hideable="true"
                 :disabled="disableDeleteButtons" />
             <toolbar-button
                 v-show="!$store.state.viewOnlyMode"
                 icon="style"
                 action="expand_more"
-                @click="hideCards"
+                @click="enableViewOnlyMode"
                 :hideable="false" />
             <toolbar-button
                 v-show="$store.state.viewOnlyMode"
                 icon="expand_less"
                 action="style"
-                @click="showCards"
+                @click="disableViewOnlyMode"
                 :hideable="false" />
             <toolbar-button
                 icon="delete"
@@ -92,25 +92,25 @@ export default class DomOverlay extends Vue {
     }
 
     /** Remove last placed model */
-    public undoLastModel(): void {
+    public unplaceModel(): void {
         this.$store.commit(Actions.UnplaceModel);
-        this.$root.$emit(Events.UndoModel);
+        this.$root.$emit(Events.UnplaceModel);
     }
 
     /** Hide model selection cards */
-    public hideCards(): void {
+    public enableViewOnlyMode(): void {
         this.$store.commit(Actions.SetViewOnlyMode, true);
     }
 
     /** Show model selection cards */
-    public showCards(): void {
+    public disableViewOnlyMode(): void {
         this.$store.commit(Actions.SetViewOnlyMode, false);
     }
 
     /** Remova ALL placed models */
     public clearModels(): void {
         this.$store.commit(Actions.ClearPlaced);
-        this.$root.$emit(Events.ClearModels);
+        this.$root.$emit(Events.ClearPlaced);
     }
 }
 </script>

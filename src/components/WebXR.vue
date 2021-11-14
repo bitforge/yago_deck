@@ -54,19 +54,19 @@ export default class WebXr extends Vue {
 
         // Subscribe to events
         this.$root.$on(Events.LaunchXR, this.onLaunchXR);
-        this.$root.$on(Events.PlaceModel, this.placeModel);
-        this.$root.$on(Events.UndoModel, this.removeLastModel);
-        this.$root.$on(Events.ClearModels, this.removeAllModels);
-        this.$root.$on(Events.SelectModel, this.updateSelectedModelId);
+        this.$root.$on(Events.SelectModel, this.onSelectModel);
+        this.$root.$on(Events.PlaceModel, this.onPlaceModel);
+        this.$root.$on(Events.UndoModel, this.onUnplaceModel);
+        this.$root.$on(Events.ClearModels, this.onClearModels);
     }
 
     public beforeDestroy(): void {
         // Unsubscribe from events
         this.$root.$off(Events.LaunchXR, this.onLaunchXR);
-        this.$root.$off(Events.PlaceModel, this.placeModel);
-        this.$root.$off(Events.UndoModel, this.removeLastModel);
-        this.$root.$off(Events.ClearModels, this.removeAllModels);
-        this.$root.$off(Events.SelectModel, this.updateSelectedModelId);
+        this.$root.$off(Events.SelectModel, this.onSelectModel);
+        this.$root.$off(Events.PlaceModel, this.onPlaceModel);
+        this.$root.$off(Events.UndoModel, this.onUnplaceModel);
+        this.$root.$off(Events.ClearModels, this.onClearModels);
     }
 
     private initCamera(): void {
@@ -96,13 +96,14 @@ export default class WebXr extends Vue {
     public onModelsLoaded(): void {
         // setting first model as selected
         const models = this.$store.state.models as Model[];
-        this.updateSelectedModelId(models[0].id);
+        this.onSelectModel(models[0].id);
     }
 
-    private updateSelectedModelId(modelId: string): void {
+    private onSelectModel(modelId: string): void {
         // Load models on demand
         this.selectedModel = this.$store.getters.getModelById(modelId) as Model;
-        if (!this.models3D[this.selectedModel.id]) {
+        const isLoaded = this.models3D[this.selectedModel.id];
+        if (!isLoaded) {
             this.loadModel(this.selectedModel);
         }
     }
@@ -116,7 +117,7 @@ export default class WebXr extends Vue {
         });
     }
 
-    public placeModel(modelId: string): void {
+    public onPlaceModel(modelId: string): void {
         if (!this.nopsy) return;
         if (this.models3D[modelId]) {
             const clone = this.models3D[modelId].clone();
@@ -125,14 +126,14 @@ export default class WebXr extends Vue {
         }
     }
 
-    public removeLastModel(): void {
+    public onUnplaceModel(): void {
         const lastModel = this.scene.children.at(-1) as THREE.Object3D;
         if (lastModel && lastModel.name.startsWith('model')) {
             this.scene.remove(lastModel);
         }
     }
 
-    public removeAllModels(): void {
+    public onClearModels(): void {
         const children = this.scene.children.slice().reverse();
         for (const child of children) {
             if (child.name.startsWith('model')) {
