@@ -13,6 +13,7 @@
 import { Component, Vue, Watch } from 'vue-property-decorator';
 import { Messages } from '@/messages';
 import { Model } from '@/api';
+import { Actions } from '@/store';
 
 // Unfortunately, Swiper.js 7 Component for Vue is uterly broken.
 // Specifically, it's Vue 3 only Vue can't load ESM packages yet.
@@ -41,7 +42,6 @@ export default class ModelCards extends Vue {
         // Detach swiper events
         this.swiper.off('slideChange', this.onSlideChanged);
         this.swiper.off('tap', this.onSliderTapped);
-        this.swiper = null;
     }
 
     @Watch('$store.state.models')
@@ -80,6 +80,7 @@ export default class ModelCards extends Vue {
         const index = this.swiper.activeIndex;
         const model = this.$store.state.models[index];
         if (!model) return;
+        this.$store.commit(Actions.PlaceModel, model);
         this.$root.$emit(Messages.MODEL_PLACE, model.id);
     }
 }

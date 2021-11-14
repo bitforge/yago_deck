@@ -20,6 +20,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { Messages } from '@/messages';
 import { Model } from '@/api';
 import * as THREE from 'three';
+import { Actions } from '@/store';
 
 @Component
 export default class WebXr extends Vue {
@@ -188,7 +189,7 @@ export default class WebXr extends Vue {
         this.session.requestAnimationFrame(this.onXRFrame);
 
         // Show DOM overlay once XR Session is active
-        this.$store.commit('setXRActive', true);
+        this.$store.commit(Actions.SetXRActive, true);
     }
 
     private onXRFrame(time: number, frame: XRFrame): void {
@@ -235,7 +236,7 @@ export default class WebXr extends Vue {
     private onSessionEnded(): void {
         // Free resources
         this.renderer?.dispose();
-        this.$store.commit('setXRActive', false);
+        this.$store.commit(Actions.SetXRActive, false);
     }
 
     private runHitTestAndUpdateCursor(frame: XRFrame) {

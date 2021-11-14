@@ -26,7 +26,7 @@
             <toolbar-button
                 v-show="enabledDeleteButtons"
                 icon="delete"
-                text="Undo"
+                text="Clear"
                 @click="clearModels"
                 :hideable="true" />
         </div>
@@ -39,6 +39,7 @@ import ModelCards from '@/components/ModelCards.vue';
 import ToolbarButton from '@/components/ToolbarButton.vue';
 import { Messages } from '@/messages';
 import { Model } from '@/api';
+import { Actions } from '@/store';
 
 @Component({
     components: {
@@ -92,21 +93,23 @@ export default class DomOverlay extends Vue {
 
     /** Remove last placed model */
     public undoLastModel(): void {
+        this.$store.commit(Actions.UnplaceModel);
         this.$root.$emit(Messages.MODEL_UNDO);
     }
 
     /** Hide model selection cards */
     public hideCards(): void {
-        this.$store.commit('setViewOnlyMode', true);
+        this.$store.commit(Actions.SetViewOnlyMode, true);
     }
 
     /** Show model selection cards */
     public showCards(): void {
-        this.$store.commit('setViewOnlyMode', false);
+        this.$store.commit(Actions.SetViewOnlyMode, false);
     }
 
     /** Remova ALL placed models */
     public clearModels(): void {
+        this.$store.commit(Actions.ClearPlaced);
         this.$root.$emit(Messages.MODEL_CLEAR);
     }
 }

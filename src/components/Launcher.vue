@@ -35,6 +35,7 @@ import { Component, Vue } from 'vue-property-decorator';
 import QRCodeStyling, { CornerDotType, CornerSquareType, DotType, DrawType } from 'qr-code-styling';
 import { Configuration, ModelsApi, ModelsListStatusEnum } from '@/api';
 import { Messages } from '@/messages';
+import { Actions } from '@/store';
 
 @Component
 export default class Launcher extends Vue {
@@ -99,7 +100,7 @@ export default class Launcher extends Vue {
                 project: process.env.VUE_APP_PROJECT_ID,
                 status: ModelsListStatusEnum.Ready,
             });
-            this.$store.commit('setModels', models);
+            this.$store.commit(Actions.SetModels, models);
         } catch (error: any) {
             let errorMsg = error.toString();
             if (error instanceof Response) {

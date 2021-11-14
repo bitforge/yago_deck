@@ -13,7 +13,19 @@ const state: MainState = {
     viewOnlyMode: false,
     // Loaded model infos from api
     models: [],
+    // Currently placed models
+    placed: [],
 };
+
+export enum Actions {
+    SetXRSupported = 'setXRSupported',
+    SetXRActive = 'setXRActive',
+    SetViewOnlyMode = 'setViewOnlyMode',
+    SetModels = 'setModels',
+    PlaceModel = 'placeModel',
+    UnplaceModel = 'unplaceModel',
+    ClearPlaced = 'clearPlaced',
+}
 
 export default new Vuex.Store({
     state,
@@ -30,6 +42,15 @@ export default new Vuex.Store({
         setModels(state: MainState, models: Model[]): void {
             state.models = models;
         },
+        placeModel(state: MainState, model: Model): void {
+            state.placed.push(model);
+        },
+        unplaceModel(state: MainState): void {
+            state.placed.pop();
+        },
+        clearPlaced(state: MainState): void {
+            state.placed = [];
+        },
     },
     getters: {
         getModelById: (state: MainState) => (id: string) => {
@@ -45,4 +66,5 @@ interface MainState {
     xrActive: boolean;
     viewOnlyMode: boolean;
     models: Model[];
+    placed: Model[];
 }
