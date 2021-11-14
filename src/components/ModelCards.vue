@@ -54,8 +54,8 @@ export default class ModelCards extends Vue {
     }
 
     @Watch('$store.state.viewOnlyMode')
-    public onViewOnlyMode(old: boolean, isViewOnly: boolean): void {
-        if (isViewOnly) {
+    public onViewOnlyModeChanged(): void {
+        if (this.$store.state.viewOnlyMode) {
             this.swiper.disable();
         } else {
             this.swiper.enable();
