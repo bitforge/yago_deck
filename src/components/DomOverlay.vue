@@ -99,11 +99,13 @@ export default class DomOverlay extends Vue {
     align-items: stretch;
 
     position: absolute;
-    left: 0;
+    top: 0;
     right: 0;
     bottom: 0;
+    left: 0;
     z-index: 100;
 
+    pointer-events: none;
     padding-top: calc(env(safe-area-inset-top) + 20px);
     padding-bottom: env(safe-area-inset-bottom);
 }
