@@ -74,7 +74,7 @@ export default class WebXr extends Vue {
         // The name was invented by Parki Banya Gang
         // The original model was built with TinkerCAD:
         // https://bit.ly/3C668ge
-        this.gltfLoader.load('nopsy.glb', gltf => {
+        this.gltfLoader.load('nipple.glb', gltf => {
             this.nopsy = gltf.scene;
             this.nopsy.name = 'nopsy';
             this.nopsy.castShadow = false;
