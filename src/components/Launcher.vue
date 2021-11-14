@@ -20,7 +20,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import FallbackContent from '@/components/FallbackContent.vue';
-import { Configuration, ModelsApi, ModelsListStatusEnum } from '@/api';
+import { Configuration, ModelsApi, Model, ModelStatus } from '@/api';
 import { Events } from '@/events';
 import { Actions } from '@/store';
 
@@ -49,13 +49,9 @@ export default class Launcher extends Vue {
     private async loadModels(): Promise<void> {
         try {
             const modelApi = new ModelsApi(new Configuration({ apiKey: process.env.VUE_APP_API_KEY }));
-            // TODO: Filter for status READY and ONLINE
-            // Unfortunately no possible with generated api atm.
-            const models = await modelApi.modelsList({
-                project: process.env.VUE_APP_PROJECT_ID,
-                status: ModelsListStatusEnum.Ready,
-            });
-            this.$store.commit(Actions.SetModels, models);
+            const models = await modelApi.modelsList({ project: process.env.VUE_APP_PROJECT_ID });
+            const visibleModels = models.filter((model: Model) => model.status != ModelStatus.Draft);
+            this.$store.commit(Actions.SetModels, visibleModels);
         } catch (error: any) {
             let errorMsg = error.toString();
             if (error instanceof Response) {
