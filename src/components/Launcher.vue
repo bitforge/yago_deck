@@ -5,7 +5,7 @@
             <img src="~@/assets/img/logo_white.svg" alt="deck" class="deck" />
         </div>
         <div class="launch-area" v-if="xrSupported || devMode">
-            <p>Place models anywhere. Play your cards well!</p>
+            <p>It's all one big session.</p>
             <button class="xr-button" @click="launchXR">
                 <img src="~@/assets/img/ar_icon.svg" />
                 Launch Demo 🥳🤳🪴
@@ -22,7 +22,7 @@
                     ARCore supported device.
                 </a>
             </p>
-            <div class="qr-element" ref="qrcode"></div>
+            <div class="qr-element"></div>
             <p>
                 <a class="qr-link" :href="qrUrl">{{ qrUrl }}</a>
             </p>
@@ -73,14 +73,20 @@ export default class Launcher extends Vue {
         this.$store.commit('setXRSupported', this.xrSupported);
 
         // Initialize
-        this.loadModels();
-        this.renderQRCode();
+        if (this.xrSupported) {
+            this.loadModels();
+        } else {
+            this.renderQRCode();
+        }
     }
 
     private renderQRCode(): void {
+        const qrElement = document.querySelector('.qr-element') as HTMLElement;
+        if (!qrElement) return;
+
         this.qrUrl = window.location.toString();
         this.qrCode = new QRCodeStyling(this.qrOptions);
-        this.qrCode.append(this.$refs.qrcode as HTMLElement);
+        this.qrCode.append(qrElement);
         this.qrCode?.update(this.qrOptions);
     }
 

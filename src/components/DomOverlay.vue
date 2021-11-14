@@ -131,12 +131,14 @@ export default class DomOverlay extends Vue {
     display: flex;
     justify-content: center;
     align-items: center;
+    pointer-events: all;
 }
 
 .toolbar {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    pointer-events: all;
     padding: 12px;
     z-index: 150;
 }
