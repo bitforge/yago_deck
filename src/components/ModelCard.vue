@@ -2,6 +2,7 @@
     <div class="swiper-slide">
         <h2>{{ model.name }}</h2>
         <img :src="model.image" :alt="model.name" />
+        <h3 class="price">{{ displayPrice }}</h3>
     </div>
 </template>
 
@@ -13,6 +14,11 @@ import { Model } from '@/api';
 export default class ModelCard extends Vue {
     @Prop()
     public model!: Model;
+
+    public get displayPrice(): string {
+        if (!this.model.price || !this.model.priceCurrency) return 'XX.- CHF';
+        return `${this.model.price} ${this.model.priceCurrency}`;
+    }
 }
 </script>
 
@@ -28,15 +34,28 @@ export default class ModelCard extends Vue {
 
 .swiper-slide h2 {
     position: absolute;
-    left: 0;
     top: 0;
     right: 0;
+    left: 0;
     font-size: 16px;
     margin: 0;
     padding: 8px 4px;
     color: #fff;
     font-weight: bold;
     text-shadow: 1px 1px 5px #222;
+}
+
+.swiper-slide h3.price {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin: 0;
+    padding: 8px;
+    color: #000;
+    text-align: center;
+    font-size: 18px;
+    background-color: #fff9;
 }
 
 /* Distinct color set from Sasha Trubetskoy: */
