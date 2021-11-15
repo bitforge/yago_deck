@@ -23,6 +23,11 @@ export default class WebXr extends Vue {
     // Current model
     private selectedModel: Model | null = null;
 
+    // THREE.js rendering layers:
+    // 0: Cursor and preview objects
+    // 1: Placed models
+    // Camera and lights are enabled on all layers
+
     // WebXR & WebGL:
     private session: XRSession | undefined;
     private xrLightProbe: XRLightProbe | undefined;
@@ -34,10 +39,12 @@ export default class WebXr extends Vue {
     private renderer: THREE.WebGLRenderer | null = null;
     private models3D: { [id: string]: THREE.Group } = {};
     private gltfLoader = new GLTFLoader();
-    private nopsy: THREE.Group | null = null;
+    private nopsy = new THREE.Group();
     private previewModel: THREE.Object3D | null = null;
     private scene = new THREE.Scene();
     private camera = new THREE.PerspectiveCamera();
+    private center = new THREE.Vector2(0, 0);
+    private modelRaycaster = new THREE.Raycaster();
     private directionalLight = new THREE.DirectionalLight(0xffffff, 1);
     private lightProbe = new THREE.LightProbe();
     private previewMaterial: THREE.MeshStandardMaterial | null = null;
@@ -45,7 +52,7 @@ export default class WebXr extends Vue {
     public mounted(): void {
         // Prepare THREE.js environment
         this.initCamera();
-        this.addLightning();
+        this.addLights();
         this.loadNopsy();
         this.createPreviewMaterial();
 
@@ -67,10 +74,14 @@ export default class WebXr extends Vue {
     }
 
     private initCamera(): void {
+        this.camera.layers.enableAll();
         this.camera.matrixAutoUpdate = false;
+        this.modelRaycaster.layers.set(1);
     }
 
-    private addLightning(): void {
+    private addLights(): void {
+        this.directionalLight.layers.enableAll();
+        this.lightProbe.layers.enableAll();
         this.scene.add(this.directionalLight);
         this.scene.add(this.lightProbe);
     }
@@ -85,12 +96,13 @@ export default class WebXr extends Vue {
             this.nopsy.name = 'nopsy';
             this.nopsy.castShadow = false;
             this.nopsy.visible = false;
+            this.nopsy.traverse(obj => obj.layers.set(0));
             this.scene.add(this.nopsy);
         });
     }
 
     private createPreviewMaterial(): void {
-        // Create and keep preview material
+        // Semi transparent (ghost) material for models not placed yet
         const transMat = new THREE.MeshStandardMaterial({
             color: 0xffffff,
             roughness: 0.5,
@@ -129,16 +141,16 @@ export default class WebXr extends Vue {
     }
 
     public onPlaceModel(modelId: string): void {
-        if (!this.nopsy) return;
         if (this.models3D[modelId]) {
-            const clone = this.models3D[modelId].clone();
-            clone.position.copy(this.nopsy.position);
-            this.scene.add(clone);
+            const placedModel = this.models3D[modelId].clone();
+            placedModel.position.copy(this.nopsy.position);
+            placedModel.traverse(obj => obj.layers.set(1));
+            this.scene.add(placedModel);
         }
     }
 
     public onUnplaceModel(): void {
-        // @ts-ignore: Reverse indexing an array with at is possible
+        // @ts-ignore: Reverse indexing an array with at() is okay
         const lastModel = this.scene.children.at(-1) as THREE.Object3D;
         if (lastModel && lastModel.name.startsWith('model')) {
             this.scene.remove(lastModel);
@@ -218,43 +230,60 @@ export default class WebXr extends Vue {
      * @param {XRFrame} frame - Current frame with all object tracked by session
      */
     private onXRFrame(time: DOMHighResTimeStamp, frame: XRFrame): void {
-        // Queue up the next draw request.
+        // Bail out if required stuff is not available
         if (!this.session) return;
-        this.session.requestAnimationFrame(this.onXRFrame);
-
-        // Bail out right away if required stuff is not available
         if (!this.renderer || !this.session.renderState.baseLayer || !this.gl) return;
 
-        // Update Lightning estimate for current frame
-        this.updateLightningEstimate(frame);
+        // Queue up the next draw request.
+        this.session.requestAnimationFrame(this.onXRFrame);
 
         // Bind the graphics framebuffer to the baseLayer's framebuffer
         this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.session.renderState.baseLayer.framebuffer);
 
-        // Retrieve the pose of the device.
         // XRFrame.getViewerPose can return null while the session attempts to establish tracking.
         const pose = frame.getViewerPose(this.referenceSpace);
         if (pose) {
-            // In mobile AR, we only have one view.
-            const view = pose.views[0];
-            const viewport = this.session.renderState.baseLayer.getViewport(view);
-            this.renderer.setSize(viewport.width, viewport.height);
+            // Update Lightning estimate for current frame
+            this.updateLightEstimate(frame);
 
-            // Use the view's transform matrix and projection matrix to configure the THREE.camera.
-            this.camera.matrix.fromArray(view.transform.matrix);
-            this.camera.projectionMatrix.fromArray(view.projectionMatrix);
-            this.camera.updateMatrixWorld(true);
+            // Update scene for current position
+            this.updateViewerPose(frame, pose);
 
-            // Update cursor and preview model in active mode
-            const hitTestEnabled = !this.$store.state.viewOnlyMode;
-            if (hitTestEnabled) {
-                this.runHitTestAndUpdateCursor(frame);
-            } else {
-                if (this.nopsy) this.nopsy.visible = false;
-            }
-
-            // Render the scene with THREE.WebGLRenderer.
+            // Render the scene
             this.renderer.render(this.scene, this.camera);
+        }
+    }
+
+    private updateViewerPose(frame: XRFrame, pose: XRViewerPose): void {
+        // Bail out if required stuff is not available
+        if (!this.session) return;
+        if (!this.renderer || !this.session.renderState.baseLayer || !this.gl) return;
+
+        // In mobile AR, we only have one view.
+        const view = pose.views[0];
+        const viewport = this.session.renderState.baseLayer.getViewport(view);
+        this.renderer.setSize(viewport.width, viewport.height);
+
+        // Use the view's transform matrix and projection matrix to configure the THREE.camera.
+        this.camera.matrix.fromArray(view.transform.matrix);
+        this.camera.projectionMatrix.fromArray(view.projectionMatrix);
+        this.camera.updateMatrixWorld(true);
+
+        // Check if center of camera frustum hits a placed model
+        // If so, hide cursor and preview model and we're done
+        this.modelRaycaster.setFromCamera(this.center, this.camera);
+        const modelHits = this.modelRaycaster.intersectObjects(this.scene.children, true);
+        if (modelHits.length > 0) {
+            this.nopsy.visible = false;
+            return;
+        }
+
+        // Check hit test and update cursor and preview model
+        const hitTestEnabled = !this.$store.state.viewOnlyMode;
+        if (hitTestEnabled) {
+            this.runHitTestAndUpdateCursor(frame);
+        } else {
+            this.nopsy.visible = false;
         }
     }
 
@@ -263,7 +292,7 @@ export default class WebXr extends Vue {
         if (!this.hitTestSource || !this.referenceSpace) return;
 
         const hitTestResults = frame.getHitTestResults(this.hitTestSource);
-        if (hitTestResults.length > 0 && this.nopsy) {
+        if (hitTestResults.length > 0) {
             const hitPose = hitTestResults[0].getPose(this.referenceSpace);
             if (hitPose) {
                 this.nopsy.visible = true;
@@ -282,7 +311,7 @@ export default class WebXr extends Vue {
 
     private updatePreviewModel(): void {
         // Nopsy is absolutely required!
-        if (!this.nopsy || !this.selectedModel) return;
+        if (!this.selectedModel) return;
         const isSelectedModel = this.previewModel?.name == `model-${this.selectedModel?.id}`;
 
         // Remove preview when it's not the current model
@@ -291,11 +320,12 @@ export default class WebXr extends Vue {
             this.previewModel = null;
         }
 
-        // Add preview model when loaded
+        // Add preview model when require and model is loaded
         const addPreviewModel = !isSelectedModel && this.models3D[this.selectedModel?.id];
         if (addPreviewModel) {
             // Add new semi transparent clone
             this.previewModel = this.models3D[this.selectedModel.id].clone();
+            this.previewModel.traverse(obj => obj.layers.set(0));
             this.previewModel.traverse((object: THREE.Object3D<THREE.Event>) => {
                 const mesh = object as THREE.Mesh;
                 const material = mesh.material as THREE.MeshStandardMaterial;
@@ -307,7 +337,7 @@ export default class WebXr extends Vue {
         }
     }
 
-    private updateLightningEstimate(frame: XRFrame): void {
+    private updateLightEstimate(frame: XRFrame): void {
         // Get light estimate from XRFrame when possible
         if (!this.xrLightProbe) return;
         const lightEstimate = frame.getLightEstimate(this.xrLightProbe);
