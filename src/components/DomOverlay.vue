@@ -1,26 +1,22 @@
 <template>
     <!-- This is the UI that gets rendered on top of WebXR session -->
     <div class="domOverlay" :class="{ viewOnly: $store.state.viewOnlyMode }">
-        <div class="models-deck" v-show="showDeck">
-            <model-cards />
-        </div>
+        <models-deck v-show="showDeck" />
         <toolbar v-show="showToolbar" />
     </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import ModelCards from '@/components/ModelCards.vue';
+import ModelsDeck from '@/components/ModelsDeck.vue';
 import Toolbar from '@/components/Toolbar.vue';
-import ToolbarButton from '@/components/ToolbarButton.vue';
 import { Events } from '@/events';
 import { Model } from '@/api';
 
 @Component({
     components: {
-        ModelCards,
+        ModelsDeck,
         Toolbar,
-        ToolbarButton,
     },
 })
 export default class DomOverlay extends Vue {
@@ -83,13 +79,5 @@ export default class DomOverlay extends Vue {
 
 .domOverlay.viewOnly .swiper.hideable {
     transform: translateY(320px);
-}
-
-.models-deck {
-    height: 235px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    pointer-events: auto;
 }
 </style>
