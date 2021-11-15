@@ -19,9 +19,10 @@
             @click="disableViewOnlyMode"
             :hideable="false" />
         <toolbar-button
-            icon="delete"
-            text="Clear"
-            @click="clearModels"
+            icon="shopping_cart"
+            text="Cart"
+            :cartBadge="true"
+            @click="showCart"
             :hideable="true"
             :disabled="disableDeleteButtons" />
     </div>
@@ -64,9 +65,8 @@ export default class Toolbar extends Vue {
     }
 
     /** Remova ALL placed models */
-    public clearModels(): void {
-        this.state.clearPlaced();
-        this.$root.$emit(Events.ClearPlaced);
+    public showCart(): void {
+        alert('Not implemented yet. 🙇‍♀️');
     }
 }
 </script>

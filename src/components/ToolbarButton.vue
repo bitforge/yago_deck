@@ -1,15 +1,20 @@
 <template>
     <button @click="onClick" :class="{ 'toolbar-button': true, hideable: hideable, disabled: disabled }">
-        <span class="material-icons">{{ icon }}</span>
-        <span :class="{ 'material-icons': action }">{{ action || text }}</span>
+        <span class="material-icons primary">{{ icon }}</span>
+        <span :class="{ 'material-icons': action, secondary: true }">{{ action || text }}</span>
+        <span class="badge" v-if="showBadge">{{ badgeCount }}</span>
     </button>
 </template>
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
+import { getModule } from 'vuex-module-decorators';
+import GlobalState from '@/store/GlobalState';
 
 @Component
 export default class ToolbarButton extends Vue {
+    private state = getModule(GlobalState, this.$store);
+
     @Prop({ default: 'home' })
     public icon!: string;
 
@@ -20,10 +25,21 @@ export default class ToolbarButton extends Vue {
     public action!: string;
 
     @Prop({ default: false })
+    public cartBadge!: boolean;
+
+    @Prop({ default: false })
     public disabled!: boolean;
 
     @Prop({ default: true })
     public hideable!: boolean;
+
+    public get showBadge(): boolean {
+        return this.cartBadge && this.state.placed.length > 0;
+    }
+
+    public get badgeCount(): number {
+        return this.state.placed.length;
+    }
 
     public onClick(): void {
         this.$emit('click');
@@ -33,6 +49,7 @@ export default class ToolbarButton extends Vue {
 
 <style>
 .toolbar-button {
+    position: relative;
     width: 70px;
     height: 70px;
     color: #fff;
@@ -51,15 +68,26 @@ export default class ToolbarButton extends Vue {
     color: #fff9;
 }
 
-.toolbar-button span:nth-child(1) {
+.toolbar-button span.primary {
     font-size: 24px;
 }
 
-.toolbar-button span:nth-child(2) {
+.toolbar-button span.secondary {
     font-size: 14px;
 }
 
 .toolbar-button .material-icons:nth-child(1) {
     margin: 4px;
+}
+
+.toolbar-button .badge {
+    position: absolute;
+    left: -16px;
+    top: -16px;
+    width: 20px;
+    height: 20px;
+    border-radius: 8px;
+    background-color: rgba(0, 0, 0, 0.6);
+    padding: 6px;
 }
 </style>
