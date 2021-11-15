@@ -146,6 +146,7 @@ export default class WebXr extends Vue {
             placedModel.position.copy(this.nopsy.position);
             placedModel.traverse(obj => obj.layers.set(1));
             this.scene.add(placedModel);
+            this.nopsy.scale.setScalar(0);
         }
     }
 
@@ -274,8 +275,9 @@ export default class WebXr extends Vue {
         this.modelRaycaster.setFromCamera(this.center, this.camera);
         const modelHits = this.modelRaycaster.intersectObjects(this.scene.children, true);
         if (modelHits.length > 0) {
-            this.nopsy.visible = false;
-            return;
+            if (this.nopsy.scale.x > 0.01) this.nopsy.scale.subScalar(0.1);
+        } else {
+            if (this.nopsy.scale.x < 0.99) this.nopsy.scale.addScalar(0.1);
         }
 
         // Check hit test and update cursor and preview model
