@@ -1,10 +1,7 @@
 <template>
     <div class="launcher">
-        <div class="branding">
-            <img src="~@/assets/img/genie_white.png" alt="Genie" class="genie" />
-            <img src="~@/assets/img/logo_white.svg" alt="deck" class="deck" />
-        </div>
-        <div class="launch-area" v-if="xrSupported">
+        <branding />
+        <div class="launch-area" v-if="$store.state.xrSupported">
             <p>It's all one big session.</p>
             <button class="xr-button" @click="launchXR">
                 <img src="~@/assets/img/ar_icon.svg" />
@@ -12,36 +9,25 @@
             </button>
             <div class="spacer"></div>
         </div>
-        <!-- Show QR Code with link to app when XR is not supported -->
-        <fallback v-if="!xrSupported" />
     </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import Fallback from '@/views/Fallback.vue';
+import Branding from '@/components/Branding.vue';
 import { Configuration, ModelsApi, Model, ModelStatus } from '@/api';
 import { Events } from '@/events';
 import { Actions } from '@/store';
 
 @Component({
     components: {
-        Fallback,
+        Branding,
     },
 })
 export default class Launcher extends Vue {
-    private xrSupported = false;
-
     public mounted(): void {
-        // Feature detect WebXR support
-        this.xrSupported = (navigator as any).xr !== undefined;
-        // Fake WebXR support in local dev mode
-        // Uncomment this work on fallback view
-        if (this.$store.state.devMode) this.xrSupported = true;
-        this.$store.commit('setXRSupported', this.xrSupported);
-
         // Load models when we have support for WebXR
-        if (this.xrSupported || this.$store.state.devMode) {
+        if (this.$store.state.xrSupported || this.$store.state.devMode) {
             this.loadModels();
         }
     }
@@ -83,10 +69,12 @@ export default class Launcher extends Vue {
     right: 0;
     bottom: 0;
     left: 0;
+
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+
     background-color: rgb(42, 44, 48);
     z-index: 10;
 }
@@ -108,24 +96,6 @@ export default class Launcher extends Vue {
     100% {
         transform: scale(1.05);
     }
-}
-
-.branding {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    padding: 4px;
-}
-
-.branding img.genie {
-    width: 140px;
-    margin: 8px;
-}
-
-.branding img.deck {
-    width: 140px;
-    margin: 8px;
 }
 
 .launch-area {

@@ -1,21 +1,39 @@
 <template>
     <div id="app">
+        <!-- Main WebXR view -->
         <web-xr />
-        <launcher />
+        <!-- WebXR needs a launch button -->
+        <launcher v-if="xrSupported" />
+        <!-- Show QR Code with link to app when XR is not supported -->
+        <fallback v-if="!xrSupported" />
     </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import Launcher from './views/Launcher.vue';
-import WebXr from './views/WebXR.vue';
+import WebXr from '@/views/WebXR.vue';
+import Launcher from '@/views/Launcher.vue';
+import Fallback from '@/views/Fallback.vue';
+
 @Component({
     components: {
-        Launcher,
         WebXr,
+        Launcher,
+        Fallback,
     },
 })
-export default class App extends Vue {}
+export default class App extends Vue {
+    private xrSupported = false;
+
+    public mounted(): void {
+        // Feature detect WebXR support
+        this.xrSupported = (navigator as any).xr !== undefined;
+        // Fake WebXR support in local dev mode
+        // Comment this this line to work on fallback view
+        if (this.$store.state.devMode) this.xrSupported = true;
+        this.$store.commit('setXRSupported', this.xrSupported);
+    }
+}
 </script>
 
 <style>

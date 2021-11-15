@@ -1,5 +1,6 @@
 <template>
-    <div class="fallback-content">
+    <div class="fallback">
+        <branding />
         <h2>WebXR not supported.</h2>
         <h3>📵 🤳 🪴 💔 😢</h3>
         <h4>This Demo was made for Android devices.</h4>
@@ -19,8 +20,13 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import QRCodeStyling, { CornerDotType, CornerSquareType, DotType, DrawType } from 'qr-code-styling';
+import Branding from '@/components/Branding.vue';
 
-@Component
+@Component({
+    components: {
+        Branding,
+    },
+})
 export default class FallbackContent extends Vue {
     // QR Code styling options
     private qrUrl = 'https://webxr.genie-ar.ch';
@@ -62,32 +68,44 @@ export default class FallbackContent extends Vue {
 </script>
 
 <style>
-.fallback-content {
-    padding: 10px;
+.fallback {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+
+    padding: 10px;
+    background-color: rgb(42, 44, 48);
 }
 
-.fallback-content h2 {
+.fallback p {
+    color: white;
+}
+
+.fallback h2 {
     font-size: 24px;
     color: white;
 }
 
-.fallback-content h3 {
+.fallback h3 {
     font-size: 22px;
     color: white;
 }
 
-.fallback-content h4 {
+.fallback h4 {
     font-size: 18px;
     color: white;
 }
 
-.fallback-content a,
-.fallback-content a:hover,
-.fallback-content a:visited {
+.fallback a,
+.fallback a:hover,
+.fallback a:visited {
     color: white;
 }
 
