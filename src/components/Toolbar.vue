@@ -7,13 +7,13 @@
             :hideable="true"
             :disabled="disableDeleteButtons" />
         <toolbar-button
-            v-show="!$store.state.viewOnlyMode"
+            v-show="!state.viewOnlyMode"
             icon="style"
             action="expand_more"
             @click="enableViewOnlyMode"
             :hideable="false" />
         <toolbar-button
-            v-show="$store.state.viewOnlyMode"
+            v-show="state.viewOnlyMode"
             icon="expand_less"
             action="style"
             @click="disableViewOnlyMode"
@@ -29,9 +29,10 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
+import { getModule } from 'vuex-module-decorators';
+import GlobalState from '@/store/GlobalState';
 import ToolbarButton from '@/components/ToolbarButton.vue';
 import { Events } from '@/events';
-import { Actions } from '@/store';
 
 @Component({
     components: {
@@ -39,30 +40,32 @@ import { Actions } from '@/store';
     },
 })
 export default class Toolbar extends Vue {
+    private state = getModule(GlobalState, this.$store);
+
     public get disableDeleteButtons(): boolean {
-        // Buttons are enabled when a model is placed
-        return this.$store.state.placed.length == 0;
+        // Buttons are enabled when any model is placed
+        return this.state.placed.length == 0;
     }
 
     /** Remove last placed model */
     public unplaceModel(): void {
-        this.$store.commit(Actions.UnplaceModel);
+        this.state.unplaceModel();
         this.$root.$emit(Events.UnplaceModel);
     }
 
     /** Hide most UI elements only view content */
     public enableViewOnlyMode(): void {
-        this.$store.commit(Actions.SetViewOnlyMode, true);
+        this.state.setViewOnlyMode(true);
     }
 
     /** Show all UI Elements again */
     public disableViewOnlyMode(): void {
-        this.$store.commit(Actions.SetViewOnlyMode, false);
+        this.state.setViewOnlyMode(false);
     }
 
     /** Remova ALL placed models */
     public clearModels(): void {
-        this.$store.commit(Actions.ClearPlaced);
+        this.state.clearPlaced();
         this.$root.$emit(Events.ClearPlaced);
     }
 }

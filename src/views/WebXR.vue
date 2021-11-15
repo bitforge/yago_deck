@@ -7,12 +7,13 @@
 
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator';
+import { getModule } from 'vuex-module-decorators';
+import GlobalState from '@/store/GlobalState';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import DomOverlay from '@/components/DomOverlay.vue';
 import { Events } from '@/events';
 import { Model } from '@/api';
 import * as THREE from 'three';
-import { Actions } from '@/store';
 
 @Component({
     components: {
@@ -20,6 +21,8 @@ import { Actions } from '@/store';
     },
 })
 export default class WebXr extends Vue {
+    private state = getModule(GlobalState, this.$store);
+
     // Current model
     private selectedModel: Model | null = null;
 
@@ -117,16 +120,18 @@ export default class WebXr extends Vue {
         this.previewMaterial = transMat;
     }
 
-    @Watch('$store.state.models')
+    @Watch('state.models')
     public onModelsLoaded(): void {
         // setting first model as selected
-        const models = this.$store.state.models as Model[];
+        const models = this.state.models as Model[];
         this.onSelectModel(models[0].id);
     }
 
     private onSelectModel(modelId: string): void {
         // Load models on demand
-        this.selectedModel = this.$store.getters.getModelById(modelId) as Model;
+        const model = this.state.getModelById(modelId);
+        if (model === undefined) return;
+        this.selectedModel = model;
         const isLoaded = this.models3D[this.selectedModel.id];
         if (!isLoaded) {
             this.loadModel(this.selectedModel);
@@ -172,7 +177,7 @@ export default class WebXr extends Vue {
     private onSessionEnded(): void {
         // Free up resources
         this.renderer?.dispose();
-        this.$store.commit(Actions.SetXRActive, false);
+        this.state.setXRActive(false);
     }
 
     private onEndXR(): void {
@@ -228,7 +233,7 @@ export default class WebXr extends Vue {
         this.session.requestAnimationFrame(this.onXRFrame);
 
         // Show DOM overlay once XR Session is active
-        this.$store.commit(Actions.SetXRActive, true);
+        this.state.setXRActive(true);
     }
 
     /**
@@ -287,7 +292,7 @@ export default class WebXr extends Vue {
         }
 
         // Check hit test and update cursor and preview model
-        const hitTestEnabled = !this.$store.state.viewOnlyMode;
+        const hitTestEnabled = !this.state.viewOnlyMode;
         if (hitTestEnabled) {
             this.runHitTestAndUpdateCursor(frame);
         } else {

@@ -1,6 +1,6 @@
 <template>
     <!-- This is the UI that gets rendered on top of WebXR session -->
-    <div class="domOverlay" :class="{ viewOnly: $store.state.viewOnlyMode }">
+    <div class="domOverlay" :class="{ viewOnly: state.viewOnlyMode }">
         <exit-button v-show="showExit" />
         <models-deck v-show="showDeck" />
         <toolbar v-show="showToolbar" />
@@ -9,6 +9,8 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
+import { getModule } from 'vuex-module-decorators';
+import GlobalState from '@/store/GlobalState';
 import ExitButton from '@/components/ExitButton.vue';
 import ModelsDeck from '@/components/ModelsDeck.vue';
 import Toolbar from '@/components/Toolbar.vue';
@@ -23,6 +25,7 @@ import { Model } from '@/api';
     },
 })
 export default class DomOverlay extends Vue {
+    private state = getModule(GlobalState, this.$store);
     private selectedModel: Model | null = null;
 
     public mounted(): void {
@@ -33,20 +36,21 @@ export default class DomOverlay extends Vue {
         this.$root.$off(Events.SelectModel, this.onModelSelected);
     }
 
-    private onModelSelected(modelId: string) {
-        this.selectedModel = this.$store.getters.getModelById(modelId) as Model;
+    public onModelSelected(modelId: string): void {
+        const model = this.state.getModelById(modelId);
+        if (model) this.selectedModel = model;
     }
 
     public get showExit(): boolean {
-        return this.$store.state.xrActive;
+        return this.state.xrActive;
     }
 
     public get showDeck(): boolean {
-        return this.$store.state.xrSupported;
+        return this.state.xrSupported;
     }
 
     public get showToolbar(): boolean {
-        return this.$store.state.xrActive || this.$store.state.devMode;
+        return this.state.xrActive || this.state.devMode;
     }
 }
 </script>

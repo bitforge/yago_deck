@@ -19,6 +19,8 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
+import { getModule } from 'vuex-module-decorators';
+import GlobalState from '@/store/GlobalState';
 import QRCodeStyling, { CornerDotType, CornerSquareType, DotType, DrawType } from 'qr-code-styling';
 import Branding from '@/components/Branding.vue';
 
@@ -28,6 +30,8 @@ import Branding from '@/components/Branding.vue';
     },
 })
 export default class FallbackContent extends Vue {
+    private state = getModule(GlobalState, this.$store);
+
     // QR Code styling options
     private qrUrl = 'https://webxr.genie-ar.ch';
     private qrCode: QRCodeStyling | null = null;
@@ -52,7 +56,7 @@ export default class FallbackContent extends Vue {
 
     public mounted(): void {
         // Render QR code when WebXR is not supported
-        if (!this.$store.state.xrSupported) this.renderQRCode();
+        if (!this.state.xrSupported) this.renderQRCode();
     }
 
     private renderQRCode(): void {

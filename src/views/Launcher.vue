@@ -1,7 +1,7 @@
 <template>
     <div class="launcher">
         <branding />
-        <div class="launch-area" v-if="$store.state.xrSupported">
+        <div class="launch-area" v-if="state.xrSupported">
             <p>It's all one big session.</p>
             <button class="xr-button" @click="launchXR">
                 <img src="~@/assets/img/ar_icon.svg" />
@@ -14,10 +14,11 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
+import { getModule } from 'vuex-module-decorators';
+import GlobalState from '@/store/GlobalState';
 import Branding from '@/components/Branding.vue';
 import { Configuration, ModelsApi, Model, ModelStatus } from '@/api';
 import { Events } from '@/events';
-import { Actions } from '@/store';
 
 @Component({
     components: {
@@ -25,9 +26,11 @@ import { Actions } from '@/store';
     },
 })
 export default class Launcher extends Vue {
+    private state = getModule(GlobalState, this.$store);
+
     public mounted(): void {
         // Load models when we have support for WebXR
-        if (this.$store.state.xrSupported || this.$store.state.devMode) {
+        if (this.state.xrSupported || this.state.devMode) {
             this.loadModels();
         }
     }
@@ -37,7 +40,7 @@ export default class Launcher extends Vue {
             const modelApi = new ModelsApi(new Configuration({ apiKey: process.env.VUE_APP_API_KEY }));
             const models = await modelApi.modelsList({ project: process.env.VUE_APP_PROJECT_ID });
             const visibleModels = models.filter((model: Model) => model.status != ModelStatus.Draft);
-            this.$store.commit(Actions.SetModels, visibleModels);
+            this.state.setModels(visibleModels);
         } catch (error: any) {
             let errorMsg = error.toString();
             if (error instanceof Response) {

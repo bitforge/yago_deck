@@ -11,6 +11,8 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
+import { getModule } from 'vuex-module-decorators';
+import GlobalState from '@/store/GlobalState';
 import WebXr from '@/views/WebXR.vue';
 import Launcher from '@/views/Launcher.vue';
 import Fallback from '@/views/Fallback.vue';
@@ -23,6 +25,7 @@ import Fallback from '@/views/Fallback.vue';
     },
 })
 export default class App extends Vue {
+    private state = getModule(GlobalState, this.$store);
     private xrSupported = false;
 
     public mounted(): void {
@@ -30,8 +33,8 @@ export default class App extends Vue {
         this.xrSupported = (navigator as any).xr !== undefined;
         // Fake WebXR support in local dev mode
         // Comment this this line to work on fallback view
-        if (this.$store.state.devMode) this.xrSupported = true;
-        this.$store.commit('setXRSupported', this.xrSupported);
+        if (this.state.devMode) this.xrSupported = true;
+        this.state.setXRSupported(this.xrSupported);
     }
 }
 </script>

@@ -36,6 +36,7 @@
     "lint-staged": "^9.5.0",
     "prettier": "^2.2.1",
     "typescript": "~4.1.5",
-    "vue-template-compiler": "^2.6.11"
+    "vue-template-compiler": "^2.6.11",
+    "vuex-module-decorators": "^1.0.1"
   }
 }

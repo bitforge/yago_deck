@@ -2,7 +2,7 @@
     <div class="models-deck">
         <div class="swiper hideable">
             <div class="swiper-wrapper">
-                <model-card :model="model" v-for="(model, index) in $store.state.models" :key="index" />
+                <model-card :model="model" v-for="(model, index) in state.models" :key="index" />
             </div>
         </div>
     </div>
@@ -10,10 +10,11 @@
 
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator';
+import { getModule } from 'vuex-module-decorators';
+import GlobalState from '@/store/GlobalState';
 import ModelCard from '@/components/ModelCard.vue';
 import { Events } from '@/events';
 import { Model } from '@/api';
-import { Actions } from '@/store';
 
 // Unfortunately, Swiper.js 7 Component for Vue is uterly broken.
 // Specifically, it's Vue 3 only Vue can't load ESM packages yet.
@@ -28,6 +29,7 @@ import { Actions } from '@/store';
     },
 })
 export default class ModelsDeck extends Vue {
+    private state = getModule(GlobalState, this.$store);
     private swiper: any | null = null;
 
     public mounted(): void {
@@ -48,18 +50,18 @@ export default class ModelsDeck extends Vue {
         this.swiper.off('tap', this.onSliderTapped);
     }
 
-    @Watch('$store.state.models')
+    @Watch('state.models')
     public async onModelsLoaded(): Promise<void> {
         await this.$nextTick();
-        if (this.$store.state.models.length > 0) {
+        if (this.state.models.length > 0) {
             this.swiper?.update();
             this.selectFirstModel();
         }
     }
 
-    @Watch('$store.state.viewOnlyMode')
+    @Watch('state.viewOnlyMode')
     public onViewOnlyModeChanged(): void {
-        if (this.$store.state.viewOnlyMode) {
+        if (this.state.viewOnlyMode) {
             this.swiper.disable();
         } else {
             this.swiper.enable();
@@ -67,7 +69,7 @@ export default class ModelsDeck extends Vue {
     }
 
     private selectFirstModel(): void {
-        const models = this.$store.state.models as Model[];
+        const models = this.state.models as Model[];
         if (models.length > 0) {
             this.$root.$emit(Events.SelectModel, models[0].id);
         }
@@ -75,16 +77,16 @@ export default class ModelsDeck extends Vue {
 
     private onSlideChanged() {
         const index = this.swiper.activeIndex;
-        const model = this.$store.state.models[index];
+        const model = this.state.models[index];
         if (!model) return;
         this.$root.$emit(Events.SelectModel, model.id);
     }
 
     private onSliderTapped() {
         const index = this.swiper.activeIndex;
-        const model = this.$store.state.models[index];
+        const model = this.state.models[index];
         if (!model) return;
-        this.$store.commit(Actions.PlaceModel, model);
+        this.state.placeModel(model);
         this.$root.$emit(Events.PlaceModel, model.id);
     }
 }
