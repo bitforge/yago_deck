@@ -43,10 +43,11 @@ export default class WebXr extends Vue {
     private previewMaterial: THREE.MeshStandardMaterial | null = null;
 
     public mounted(): void {
-        // Prepare THREE.js Scene
+        // Prepare THREE.js environment
         this.initCamera();
         this.addLightning();
         this.loadNopsy();
+        this.createPreviewMaterial();
 
         // Subscribe to events
         this.$root.$on(Events.LaunchXR, this.onLaunchXR);
@@ -86,6 +87,20 @@ export default class WebXr extends Vue {
             this.nopsy.visible = false;
             this.scene.add(this.nopsy);
         });
+    }
+
+    private createPreviewMaterial(): void {
+        // Create and keep preview material
+        const transMat = new THREE.MeshStandardMaterial({
+            color: 0xffffff,
+            roughness: 0.5,
+            metalness: 0.5,
+        });
+        transMat.format = THREE.RGBAFormat;
+        transMat.transparent = true;
+        transMat.opacity = 0.3;
+        transMat.side = THREE.DoubleSide;
+        this.previewMaterial = transMat;
     }
 
     @Watch('$store.state.models')
@@ -139,6 +154,13 @@ export default class WebXr extends Vue {
         }
     }
 
+    private onSessionEnded(): void {
+        // Free up resources
+        this.renderer?.dispose();
+        this.$store.commit(Actions.SetXRActive, false);
+    }
+
+    /** Initiates WebXR session and THREE.js rendering contenxt */
     public async onLaunchXR(): Promise<void> {
         // Create WebGL rendering context
         const canvas = this.$refs.glcanvas as any;
@@ -190,7 +212,12 @@ export default class WebXr extends Vue {
         this.$store.commit(Actions.SetXRActive, true);
     }
 
-    private onXRFrame(time: number, frame: XRFrame): void {
+    /**
+     * Main WebXR rendering loop
+     * @param {DOMHighResTimeStamp} time - Current time offset since last frame
+     * @param {XRFrame} frame - Current frame with all object tracked by session
+     */
+    private onXRFrame(time: DOMHighResTimeStamp, frame: XRFrame): void {
         // Queue up the next draw request.
         if (!this.session) return;
         this.session.requestAnimationFrame(this.onXRFrame);
@@ -229,12 +256,6 @@ export default class WebXr extends Vue {
             // Render the scene with THREE.WebGLRenderer.
             this.renderer.render(this.scene, this.camera);
         }
-    }
-
-    private onSessionEnded(): void {
-        // Free resources
-        this.renderer?.dispose();
-        this.$store.commit(Actions.SetXRActive, false);
     }
 
     private runHitTestAndUpdateCursor(frame: XRFrame) {
@@ -278,28 +299,12 @@ export default class WebXr extends Vue {
             this.previewModel.traverse((object: THREE.Object3D<THREE.Event>) => {
                 const mesh = object as THREE.Mesh;
                 const material = mesh.material as THREE.MeshStandardMaterial;
-                if (material) mesh.material = this.getPreviewMaterial();
+                if (material && this.previewMaterial) {
+                    mesh.material = this.previewMaterial;
+                }
             });
             this.nopsy.add(this.previewModel);
         }
-    }
-
-    private getPreviewMaterial(): THREE.MeshStandardMaterial {
-        // Only create once
-        if (this.previewMaterial) return this.previewMaterial;
-
-        // Create and keep preview material
-        const transMat = new THREE.MeshStandardMaterial({
-            color: 0xffffff,
-            roughness: 0.5,
-            metalness: 0.5,
-        });
-        transMat.format = THREE.RGBAFormat;
-        transMat.transparent = true;
-        transMat.opacity = 0.3;
-        transMat.side = THREE.DoubleSide;
-        this.previewMaterial = transMat;
-        return this.previewMaterial;
     }
 
     private updateLightningEstimate(frame: XRFrame): void {
