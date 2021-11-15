@@ -122,6 +122,24 @@ export interface PatchedModelUpdate {
      * @memberof PatchedModelUpdate
      */
     scaleable?: boolean;
+    /**
+     * Stock-keeping unit. The identfier of the product in external webstore.
+     * @type {string}
+     * @memberof PatchedModelUpdate
+     */
+    sku?: string | null;
+    /**
+     * Display price. The effective price is determined by the external webstore.
+     * @type {string}
+     * @memberof PatchedModelUpdate
+     */
+    price?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof PatchedModelUpdate
+     */
+    readonly priceCurrency?: string;
 }
 
 export function PatchedModelUpdateFromJSON(json: any): PatchedModelUpdate {
@@ -150,6 +168,9 @@ export function PatchedModelUpdateFromJSONTyped(json: any, ignoreDiscriminator: 
         'siteUrlFr': !exists(json, 'site_url_fr') ? undefined : json['site_url_fr'],
         'siteUrlIt': !exists(json, 'site_url_it') ? undefined : json['site_url_it'],
         'scaleable': !exists(json, 'scaleable') ? undefined : json['scaleable'],
+        'sku': !exists(json, 'sku') ? undefined : json['sku'],
+        'price': !exists(json, 'price') ? undefined : json['price'],
+        'priceCurrency': !exists(json, 'price_currency') ? undefined : json['price_currency'],
     };
 }
 
@@ -177,6 +198,8 @@ export function PatchedModelUpdateToJSON(value?: PatchedModelUpdate | null): any
         'site_url_fr': value.siteUrlFr,
         'site_url_it': value.siteUrlIt,
         'scaleable': value.scaleable,
+        'sku': value.sku,
+        'price': value.price,
     };
 }
 

@@ -165,6 +165,24 @@ export interface Model {
      */
     siteUrlIt?: string | null;
     /**
+     * Stock-keeping unit. The identfier of the product in external webstore.
+     * @type {string}
+     * @memberof Model
+     */
+    sku?: string | null;
+    /**
+     * Display price. The effective price is determined by the external webstore.
+     * @type {string}
+     * @memberof Model
+     */
+    price?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof Model
+     */
+    readonly priceCurrency: string;
+    /**
      * Let's the user scale the model in AR when enabled.
      * @type {boolean}
      * @memberof Model
@@ -229,6 +247,9 @@ export function ModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): Mod
         'siteUrlEn': !exists(json, 'site_url_en') ? undefined : json['site_url_en'],
         'siteUrlFr': !exists(json, 'site_url_fr') ? undefined : json['site_url_fr'],
         'siteUrlIt': !exists(json, 'site_url_it') ? undefined : json['site_url_it'],
+        'sku': !exists(json, 'sku') ? undefined : json['sku'],
+        'price': !exists(json, 'price') ? undefined : json['price'],
+        'priceCurrency': json['price_currency'],
         'scaleable': !exists(json, 'scaleable') ? undefined : json['scaleable'],
         'glb': !exists(json, 'glb') ? undefined : json['glb'],
         'usdz': !exists(json, 'usdz') ? undefined : json['usdz'],
@@ -263,6 +284,8 @@ export function ModelToJSON(value?: Model | null): any {
         'site_url_en': value.siteUrlEn,
         'site_url_fr': value.siteUrlFr,
         'site_url_it': value.siteUrlIt,
+        'sku': value.sku,
+        'price': value.price,
         'scaleable': value.scaleable,
         'glb': value.glb,
         'usdz': value.usdz,

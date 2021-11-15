@@ -122,6 +122,24 @@ export interface ModelUpdate {
      * @memberof ModelUpdate
      */
     scaleable?: boolean;
+    /**
+     * Stock-keeping unit. The identfier of the product in external webstore.
+     * @type {string}
+     * @memberof ModelUpdate
+     */
+    sku?: string | null;
+    /**
+     * Display price. The effective price is determined by the external webstore.
+     * @type {string}
+     * @memberof ModelUpdate
+     */
+    price?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof ModelUpdate
+     */
+    readonly priceCurrency: string;
 }
 
 export function ModelUpdateFromJSON(json: any): ModelUpdate {
@@ -150,6 +168,9 @@ export function ModelUpdateFromJSONTyped(json: any, ignoreDiscriminator: boolean
         'siteUrlFr': !exists(json, 'site_url_fr') ? undefined : json['site_url_fr'],
         'siteUrlIt': !exists(json, 'site_url_it') ? undefined : json['site_url_it'],
         'scaleable': !exists(json, 'scaleable') ? undefined : json['scaleable'],
+        'sku': !exists(json, 'sku') ? undefined : json['sku'],
+        'price': !exists(json, 'price') ? undefined : json['price'],
+        'priceCurrency': json['price_currency'],
     };
 }
 
@@ -177,6 +198,8 @@ export function ModelUpdateToJSON(value?: ModelUpdate | null): any {
         'site_url_fr': value.siteUrlFr,
         'site_url_it': value.siteUrlIt,
         'scaleable': value.scaleable,
+        'sku': value.sku,
+        'price': value.price,
     };
 }
 
