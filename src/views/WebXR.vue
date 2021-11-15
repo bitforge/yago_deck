@@ -1,19 +1,24 @@
 <template>
     <div class="webxr">
         <canvas ref="glcanvas" class="glcanvas"></canvas>
-        <slot></slot>
+        <dom-overlay />
     </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import DomOverlay from '@/components/DomOverlay.vue';
 import { Events } from '@/events';
 import { Model } from '@/api';
 import * as THREE from 'three';
 import { Actions } from '@/store';
 
-@Component
+@Component({
+    components: {
+        DomOverlay,
+    },
+})
 export default class WebXr extends Vue {
     // Current model
     private selectedModel: Model | null = null;

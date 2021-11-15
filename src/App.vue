@@ -1,8 +1,6 @@
 <template>
     <div id="app">
-        <web-xr>
-            <dom-overlay />
-        </web-xr>
+        <web-xr />
         <launcher />
     </div>
 </template>
@@ -10,12 +8,10 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import Launcher from './views/Launcher.vue';
-import DomOverlay from './components/DomOverlay.vue';
 import WebXr from './views/WebXR.vue';
 @Component({
     components: {
         Launcher,
-        DomOverlay,
         WebXr,
     },
 })
