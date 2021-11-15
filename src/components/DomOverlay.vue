@@ -1,6 +1,7 @@
 <template>
     <!-- This is the UI that gets rendered on top of WebXR session -->
     <div class="domOverlay" :class="{ viewOnly: $store.state.viewOnlyMode }">
+        <exit-button v-show="showExit" />
         <models-deck v-show="showDeck" />
         <toolbar v-show="showToolbar" />
     </div>
@@ -8,6 +9,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
+import ExitButton from '@/components/ExitButton.vue';
 import ModelsDeck from '@/components/ModelsDeck.vue';
 import Toolbar from '@/components/Toolbar.vue';
 import { Events } from '@/events';
@@ -15,6 +17,7 @@ import { Model } from '@/api';
 
 @Component({
     components: {
+        ExitButton,
         ModelsDeck,
         Toolbar,
     },
@@ -34,13 +37,15 @@ export default class DomOverlay extends Vue {
         this.selectedModel = this.$store.getters.getModelById(modelId) as Model;
     }
 
+    public get showExit(): void {
+        return this.$store.state.xrActive;
+    }
+
     public get showDeck(): void {
-        // Card are visible when WebXR is supported
         return this.$store.state.xrSupported;
     }
 
     public get showToolbar(): boolean {
-        // Show toolbar when XR session is active or in dev mode
         return this.$store.state.xrActive || this.$store.state.devMode;
     }
 }

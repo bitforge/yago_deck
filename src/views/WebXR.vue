@@ -58,6 +58,7 @@ export default class WebXr extends Vue {
 
         // Subscribe to events
         this.$root.$on(Events.LaunchXR, this.onLaunchXR);
+        this.$root.$on(Events.EndXR, this.onEndXR);
         this.$root.$on(Events.SelectModel, this.onSelectModel);
         this.$root.$on(Events.PlaceModel, this.onPlaceModel);
         this.$root.$on(Events.UnplaceModel, this.onUnplaceModel);
@@ -67,6 +68,7 @@ export default class WebXr extends Vue {
     public beforeDestroy(): void {
         // Unsubscribe from events
         this.$root.$off(Events.LaunchXR, this.onLaunchXR);
+        this.$root.$off(Events.EndXR, this.onEndXR);
         this.$root.$off(Events.SelectModel, this.onSelectModel);
         this.$root.$off(Events.PlaceModel, this.onPlaceModel);
         this.$root.$off(Events.UnplaceModel, this.onUnplaceModel);
@@ -171,6 +173,10 @@ export default class WebXr extends Vue {
         // Free up resources
         this.renderer?.dispose();
         this.$store.commit(Actions.SetXRActive, false);
+    }
+
+    private onEndXR(): void {
+        this.session?.end();
     }
 
     /** Initiates WebXR session and THREE.js rendering contenxt */
