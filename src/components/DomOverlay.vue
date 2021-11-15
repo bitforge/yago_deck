@@ -37,11 +37,11 @@ export default class DomOverlay extends Vue {
         this.selectedModel = this.$store.getters.getModelById(modelId) as Model;
     }
 
-    public get showExit(): void {
+    public get showExit(): boolean {
         return this.$store.state.xrActive;
     }
 
-    public get showDeck(): void {
+    public get showDeck(): boolean {
         return this.$store.state.xrSupported;
     }
 

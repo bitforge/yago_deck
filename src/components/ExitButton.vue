@@ -1,6 +1,6 @@
 <template>
     <button @click="endSession" class="exit-button">
-        <span class="material-icons">close</span>
+        <span class="material-icons">arrow_back</span>
     </button>
 </template>
 
@@ -20,7 +20,7 @@ export default class ExitButton extends Vue {
 .exit-button {
     position: absolute;
     top: env(safe-area-inset-top);
-    right: 0;
+    left: 0;
     width: 70px;
     height: 70px;
 
