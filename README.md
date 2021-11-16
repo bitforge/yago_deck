@@ -1,4 +1,8 @@
-# genie_webxr_demo
+# genie_deck
+
+WebXR store for Genie AR with magic tricks.
+
+Currently at demo stage, mainly intended as WebXR exploration.
 
 ## Project setup
 ```
