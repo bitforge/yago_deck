@@ -4,6 +4,7 @@
         <exit-button v-show="showExit" />
         <models-deck v-show="showDeck" />
         <toolbar v-show="showToolbar" />
+        <cart v-show="showCart" />
     </div>
 </template>
 
@@ -14,6 +15,7 @@ import GlobalState from '@/store/GlobalState';
 import ExitButton from '@/components/ExitButton.vue';
 import ModelsDeck from '@/components/ModelsDeck.vue';
 import Toolbar from '@/components/Toolbar.vue';
+import Cart from '@/views/Cart.vue';
 import { Events } from '@/events';
 import { Model } from '@bitforgehq/genie-api-client';
 
@@ -22,6 +24,7 @@ import { Model } from '@bitforgehq/genie-api-client';
         ExitButton,
         ModelsDeck,
         Toolbar,
+        Cart,
     },
 })
 export default class DomOverlay extends Vue {
@@ -51,6 +54,10 @@ export default class DomOverlay extends Vue {
 
     public get showToolbar(): boolean {
         return this.state.xrActive || this.state.devMode;
+    }
+
+    public get showCart(): boolean {
+        return this.state.showCart;
     }
 }
 </script>

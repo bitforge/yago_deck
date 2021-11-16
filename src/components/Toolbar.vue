@@ -2,10 +2,10 @@
     <div class="toolbar">
         <toolbar-button
             icon="undo"
-            text="Undo"
+            text="Unplace"
             @click="unplaceModel"
             :hideable="true"
-            :disabled="disableDeleteButtons" />
+            :disabled="noModelPlacedInScene" />
         <toolbar-button
             v-show="!state.viewOnlyMode"
             icon="style"
@@ -24,7 +24,7 @@
             :cartBadge="true"
             @click="showCart"
             :hideable="true"
-            :disabled="disableDeleteButtons" />
+            :disabled="noModelPlacedInScene" />
     </div>
 </template>
 
@@ -43,8 +43,8 @@ import { Events } from '@/events';
 export default class Toolbar extends Vue {
     private state = getModule(GlobalState, this.$store);
 
-    public get disableDeleteButtons(): boolean {
-        // Buttons are enabled when any model is placed
+    /* Toggles visbility of remove last and show cart buttons */
+    public get noModelPlacedInScene(): boolean {
         return this.state.placed.length == 0;
     }
 
@@ -54,19 +54,19 @@ export default class Toolbar extends Vue {
         this.$root.$emit(Events.UnplaceModel);
     }
 
-    /** Hide most UI elements only view content */
+    /** Hides most UI elements to view placed models only */
     public enableViewOnlyMode(): void {
         this.state.setViewOnlyMode(true);
     }
 
-    /** Show all UI Elements again */
+    /** Show all UI elements again */
     public disableViewOnlyMode(): void {
         this.state.setViewOnlyMode(false);
     }
 
-    /** Remova ALL placed models */
+    /** Show current place models cart */
     public showCart(): void {
-        alert('Not implemented yet. 🙇‍♀️');
+        this.state.setShowCart(true);
     }
 }
 </script>
