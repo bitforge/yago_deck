@@ -1,5 +1,5 @@
 import { Module, VuexModule, Mutation } from 'vuex-module-decorators';
-import { Model } from '@/api';
+import { Model } from '@bitforgehq/genie-api-client';
 
 @Module({ name: 'global' })
 export default class GlobalState extends VuexModule {

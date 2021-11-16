@@ -11,6 +11,7 @@
     "ngrok": "ngrok http -host-header=rewrite 8080"
   },
   "dependencies": {
+    "@bitforgehq/genie-api-client": "^1.0.2",
     "core-js": "^3.6.5",
     "qr-code-styling": "^1.6.0-rc.1",
     "three": "^0.133.1",

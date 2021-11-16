@@ -14,7 +14,7 @@ import { getModule } from 'vuex-module-decorators';
 import GlobalState from '@/store/GlobalState';
 import ModelCard from '@/components/ModelCard.vue';
 import { Events } from '@/events';
-import { Model } from '@/api';
+import { Model } from '@bitforgehq/genie-api-client';
 
 // Unfortunately, Swiper.js 7 Component for Vue is uterly broken.
 // Specifically, it's Vue 3 only Vue can't load ESM packages yet.

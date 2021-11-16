@@ -12,7 +12,7 @@ import GlobalState from '@/store/GlobalState';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import DomOverlay from '@/components/DomOverlay.vue';
 import { Events } from '@/events';
-import { Model } from '@/api';
+import { Model } from '@bitforgehq/genie-api-client';
 import * as THREE from 'three';
 
 @Component({

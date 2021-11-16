@@ -17,7 +17,7 @@ import { Component, Vue } from 'vue-property-decorator';
 import { getModule } from 'vuex-module-decorators';
 import GlobalState from '@/store/GlobalState';
 import Branding from '@/components/Branding.vue';
-import { Configuration, ModelsApi, Model, ModelStatus } from '@/api';
+import { Configuration, ModelsApi, Model, ModelStatus } from '@bitforgehq/genie-api-client';
 import { Events } from '@/events';
 
 @Component({

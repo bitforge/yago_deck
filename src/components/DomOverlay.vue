@@ -15,7 +15,7 @@ import ExitButton from '@/components/ExitButton.vue';
 import ModelsDeck from '@/components/ModelsDeck.vue';
 import Toolbar from '@/components/Toolbar.vue';
 import { Events } from '@/events';
-import { Model } from '@/api';
+import { Model } from '@bitforgehq/genie-api-client';
 
 @Component({
     components: {
