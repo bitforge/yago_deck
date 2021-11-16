@@ -14,15 +14,17 @@ yarn install
 yarn serve
 ```
 
+### Launches ngrok to serve over https tunnel for secure context
+```
+yarn ngrok
+```
+
 ### Compiles and minifies for production
 ```
 yarn build
 ```
 
-### Lints and fixes files
+### Builds and release to production
 ```
-yarn lint
+yarn release
 ```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
