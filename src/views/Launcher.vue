@@ -37,10 +37,7 @@ export default class Launcher extends Vue {
 
     private async loadModels(): Promise<void> {
         try {
-            const modelApi = new ModelsApi(new Configuration({ apiKey: process.env.VUE_APP_API_KEY }));
-            const models = await modelApi.modelsList({ project: process.env.VUE_APP_PROJECT_ID });
-            const visibleModels = models.filter((model: Model) => model.status != ModelStatus.Draft);
-            this.state.setModels(visibleModels);
+            this.state.loadModels();
         } catch (error: any) {
             let errorMsg = error.toString();
             if (error instanceof Response) {

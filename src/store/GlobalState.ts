@@ -1,5 +1,5 @@
-import { Module, VuexModule, Mutation } from 'vuex-module-decorators';
-import { Model } from '@bitforgehq/genie-api-client';
+import { Module, VuexModule, Mutation, Action } from 'vuex-module-decorators';
+import { Configuration, Model, ModelsApi, ModelStatus } from '@bitforgehq/genie-api-client';
 
 @Module({ name: 'global' })
 export default class GlobalState extends VuexModule {
@@ -22,38 +22,46 @@ export default class GlobalState extends VuexModule {
     public placed: Model[] = [];
 
     @Mutation
-    setXRSupported(xrSupported: boolean): void {
+    public setXRSupported(xrSupported: boolean): void {
         this.xrSupported = xrSupported;
     }
 
     @Mutation
-    setXRActive(xrActive: boolean): void {
+    public setXRActive(xrActive: boolean): void {
         this.xrActive = xrActive;
     }
 
     @Mutation
-    setViewOnlyMode(viewOnlyMode: boolean): void {
+    public setViewOnlyMode(viewOnlyMode: boolean): void {
         this.viewOnlyMode = viewOnlyMode;
     }
 
     @Mutation
-    setModels(models: Model[]): void {
+    public setModels(models: Model[]): void {
         this.models = models;
     }
 
     @Mutation
-    placeModel(model: Model): void {
+    public placeModel(model: Model): void {
         this.placed.push(model);
     }
 
     @Mutation
-    unplaceModel(): void {
+    public unplaceModel(): void {
         this.placed.pop();
     }
 
     @Mutation
-    clearPlaced(): void {
+    public clearPlaced(): void {
         this.placed = [];
+    }
+
+    @Action({ commit: 'setModels' })
+    public async loadModels(): Promise<Model[]> {
+        const modelApi = new ModelsApi(new Configuration({ apiKey: process.env.VUE_APP_API_KEY }));
+        const models = await modelApi.modelsList({ project: process.env.VUE_APP_PROJECT_ID });
+        const activeModels = models.filter((model: Model) => model.status != ModelStatus.Draft);
+        return activeModels;
     }
 
     public get getModelById() {
