@@ -48,8 +48,10 @@ export default class Cart extends Vue {
 }
 
 .cart {
-    min-width: 80vw;
-    min-height: 80vh;
+    height: 85vh;
+    width: 90vw;
+    min-width: 320px;
+    max-width: 720px;
     display: flex;
     flex-direction: column;
     align-items: stretch;
