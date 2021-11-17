@@ -9,6 +9,10 @@
                 <cart-item v-for="(lineItem, index) in cart.lineItems" :key="index" :item="lineItem" />
             </section>
             <footer>
+                <p class="total">
+                    <span>Total:</span>
+                    <span>{{ cart.totalPrice }} {{ cart.totalCurrency }}</span>
+                </p>
                 <button class="checkout">Checkout</button>
             </footer>
         </div>
@@ -19,7 +23,6 @@
 import { Component, Vue, Watch } from 'vue-property-decorator';
 import { getModule } from 'vuex-module-decorators';
 import GlobalState from '@/store/GlobalState';
-import { randInt } from 'three/src/math/MathUtils';
 import Cart from '@/cart/Cart';
 import CartItem from '@/components/CartItem.vue';
 
@@ -33,21 +36,20 @@ export default class CartView extends Vue {
 
     public cart = new Cart();
 
-    @Watch('state.models')
-    public testFillCart(): void {
-        if (!this.state.devMode) return;
-        for (const model of this.state.models) {
-            const count = randInt(0, 3);
-            for (let i = 0; i < count; i++) {
-                this.state.placeModel(model);
-            }
-        }
-    }
+    // Uncomment to fill cart for testing
+    // @Watch('state.models')
+    // public testFillCart(): void {
+    //     for (const model of this.state.models) {
+    //         const count = randInt(0, 3);
+    //         for (let i = 0; i < count; i++) {
+    //             this.state.placeModel(model);
+    //         }
+    //     }
+    // }
 
     @Watch('state.placed')
     public updateCart(): void {
         this.cart.updateModels(this.state.placed);
-        console.log(this.cart.lineItems.length);
     }
 
     public onClose(): void {
@@ -115,16 +117,27 @@ export default class CartView extends Vue {
 
 .cart footer {
     padding: 16px;
+    border-radius: 0 0 8px 8px;
+    background-color: #cedeca;
+}
+
+.cart .total {
+    display: flex;
+    margin: 0 0 8px 0;
+    flex-direction: row;
+    justify-content: space-between;
+    font-size: 20px;
+    font-weight: bold;
 }
 
 .cart button.checkout {
     width: 100%;
-    font-size: 18px;
+    font-size: 20px;
     font-weight: bold;
     background-color: #000;
     color: white;
     border-radius: 4px;
     border: none;
-    padding: 8px;
+    padding: 12px;
 }
 </style>

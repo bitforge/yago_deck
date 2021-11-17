@@ -42,7 +42,9 @@ export default class ToolbarButton extends Vue {
     }
 
     public onClick(): void {
-        this.$emit('click');
+        if (!this.disabled) {
+            this.$emit('click');
+        }
     }
 }
 </script>
