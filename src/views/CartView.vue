@@ -13,7 +13,7 @@
                     <span>Total:</span>
                     <span>{{ cart.totalPrice }} {{ cart.totalCurrency }}</span>
                 </p>
-                <button class="checkout">Checkout</button>
+                <button class="checkout" @click="onCheckout">Checkout</button>
             </footer>
         </div>
     </div>
@@ -54,6 +54,10 @@ export default class CartView extends Vue {
 
     public onClose(): void {
         this.state.setShowCart(false);
+    }
+
+    public onCheckout(): void {
+        alert('Not part of the demo (yet). 😉');
     }
 }
 </script>
