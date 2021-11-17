@@ -13,7 +13,7 @@ export default class GlobalState extends VuexModule {
     public xrActive = false;
 
     /** True when showing placed models only */
-    public viewOnlyMode = false;
+    public viewOnlyMode = true;
 
     /** True when cart is visible */
     public showCart = false;
@@ -69,6 +69,7 @@ export default class GlobalState extends VuexModule {
         const modelApi = new ModelsApi(new Configuration({ apiKey: process.env.VUE_APP_API_KEY }));
         const models = await modelApi.modelsList({ project: process.env.VUE_APP_PROJECT_ID });
         const activeModels = models.filter((model: Model) => model.status != ModelStatus.Draft);
+        this.context.commit('setViewOnlyMode', false);
         return activeModels;
     }
 
