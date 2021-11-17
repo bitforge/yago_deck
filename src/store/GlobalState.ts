@@ -3,7 +3,7 @@ import { Configuration, Model, ModelsApi, ModelStatus } from '@bitforgehq/genie-
 
 @Module({ name: 'global' })
 export default class GlobalState extends VuexModule {
-    /** Toggles visiblity of UI elements in dev */
+    /** Toggles visiblity of UI elements in dev mode */
     public devMode = process.env.NODE_ENV === 'development';
 
     /** True when WebXR is supported */
@@ -12,13 +12,16 @@ export default class GlobalState extends VuexModule {
     /** True when WebXR session is active */
     public xrActive = false;
 
-    /** True when only showing placed models */
+    /** True when showing placed models only */
     public viewOnlyMode = false;
 
-    /** Models loaded from api */
+    /** True when cart is visible */
+    public showCart = false;
+
+    /** Model details loaded from API */
     public models: Model[] = [];
 
-    /** Currently placed models in scene */
+    /** Currently placed models in scene, in order of placement */
     public placed: Model[] = [];
 
     @Mutation
@@ -34,6 +37,11 @@ export default class GlobalState extends VuexModule {
     @Mutation
     public setViewOnlyMode(viewOnlyMode: boolean): void {
         this.viewOnlyMode = viewOnlyMode;
+    }
+
+    @Mutation
+    public setShowCart(showCart: boolean): void {
+        this.showCart = showCart;
     }
 
     @Mutation
