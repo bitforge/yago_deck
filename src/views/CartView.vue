@@ -71,7 +71,8 @@ export default class CartView extends Vue {
 
     background-color: #0002;
     z-index: 1000;
-    padding: 16px 0 112px 0;
+    padding-top: calc(env(safe-area-inset-top) + 8px);
+    padding-bottom: calc(env(safe-area-inset-bottom) + 16px);
 }
 
 .cart {
