@@ -35,6 +35,7 @@ export default class CartView extends Vue {
 
     @Watch('state.models')
     public testFillCart(): void {
+        if (!this.state.devMode) return;
         for (const model of this.state.models) {
             const count = randInt(0, 3);
             for (let i = 0; i < count; i++) {
