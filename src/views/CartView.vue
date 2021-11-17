@@ -2,6 +2,7 @@
     <div class="cart-overlay">
         <div class="cart">
             <header>
+                <h2>Your cart</h2>
                 <span @click="onClose" class="close-button material-icons">close</span>
             </header>
             <section class="items">
@@ -89,8 +90,14 @@ export default class CartView extends Vue {
 
 .cart header {
     display: flex;
-    justify-content: flex-end;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
     padding: 16px;
+}
+
+.cart header h2 {
+    margin: 0;
 }
 
 .cart .close-button {

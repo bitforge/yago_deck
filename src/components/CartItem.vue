@@ -1,8 +1,9 @@
 <template>
     <div class="cart-item">
+        <p class="quantity">{{ item.quantity }}×</p>
         <img :src="item.model.imageThumb" :alt="item.model.name" />
         <h3 class="title">{{ item.model.name }}</h3>
-        <input type="number" min="1" max="10" :value="item.quantity" class="quantity" />
+        <p class="price">{{ item.priceDisplay }}</p>
     </div>
 </template>
 
@@ -24,30 +25,36 @@ export default class ModelCard extends Vue {
     align-items: center;
     justify-content: space-between;
     height: 60px;
-    padding: 4px 0;
+    padding: 4px;
+}
+
+.cart-item .quantity {
+    width: 18px;
+    padding: 4px;
+    font-size: 18px;
 }
 
 .cart-item img {
-    width: 60px;
-    height: 60px;
+    width: 52px;
+    height: 52px;
+    padding: 4px;
     margin-right: 10px;
     object-fit: contain;
 }
 
 .cart-item .title {
     flex-grow: 1;
+    font-size: 16px;
     text-align: left;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
 }
 
-.cart-item .quantity {
-    max-width: 50px;
-    height: 30px;
-    padding: 10px;
-    border: none;
+.cart-item .price {
+    min-width: 80px;
+    padding: 4px 8px;
+    font-weight: bold;
     font-size: 18px;
 }
-
 </style>
