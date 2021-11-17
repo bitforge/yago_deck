@@ -1,7 +1,7 @@
 <template>
     <div class="swiper-slide">
         <h2>{{ model.name }}</h2>
-        <img :src="model.image" :alt="model.name" />
+        <img :src="model.imagePreview" :alt="model.name" />
         <h3 class="price">{{ displayPrice }}</h3>
     </div>
 </template>
@@ -54,7 +54,7 @@ export default class ModelCard extends Vue {
     padding: 8px;
     color: #000;
     text-align: center;
-    font-size: 18px;
+    font-size: 16px;
     background-color: #fff9;
 }
 
