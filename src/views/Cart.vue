@@ -5,7 +5,9 @@
                 <span @click="onClose" class="close-button material-icons">close</span>
             </header>
             <section class="items">
-                <p>Empty cart</p>
+                <div v-for="(model, index) in state.placed" :key="index" class="cart-item">
+                    <h3>{{ model.name }}</h3>
+                </div>
             </section>
             <footer>
                 <button class="checkout">Checkout</button>
@@ -15,13 +17,24 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Watch } from 'vue-property-decorator';
 import { getModule } from 'vuex-module-decorators';
 import GlobalState from '@/store/GlobalState';
+import { randInt } from 'three/src/math/MathUtils';
 
 @Component
 export default class Cart extends Vue {
     private state = getModule(GlobalState, this.$store);
+
+    @Watch('state.models')
+    public testFillCart(): void {
+        for (const model of this.state.models) {
+            const count = randInt(0, 3);
+            for (let i = 0; i < count; i++) {
+                this.state.placeModel(model);
+            }
+        }
+    }
 
     public onClose(): void {
         this.state.setShowCart(false);
