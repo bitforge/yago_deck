@@ -9,12 +9,14 @@
 import { Component, Vue, Watch } from 'vue-property-decorator';
 import { getModule } from 'vuex-module-decorators';
 import GlobalState from '@/store/GlobalState';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import DomOverlay from '@/components/DomOverlay.vue';
 import { Events } from '@/events';
 import { Model } from '@bitforgehq/genie-api-client';
+
 import * as THREE from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
+import Stats from '@/stats';
 
 @Component({
     components: {
@@ -53,6 +55,7 @@ export default class WebXr extends Vue {
     private directionalLight = new THREE.DirectionalLight(0xffffff, 1);
     private lightProbe = new THREE.LightProbe();
     private previewMaterial: THREE.MeshStandardMaterial | null = null;
+    private stats = Stats();
 
     public mounted(): void {
         // Prepare THREE.js environment
@@ -61,6 +64,7 @@ export default class WebXr extends Vue {
         this.loadNopsy();
         this.createPreviewMaterial();
         this.prepareDracoLoader();
+        this.addStats();
 
         // Subscribe to events
         this.$root.$on(Events.LaunchXR, this.onLaunchXR);
@@ -127,6 +131,11 @@ export default class WebXr extends Vue {
         this.dracoLoader.setDecoderPath('/draco/');
         this.dracoLoader.preload();
         this.gltfLoader.setDRACOLoader(this.dracoLoader);
+    }
+
+    private addStats(): void {
+        const domOverlay = document.querySelector('.domOverlay');
+        domOverlay?.appendChild(this.stats.dom);
     }
 
     @Watch('state.models')
@@ -272,6 +281,9 @@ export default class WebXr extends Vue {
 
             // Render the scene
             this.renderer.render(this.scene, this.camera);
+
+            // Update stats
+            this.stats.update();
         }
     }
 
