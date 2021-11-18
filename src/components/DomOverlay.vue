@@ -5,6 +5,7 @@
         <models-deck v-show="showDeck" />
         <toolbar v-show="showToolbar" />
         <cart-view v-show="showCart" />
+        <div class="render-stats" v-show="showStats"></div>
     </div>
 </template>
 
@@ -58,6 +59,10 @@ export default class DomOverlay extends Vue {
 
     public get showCart(): boolean {
         return this.state.showCart;
+    }
+
+    public get showStats(): boolean {
+        return this.state.xrActive;
     }
 }
 </script>

@@ -134,7 +134,7 @@ export default class WebXr extends Vue {
     }
 
     private addStats(): void {
-        const domOverlay = document.querySelector('.domOverlay');
+        const domOverlay = document.querySelector('.render-stats');
         domOverlay?.appendChild(this.stats.dom);
     }
 
