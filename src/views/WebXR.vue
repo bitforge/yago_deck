@@ -14,6 +14,7 @@ import DomOverlay from '@/components/DomOverlay.vue';
 import { Events } from '@/events';
 import { Model } from '@bitforgehq/genie-api-client';
 import * as THREE from 'three';
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 
 @Component({
     components: {
@@ -42,6 +43,7 @@ export default class WebXr extends Vue {
     private renderer: THREE.WebGLRenderer | null = null;
     private models3D: { [id: string]: THREE.Group } = {};
     private gltfLoader = new GLTFLoader();
+    private dracoLoader = new DRACOLoader();
     private nopsy = new THREE.Group();
     private previewModel: THREE.Object3D | null = null;
     private scene = new THREE.Scene();
@@ -58,6 +60,7 @@ export default class WebXr extends Vue {
         this.addLights();
         this.loadNopsy();
         this.createPreviewMaterial();
+        this.prepareDracoLoader();
 
         // Subscribe to events
         this.$root.$on(Events.LaunchXR, this.onLaunchXR);
@@ -118,6 +121,12 @@ export default class WebXr extends Vue {
         transMat.opacity = 0.3;
         transMat.side = THREE.DoubleSide;
         this.previewMaterial = transMat;
+    }
+
+    private prepareDracoLoader(): void {
+        this.dracoLoader.setDecoderPath('/draco/');
+        this.dracoLoader.preload();
+        this.gltfLoader.setDRACOLoader(this.dracoLoader);
     }
 
     @Watch('state.models')
