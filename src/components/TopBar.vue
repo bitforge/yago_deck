@@ -1,5 +1,5 @@
 <template>
-    <div :class="['top-bar', { visible: isVisible }]">
+    <div :class="['top-bar', 'hideable', { visible: isVisible }]">
         <button @click="endSession" :class="['exit-button']" v-show="showBackButton">
             <span class="material-icons">arrow_back</span>
         </button>

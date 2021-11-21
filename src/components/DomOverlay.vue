@@ -85,14 +85,19 @@ export default class DomOverlay extends Vue {
     pointer-events: none;
     padding-top: calc(env(safe-area-inset-top) + 20px);
     padding-bottom: env(safe-area-inset-bottom);
+    --easeInOutBack: cubic-bezier(0.68, -0.6, 0.32, 1.6);
 }
 
 .domOverlay .hideable {
-    transition: transform 0.3s cubic-bezier(0.68, -0.6, 0.32, 1.6);
+    transition: transform 0.3s var(--easeInOutBack);
 }
 
 .domOverlay .swiper.hideable {
-    transition: transform 0.5s cubic-bezier(0.68, -0.6, 0.32, 1.6);
+    transition: transform 0.5s var(--easeInOutBack);
+}
+
+.domOverlay .top-bar.hideable {
+    transition: transform 0.3s var(--easeInOutBack);
 }
 
 .domOverlay.viewOnly .hideable {
@@ -101,5 +106,9 @@ export default class DomOverlay extends Vue {
 
 .domOverlay.viewOnly .swiper.hideable {
     transform: translateY(320px);
+}
+
+.domOverlay.viewOnly .top-bar.hideable {
+    transform: translateY(-140px);
 }
 </style>
