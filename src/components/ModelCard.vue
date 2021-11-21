@@ -42,7 +42,7 @@ export default class ModelCard extends Vue {
     padding: 8px 4px;
     color: #fff;
     font-weight: bold;
-    text-shadow: 1px 1px 5px #222;
+    text-shadow: 0px 0px 4px #000;
 }
 
 .swiper-slide h3.price {
@@ -62,53 +62,53 @@ export default class ModelCard extends Vue {
 /* https://sashamaps.net/docs/resources/20-colors/ */
 
 /* Red */
-.swiper-slide:nth-child(1n) h2 {
-    background-color: #e6194baa;
+.swiper-slide:nth-child(1n) {
+    background-color: #e6194b;
 }
 
 /* Orange */
-.swiper-slide:nth-child(2n) h2{
-    background-color: #f58231aa;
+.swiper-slide:nth-child(2n) {
+    background-color: #f58231;
 }
 
 /* Yellow */
-.swiper-slide:nth-child(3n) h2 {
-    background-color: #ffe119aa;
+.swiper-slide:nth-child(3n) {
+    background-color: #ffe119;
 }
 
 /* Lime */
-.swiper-slide:nth-child(4n) h2 {
-    background-color: #bfef45aa;
+.swiper-slide:nth-child(4n) {
+    background-color: #bfef45;
 }
 
 /* Green */
-.swiper-slide:nth-child(5n) h2 {
-    background-color: #3cb44baa;
+.swiper-slide:nth-child(5n) {
+    background-color: #3cb44b;
 }
 
 /* Cyan */
-.swiper-slide:nth-child(6n) h2 {
-    background-color: #42d4f4aa;
+.swiper-slide:nth-child(6n) {
+    background-color: #42d4f4;
 }
 
 /* Blue */
-.swiper-slide:nth-child(7n) h2 {
-    background-color: #4363d8aa;
+.swiper-slide:nth-child(7n) {
+    background-color: #4363d8;
 }
 
 /* Purple */
-.swiper-slide:nth-child(8n) h2 {
-    background-color: #911eb4aa;
+.swiper-slide:nth-child(8n) {
+    background-color: #911eb4;
 }
 
 /* Magenta */
-.swiper-slide:nth-child(9n) h2 {
-    background-color: #f032e6aa;
+.swiper-slide:nth-child(9n) {
+    background-color: #f032e6;
 }
 
 /* Grey */
-.swiper-slide:nth-child(10n) h2 {
-    background-color: #a9a9a9aa;
+.swiper-slide:nth-child(10n) {
+    background-color: #a9a9a9;
 }
 
 .swiper-slide img {
