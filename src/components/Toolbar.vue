@@ -1,9 +1,9 @@
 <template>
     <div class="toolbar">
         <toolbar-button
-            icon="undo"
-            text="Unplace"
-            @click="unplaceModel"
+            icon="refresh"
+            text="Reset"
+            @click="clearModels"
             :hideable="true"
             :disabled="noModelPlacedInScene" />
         <toolbar-button
@@ -49,9 +49,9 @@ export default class Toolbar extends Vue {
     }
 
     /** Remove last placed model */
-    public unplaceModel(): void {
-        this.state.unplaceModel();
-        this.$root.$emit(Events.UnplaceModel);
+    public clearModels(): void {
+        this.state.clearPlaced();
+        this.$root.$emit(Events.ClearPlaced);
     }
 
     /** Hides most UI elements to view placed models only */
