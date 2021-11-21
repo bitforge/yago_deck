@@ -24,6 +24,9 @@ export default class GlobalState extends VuexModule {
     /** Currently placed models in scene, in order of placement */
     public placed: Model[] = [];
 
+    // Incremental counter for every placed object
+    private placingId = 0;
+
     @Mutation
     public setXRSupported(xrSupported: boolean): void {
         this.xrSupported = xrSupported;
@@ -50,15 +53,17 @@ export default class GlobalState extends VuexModule {
     }
 
     @Mutation
-    public placeModel(model: Model, objectID: number): void {
+    public placeModel(model: Model): Model {
         // Using number to store objectID from scene
-        model.number = objectID;
-        this.placed.push(model);
+        const modelClone = { ...model };
+        modelClone.number = this.placingId++;
+        this.placed.push(modelClone);
+        return modelClone;
     }
 
     @Mutation
-    public unplaceModel(objectID: number): void {
-        const modelToRemove = this.placed.find(m => m.number == objectID);
+    public unplaceModel(model: Model): void {
+        const modelToRemove = this.placed.find(m => m.number === model.number);
         if (modelToRemove) {
             const modelIndex = this.placed.indexOf(modelToRemove);
             this.placed.splice(modelIndex, 1);
