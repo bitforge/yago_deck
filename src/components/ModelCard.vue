@@ -62,47 +62,47 @@ export default class ModelCard extends Vue {
 /* https://sashamaps.net/docs/resources/20-colors/ */
 
 /* Red */
-.swiper-slide:nth-child(1n) {
+.swiper-slide:nth-child(10n + 1) {
     background-color: #e6194b;
 }
 
 /* Orange */
-.swiper-slide:nth-child(2n) {
+.swiper-slide:nth-child(10n + 2) {
     background-color: #f58231;
 }
 
 /* Yellow */
-.swiper-slide:nth-child(3n) {
+.swiper-slide:nth-child(10n + 3) {
     background-color: #ffe119;
 }
 
 /* Lime */
-.swiper-slide:nth-child(4n) {
+.swiper-slide:nth-child(10n + 4) {
     background-color: #bfef45;
 }
 
 /* Green */
-.swiper-slide:nth-child(5n) {
+.swiper-slide:nth-child(10n + 5) {
     background-color: #3cb44b;
 }
 
 /* Cyan */
-.swiper-slide:nth-child(6n) {
+.swiper-slide:nth-child(10n + 6) {
     background-color: #42d4f4;
 }
 
 /* Blue */
-.swiper-slide:nth-child(7n) {
+.swiper-slide:nth-child(10n + 7) {
     background-color: #4363d8;
 }
 
 /* Purple */
-.swiper-slide:nth-child(8n) {
+.swiper-slide:nth-child(10n + 8) {
     background-color: #911eb4;
 }
 
 /* Magenta */
-.swiper-slide:nth-child(9n) {
+.swiper-slide:nth-child(10n + 9) {
     background-color: #f032e6;
 }
 
