@@ -160,7 +160,7 @@ export default class WebXr extends Vue {
         if (!model || !model.glb) throw 'Cloud not find model infos for ' + model;
         this.gltfLoader.load(model.glb, gltf => {
             const object3D = gltf.scene;
-            object3D.name = `model-${model.id}`;
+            object3D.name = model.slug!;
             this.models3D[model.id] = object3D;
         });
     }
@@ -346,7 +346,7 @@ export default class WebXr extends Vue {
     private updatePreviewModel(): void {
         // Nopsy is absolutely required!
         if (!this.selectedModel) return;
-        const isSelectedModel = this.previewModel?.name == `model-${this.selectedModel?.id}`;
+        const isSelectedModel = this.previewModel?.name == this.selectedModel.slug;
 
         // Remove preview when it's not the current model
         if (this.previewModel && !isSelectedModel) {
