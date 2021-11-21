@@ -169,20 +169,34 @@ export default class WebXr extends Vue {
 
     public onPlaceModel(modelId: string): void {
         if (this.models3D[modelId]) {
+            // Create copy of 3D model and API model data
             const placedModel = this.models3D[modelId].clone();
+            const modelClone = { ...placedModel.userData } as Model;
+            placedModel.userData = modelClone;
+
+            // Set position to current cursor
             placedModel.position.copy(this.nopsy.position);
+            // Set layer for model and all children
             placedModel.traverse(obj => obj.layers.set(1));
+            // Add clone to scene
             this.scene.add(placedModel);
+
+            // Append placed model to state with scene id
+            this.state.placeModel(modelClone, placedModel.id);
+            // Instantly hide placing cursor
             this.nopsy.scale.setScalar(0);
         }
     }
 
-    public onUnplaceModel(): void {
-        // @ts-ignore: Reverse indexing an array with at() is okay
-        const lastModel = this.scene.children.at(-1) as THREE.Object3D;
-        if (lastModel && lastModel.name.startsWith('mdl')) {
-            this.scene.remove(lastModel);
+    public onUnplaceModel(object: THREE.Object3D): void {
+        // Find model root object
+        while (object.parent && !object.name.startsWith('mdl')) {
+            object = object.parent;
         }
+
+        // Remove object from scene and placed models
+        this.scene.remove(object);
+        this.state.unplaceModel(object.id);
     }
 
     public onClearModels(): void {

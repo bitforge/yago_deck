@@ -59,7 +59,7 @@ export default class TopBar extends Vue {
     }
 
     public deleteModel(): void {
-        // Not implemented yet
+        this.$root.$emit(Events.UnplaceModel, this.focusModel);
     }
 }
 </script>
