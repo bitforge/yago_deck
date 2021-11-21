@@ -1,7 +1,7 @@
 <template>
     <!-- This is the UI that gets rendered on top of WebXR session -->
     <div class="domOverlay" :class="{ viewOnly: state.viewOnlyMode }">
-        <exit-button v-show="showExit" />
+        <top-bar v-show="showTopBar" />
         <models-deck v-show="showDeck" />
         <toolbar v-show="showToolbar" />
         <cart-view v-show="showCart" />
@@ -13,7 +13,7 @@
 import { Component, Vue } from 'vue-property-decorator';
 import { getModule } from 'vuex-module-decorators';
 import GlobalState from '@/store/GlobalState';
-import ExitButton from '@/components/ExitButton.vue';
+import TopBar from '@/components/TopBar.vue';
 import ModelsDeck from '@/components/ModelsDeck.vue';
 import Toolbar from '@/components/Toolbar.vue';
 import CartView from '@/views/CartView.vue';
@@ -22,7 +22,7 @@ import { Model } from '@bitforgehq/genie-api-client';
 
 @Component({
     components: {
-        ExitButton,
+        TopBar,
         ModelsDeck,
         Toolbar,
         CartView,
@@ -45,8 +45,9 @@ export default class DomOverlay extends Vue {
         if (model) this.selectedModel = model;
     }
 
-    public get showExit(): boolean {
-        return this.state.xrActive;
+    public get showTopBar(): boolean {
+        // return this.state.xrActive;
+        return true;
     }
 
     public get showDeck(): boolean {
