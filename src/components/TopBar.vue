@@ -1,10 +1,12 @@
 <template>
-    <div class="top-bar">
-        <button @click="endSession" class="exit-button">
+    <div :class="['top-bar', { visible: isVisible }]">
+        <button @click="endSession" :class="['exit-button']" v-show="showBackButton">
             <span class="material-icons">arrow_back</span>
         </button>
-        <h1>{{ title }}</h1>
-        <button @click="deleteModel" class="delete-button">
+
+        <h1 :class="['title', { visible: isVisible }]">{{ title }}</h1>
+
+        <button @click="deleteModel" :class="['delete-button', { visible: isVisible }]">
             <span class="material-icons">delete</span>
         </button>
     </div>
@@ -21,7 +23,18 @@ import * as THREE from 'three';
 export default class TopBar extends Vue {
     public state = getModule(GlobalState, this.$store);
     public focusModel: THREE.Object3D | null = null;
-    public title = '';
+
+    public get isVisible(): boolean {
+        return this.focusModel != null;
+    }
+
+    public get showBackButton(): boolean {
+        return this.state.xrActive;
+    }
+
+    public get title(): string {
+        return this.focusModel?.userData?.name || '';
+    }
 
     public mounted(): void {
         this.$root.$on(Events.FocusedModel, this.onModelFocused);
@@ -35,12 +48,10 @@ export default class TopBar extends Vue {
 
     public onModelFocused(object: THREE.Object3D): void {
         this.focusModel = object;
-        this.title = this.focusModel.userData.name;
     }
 
     public onModelUnfocused(): void {
         this.focusModel = null;
-        this.title = '';
     }
 
     public endSession(): void {
@@ -55,6 +66,8 @@ export default class TopBar extends Vue {
 
 <style>
 .top-bar {
+    --transition-timing: 0.5s;
+
     position: absolute;
     top: calc(env(safe-area-inset-top) + 8px);
     left: 12px;
@@ -65,9 +78,14 @@ export default class TopBar extends Vue {
     align-items: center;
     justify-content: space-between;
 
-    background-color: #000a;
+    background-color: #0000;
+    transition: background-color var(--transition-timing);
     pointer-events: auto;
     border-radius: 16px;
+}
+
+.top-bar.visible {
+    background-color: #000a;
 }
 
 .top-bar button {
@@ -90,11 +108,26 @@ export default class TopBar extends Vue {
     font-size: 32px;
 }
 
-.top-bar h1 {
+.top-bar h1.title {
     margin: 0;
     flex-grow: 1;
     font-size: 18px;
     font-weight: bold;
     color: #fff;
+    opacity: 0;
+    transition: opacity var(--transition-timing);
+}
+
+.top-bar h1.title.visible {
+    opacity: 1;
+}
+
+.top-bar .delete-button {
+    opacity: 0;
+    transition: opacity var(--transition-timing);
+}
+
+.top-bar .delete-button.visible {
+    opacity: 1;
 }
 </style>
