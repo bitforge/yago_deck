@@ -12,4 +12,8 @@ export enum Events {
     UnplaceModel = 'unplaceModel',
     // Remove all models
     ClearPlaced = 'clearPlace',
+    // Model visible in center of screen;
+    FocusedModel = 'focusModel',
+    // Left model in center of screen
+    UnfocusedModel = 'unfocusedModel',
 }

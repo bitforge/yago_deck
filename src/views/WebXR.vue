@@ -55,6 +55,7 @@ export default class WebXr extends Vue {
     private directionalLight = new THREE.DirectionalLight(0xffffff, 1);
     private lightProbe = new THREE.LightProbe();
     private previewMaterial: THREE.MeshStandardMaterial | null = null;
+    private focusedObject: THREE.Object3D | null = null;
     private stats = Stats();
 
     public mounted(): void {
@@ -160,7 +161,8 @@ export default class WebXr extends Vue {
         if (!model || !model.glb) throw 'Cloud not find model infos for ' + model;
         this.gltfLoader.load(model.glb, gltf => {
             const object3D = gltf.scene;
-            object3D.name = model.slug!;
+            object3D.name = `mdl-${model.slug}`;
+            object3D.traverse(obj => (obj.userData = model));
             this.models3D[model.id] = object3D;
         });
     }
@@ -178,7 +180,7 @@ export default class WebXr extends Vue {
     public onUnplaceModel(): void {
         // @ts-ignore: Reverse indexing an array with at() is okay
         const lastModel = this.scene.children.at(-1) as THREE.Object3D;
-        if (lastModel && lastModel.name.startsWith('model')) {
+        if (lastModel && lastModel.name.startsWith('mdl')) {
             this.scene.remove(lastModel);
         }
     }
@@ -307,9 +309,24 @@ export default class WebXr extends Vue {
         this.modelRaycaster.setFromCamera(this.center, this.camera);
         const modelHits = this.modelRaycaster.intersectObjects(this.scene.children, true);
         if (modelHits.length > 0) {
-            if (this.nopsy.scale.x > 0.01) this.nopsy.scale.subScalar(0.1);
+            const currentObject = modelHits[0].object;
+            if (currentObject.id !== this.focusedObject?.id) {
+                this.focusedObject = currentObject;
+                this.$root.$emit(Events.FocusedModel, currentObject);
+            }
+
+            if (this.nopsy.scale.x > 0.01) {
+                this.nopsy.scale.subScalar(0.1);
+            }
         } else {
-            if (this.nopsy.scale.x < 0.99) this.nopsy.scale.addScalar(0.1);
+            if (this.focusedObject) {
+                this.focusedObject = null;
+                this.$root.$emit(Events.UnfocusedModel);
+            }
+
+            if (this.nopsy.scale.x < 0.99) {
+                this.nopsy.scale.addScalar(0.1);
+            }
         }
 
         // Check hit test and update cursor and preview model
@@ -346,7 +363,7 @@ export default class WebXr extends Vue {
     private updatePreviewModel(): void {
         // Nopsy is absolutely required!
         if (!this.selectedModel) return;
-        const isSelectedModel = this.previewModel?.name == this.selectedModel.slug;
+        const isSelectedModel = this.previewModel?.name == `mdl-${this.selectedModel.slug}`;
 
         // Remove preview when it's not the current model
         if (this.previewModel && !isSelectedModel) {
