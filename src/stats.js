@@ -83,6 +83,10 @@ var Stats = function () {
             beginTime = this.end();
         },
 
+        getFPS: function () {
+            return frames;
+        },
+
         // Backwards Compatibility
 
         domElement: container,

@@ -205,7 +205,7 @@ export default class WebXr extends Vue {
     /** Initiates WebXR session and THREE.js rendering contenxt */
     public async onLaunchXR(): Promise<void> {
         // Create WebGL rendering context
-        const canvas = this.$refs.glcanvas as any;
+        const canvas = this.$refs.glcanvas as HTMLCanvasElement;
         this.gl = canvas.getContext('webgl', {
             xrCompatible: true,
         }) as WebGLRenderingContext;
@@ -282,7 +282,7 @@ export default class WebXr extends Vue {
             // Render the scene
             this.renderer.render(this.scene, this.camera);
 
-            // Update stats
+            // Update render stats
             this.stats.update();
         }
     }
