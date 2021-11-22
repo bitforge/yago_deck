@@ -178,9 +178,13 @@ export default class WebXr extends Vue {
             // Add clone to scene
             this.scene.add(placedModel);
 
-            // Append placed model to state, save clone;
+            // Append placed model to state
             const model = placedModel.userData as Model;
-            placedModel.userData = this.state.placeModel(model);
+            const modelClone = { ...model };
+            modelClone.number = placedModel.id;
+            placedModel.traverse(obj => (obj.userData = modelClone));
+            this.state.placeModel(modelClone);
+
             // Instantly hide placing cursor
             this.nopsy.scale.setScalar(0);
         }
@@ -193,8 +197,9 @@ export default class WebXr extends Vue {
         }
 
         // Remove object from scene and placed models
+        const model = object.userData as Model;
+        this.state.unplaceModel(model);
         this.scene.remove(object);
-        this.state.unplaceModel(object.userData as Model);
     }
 
     public onClearModels(): void {
