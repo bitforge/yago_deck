@@ -291,17 +291,37 @@ export default class WebXr extends Vue {
         // XRFrame.getViewerPose can return null while the session attempts to establish tracking.
         const pose = frame.getViewerPose(this.referenceSpace);
         if (pose) {
-            // Update Lightning estimate for current frame
-            this.updateLightEstimate(frame);
-
             // Update scene for current position
             this.updateViewerPose(frame, pose);
+
+            // Check if camera center hits a detected plane & update cursor
+            if (!this.state.viewOnlyMode) {
+                this.runHitTestAndUpdateCursor(frame);
+            } else {
+                this.nopsy.visible = false;
+            }
+
+            // Hide plane detection instruction when cursor is visible
+            if (!this.state.xrTracking && this.nopsy.visible) {
+                this.state.setXRTracking(true);
+            }
+
+            // Check if model is focused with Raycast form camera center
+            this.updateFocusModel();
+
+            // Update Light estimate for current frame
+            this.updateLightEstimate(frame);
 
             // Render the scene
             this.renderer.render(this.scene, this.camera);
 
             // Update render stats
             this.stats.update();
+        } else {
+            // Show plane detection instructions (again)
+            if (this.state.xrTracking) {
+                this.state.setXRTracking(false);
+            }
         }
     }
 
@@ -319,37 +339,6 @@ export default class WebXr extends Vue {
         this.camera.matrix.fromArray(view.transform.matrix);
         this.camera.projectionMatrix.fromArray(view.projectionMatrix);
         this.camera.updateMatrixWorld(true);
-
-        // Check if center of camera frustum hits a placed model
-        // If so, hide cursor and preview model and we're done
-        this.modelRaycaster.setFromCamera(this.center, this.camera);
-        const modelHits = this.modelRaycaster.intersectObjects(this.scene.children, true);
-        if (modelHits.length > 0) {
-            const currentObject = modelHits[0].object;
-            if (currentObject.id !== this.state.focused?.id) {
-                this.state.setFocused(currentObject);
-            }
-
-            if (this.nopsy.scale.x > 0.01) {
-                this.nopsy.scale.subScalar(0.1);
-            }
-        } else {
-            if (this.state.focused) {
-                this.state.setFocused(null);
-            }
-
-            if (this.nopsy.scale.x < 0.99) {
-                this.nopsy.scale.addScalar(0.1);
-            }
-        }
-
-        // Check hit test and update cursor and preview model
-        const hitTestEnabled = !this.state.viewOnlyMode;
-        if (hitTestEnabled) {
-            this.runHitTestAndUpdateCursor(frame);
-        } else {
-            this.nopsy.visible = false;
-        }
     }
 
     private runHitTestAndUpdateCursor(frame: XRFrame) {
@@ -375,7 +364,6 @@ export default class WebXr extends Vue {
     }
 
     private updatePreviewModel(): void {
-        // Nopsy is absolutely required!
         if (!this.selectedModel) return;
         const isSelectedModel = this.previewModel?.name == `mdl-${this.selectedModel.slug}`;
 
@@ -399,6 +387,33 @@ export default class WebXr extends Vue {
                 }
             });
             this.nopsy.add(this.previewModel);
+        }
+    }
+
+    private updateFocusModel() {
+        // Check if center of camera view hits a placed model
+        // If so, hide cursor and preview model
+        this.modelRaycaster.setFromCamera(this.center, this.camera);
+        const modelHits = this.modelRaycaster.intersectObjects(this.scene.children, true);
+        if (modelHits.length > 0) {
+            // Update focused model
+            const currentObject = modelHits[0].object;
+            if (currentObject.id !== this.state.focused?.id) {
+                this.state.setFocused(currentObject);
+            }
+            // Fade out cursor
+            if (this.nopsy.scale.x > 0.01) {
+                this.nopsy.scale.subScalar(0.1);
+            }
+        } else {
+            // Unset focused model
+            if (this.state.focused) {
+                this.state.setFocused(null);
+            }
+            // Fade in cursor
+            if (this.nopsy.scale.x < 0.99) {
+                this.nopsy.scale.addScalar(0.1);
+            }
         }
     }
 

@@ -13,6 +13,9 @@ export default class GlobalState extends VuexModule {
     /** True when WebXR session is active */
     public xrActive = false;
 
+    /** True when WebXR session pose found an tracking */
+    public xrTracking = false;
+
     /** True when showing placed models only */
     public viewOnlyMode = true;
 
@@ -36,6 +39,11 @@ export default class GlobalState extends VuexModule {
     @Mutation
     public setXRActive(xrActive: boolean): void {
         this.xrActive = xrActive;
+    }
+
+    @Mutation
+    public setXRTracking(xrTracking: boolean): void {
+        this.xrTracking = xrTracking;
     }
 
     @Mutation

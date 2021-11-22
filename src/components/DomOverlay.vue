@@ -5,6 +5,9 @@
         <models-deck v-show="showDeck" />
         <toolbar v-show="showToolbar" />
         <cart-view v-show="showCart" />
+        <modal v-if="showOnboarding">
+            <p>Point your phone down at an empty space an move it slowly.</p>
+        </modal>
         <div class="render-stats" v-show="showStats"></div>
     </div>
 </template>
@@ -16,6 +19,7 @@ import GlobalState from '@/store/GlobalState';
 import TopBar from '@/components/TopBar.vue';
 import ModelsDeck from '@/components/ModelsDeck.vue';
 import Toolbar from '@/components/Toolbar.vue';
+import Modal from '@/components/Modal.vue';
 import CartView from '@/views/CartView.vue';
 import { Events } from '@/events';
 import { Model } from '@bitforgehq/genie-api-client';
@@ -26,6 +30,7 @@ import { Model } from '@bitforgehq/genie-api-client';
         ModelsDeck,
         Toolbar,
         CartView,
+        Modal,
     },
 })
 export default class DomOverlay extends Vue {
@@ -46,8 +51,7 @@ export default class DomOverlay extends Vue {
     }
 
     public get showTopBar(): boolean {
-        // return this.state.xrActive;
-        return true;
+        return this.state.xrActive;
     }
 
     public get showDeck(): boolean {
@@ -62,8 +66,12 @@ export default class DomOverlay extends Vue {
         return this.state.showCart;
     }
 
+    public get showOnboarding(): boolean {
+        return this.state.xrActive && !this.state.xrTracking;
+    }
+
     public get showStats(): boolean {
-        return this.state.xrActive;
+        return this.state.xrActive && this.state.devMode;
     }
 }
 </script>
