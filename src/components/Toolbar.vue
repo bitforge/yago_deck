@@ -1,11 +1,11 @@
 <template>
     <div class="toolbar">
         <toolbar-button
-            icon="refresh"
-            text="Reset"
-            @click="clearModels"
+            icon="delete"
+            text="Remove"
+            @click="deleteModel"
             :hideable="true"
-            :disabled="noModelPlacedInScene" />
+            :disabled="state.focused == null" />
         <toolbar-button
             v-show="!state.viewOnlyMode"
             icon="style"
@@ -24,7 +24,7 @@
             :cartBadge="true"
             @click="showCart"
             :hideable="true"
-            :disabled="noModelPlacedInScene" />
+            :disabled="state.placed.length == 0" />
     </div>
 </template>
 
@@ -43,15 +43,9 @@ import { Events } from '@/events';
 export default class Toolbar extends Vue {
     private state = getModule(GlobalState, this.$store);
 
-    /* Toggles visbility of remove last and show cart buttons */
-    public get noModelPlacedInScene(): boolean {
-        return this.state.placed.length == 0;
-    }
-
-    /** Remove last placed model */
-    public clearModels(): void {
-        this.state.clearPlaced();
-        this.$root.$emit(Events.ClearPlaced);
+    /** Remove focused model */
+    public deleteModel(): void {
+        this.$root.$emit(Events.UnplaceModel, this.state.focused);
     }
 
     /** Hides most UI elements to view placed models only */

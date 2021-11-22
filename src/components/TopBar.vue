@@ -6,8 +6,8 @@
 
         <h1 :class="['title', { visible: isVisible }]">{{ title }}</h1>
 
-        <button @click="deleteModel" :class="['delete-button', { visible: isVisible }]">
-            <span class="material-icons">delete</span>
+        <button @click="navigateToModelUrl" :class="['info-button', { visible: isVisible }]">
+            <span class="material-icons">info</span>
         </button>
     </div>
 </template>
@@ -17,6 +17,7 @@ import { Component, Vue } from 'vue-property-decorator';
 import { getModule } from 'vuex-module-decorators';
 import GlobalState from '@/store/GlobalState';
 import { Events } from '@/events';
+import { Model } from '@bitforgehq/genie-api-client';
 
 @Component
 export default class TopBar extends Vue {
@@ -38,8 +39,12 @@ export default class TopBar extends Vue {
         this.$root.$emit(Events.EndXR);
     }
 
-    public deleteModel(): void {
-        this.$root.$emit(Events.UnplaceModel, this.state.focused);
+    public navigateToModelUrl(): void {
+        if (!this.state.focused) return;
+        const model = this.state.focused.userData as Model;
+        if (model.siteUrl) {
+            window.location.assign(model.siteUrl);
+        }
     }
 }
 </script>
@@ -102,12 +107,12 @@ export default class TopBar extends Vue {
     opacity: 1;
 }
 
-.top-bar .delete-button {
+.top-bar .info-button {
     opacity: 0;
     transition: opacity var(--transition-timing);
 }
 
-.top-bar .delete-button.visible {
+.top-bar .info-button.visible {
     opacity: 1;
 }
 </style>
