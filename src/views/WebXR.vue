@@ -55,7 +55,6 @@ export default class WebXr extends Vue {
     private directionalLight = new THREE.DirectionalLight(0xffffff, 1);
     private lightProbe = new THREE.LightProbe();
     private previewMaterial: THREE.MeshStandardMaterial | null = null;
-    private focusedObject: THREE.Object3D | null = null;
     private stats = Stats();
 
     public mounted(): void {
@@ -327,18 +326,16 @@ export default class WebXr extends Vue {
         const modelHits = this.modelRaycaster.intersectObjects(this.scene.children, true);
         if (modelHits.length > 0) {
             const currentObject = modelHits[0].object;
-            if (currentObject.id !== this.focusedObject?.id) {
-                this.focusedObject = currentObject;
-                this.$root.$emit(Events.FocusedModel, currentObject);
+            if (currentObject.id !== this.state.focused?.id) {
+                this.state.setFocused(currentObject);
             }
 
             if (this.nopsy.scale.x > 0.01) {
                 this.nopsy.scale.subScalar(0.1);
             }
         } else {
-            if (this.focusedObject) {
-                this.focusedObject = null;
-                this.$root.$emit(Events.UnfocusedModel);
+            if (this.state.focused) {
+                this.state.setFocused(null);
             }
 
             if (this.nopsy.scale.x < 0.99) {

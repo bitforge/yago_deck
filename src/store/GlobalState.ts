@@ -1,5 +1,6 @@
 import { Module, VuexModule, Mutation, Action } from 'vuex-module-decorators';
 import { Configuration, Model, ModelsApi, ModelStatus } from '@bitforgehq/genie-api-client';
+import THREE from 'three';
 
 @Module({ name: 'global' })
 export default class GlobalState extends VuexModule {
@@ -24,6 +25,9 @@ export default class GlobalState extends VuexModule {
     /** Currently placed models in scene, in order of placement */
     public placed: Model[] = [];
 
+    /* An object is focused when it's in the center of viewport */
+    public focused: THREE.Object3D | null = null;
+
     @Mutation
     public setXRSupported(xrSupported: boolean): void {
         this.xrSupported = xrSupported;
@@ -47,6 +51,11 @@ export default class GlobalState extends VuexModule {
     @Mutation
     public setModels(models: Model[]): void {
         this.models = models;
+    }
+
+    @Mutation
+    public setFocused(model: THREE.Object3D | null): void {
+        this.focused = model;
     }
 
     @Mutation

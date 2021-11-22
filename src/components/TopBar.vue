@@ -17,15 +17,13 @@ import { Component, Vue } from 'vue-property-decorator';
 import { getModule } from 'vuex-module-decorators';
 import GlobalState from '@/store/GlobalState';
 import { Events } from '@/events';
-import * as THREE from 'three';
 
 @Component
 export default class TopBar extends Vue {
     public state = getModule(GlobalState, this.$store);
-    public focusModel: THREE.Object3D | null = null;
 
     public get isVisible(): boolean {
-        return this.focusModel != null;
+        return this.state.focused != null;
     }
 
     public get showBackButton(): boolean {
@@ -33,25 +31,7 @@ export default class TopBar extends Vue {
     }
 
     public get title(): string {
-        return this.focusModel?.userData?.name || '';
-    }
-
-    public mounted(): void {
-        this.$root.$on(Events.FocusedModel, this.onModelFocused);
-        this.$root.$on(Events.UnfocusedModel, this.onModelUnfocused);
-    }
-
-    public beforeDestroy(): void {
-        this.$root.$off(Events.FocusedModel, this.onModelFocused);
-        this.$root.$off(Events.UnfocusedModel, this.onModelUnfocused);
-    }
-
-    public onModelFocused(object: THREE.Object3D): void {
-        this.focusModel = object;
-    }
-
-    public onModelUnfocused(): void {
-        this.focusModel = null;
+        return this.state.focused?.userData?.name || '';
     }
 
     public endSession(): void {
@@ -59,7 +39,7 @@ export default class TopBar extends Vue {
     }
 
     public deleteModel(): void {
-        this.$root.$emit(Events.UnplaceModel, this.focusModel);
+        this.$root.$emit(Events.UnplaceModel, this.state.focused);
     }
 }
 </script>
