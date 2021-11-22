@@ -86,7 +86,6 @@ export default class ModelsDeck extends Vue {
         const index = this.swiper.activeIndex;
         const model = this.state.models[index];
         if (!model) return;
-        this.state.placeModel(model);
         this.$root.$emit(Events.PlaceModel, model.id);
     }
 }

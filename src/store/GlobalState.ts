@@ -51,12 +51,16 @@ export default class GlobalState extends VuexModule {
 
     @Mutation
     public placeModel(model: Model): void {
+        // Using number to store objectID from scene
         this.placed.push(model);
     }
 
     @Mutation
-    public unplaceModel(): void {
-        this.placed.pop();
+    public unplaceModel(model: Model): void {
+        const indexToRemove = this.placed.findIndex(mdl => mdl.number === model.number);
+        if (indexToRemove > -1) {
+            this.placed.splice(indexToRemove, 1);
+        }
     }
 
     @Mutation

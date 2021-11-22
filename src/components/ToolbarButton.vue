@@ -59,6 +59,7 @@ export default class ToolbarButton extends Vue {
     border-radius: 8px;
     padding: 8px 16px;
     background-color: rgba(0, 0, 0, 0.3);
+    cursor: pointer;
 
     display: flex;
     flex-direction: column;

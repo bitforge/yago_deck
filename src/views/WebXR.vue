@@ -55,6 +55,7 @@ export default class WebXr extends Vue {
     private directionalLight = new THREE.DirectionalLight(0xffffff, 1);
     private lightProbe = new THREE.LightProbe();
     private previewMaterial: THREE.MeshStandardMaterial | null = null;
+    private focusedObject: THREE.Object3D | null = null;
     private stats = Stats();
 
     public mounted(): void {
@@ -160,27 +161,45 @@ export default class WebXr extends Vue {
         if (!model || !model.glb) throw 'Cloud not find model infos for ' + model;
         this.gltfLoader.load(model.glb, gltf => {
             const object3D = gltf.scene;
-            object3D.name = model.slug!;
+            object3D.name = `mdl-${model.slug}`;
+            object3D.traverse(obj => (obj.userData = model));
             this.models3D[model.id] = object3D;
         });
     }
 
     public onPlaceModel(modelId: string): void {
         if (this.models3D[modelId]) {
+            // Create copy of 3D model and API model data
             const placedModel = this.models3D[modelId].clone();
+            // Set position to current cursor
             placedModel.position.copy(this.nopsy.position);
+            // Set layer for model and all children
             placedModel.traverse(obj => obj.layers.set(1));
+            // Add clone to scene
             this.scene.add(placedModel);
+
+            // Append placed model to state
+            const model = placedModel.userData as Model;
+            const modelClone = { ...model };
+            modelClone.number = placedModel.id;
+            placedModel.traverse(obj => (obj.userData = modelClone));
+            this.state.placeModel(modelClone);
+
+            // Instantly hide placing cursor
             this.nopsy.scale.setScalar(0);
         }
     }
 
-    public onUnplaceModel(): void {
-        // @ts-ignore: Reverse indexing an array with at() is okay
-        const lastModel = this.scene.children.at(-1) as THREE.Object3D;
-        if (lastModel && lastModel.name.startsWith('model')) {
-            this.scene.remove(lastModel);
+    public onUnplaceModel(object: THREE.Object3D): void {
+        // Find model root object
+        while (object.parent && !object.name.startsWith('mdl')) {
+            object = object.parent;
         }
+
+        // Remove object from scene and placed models
+        const model = object.userData as Model;
+        this.state.unplaceModel(model);
+        this.scene.remove(object);
     }
 
     public onClearModels(): void {
@@ -307,9 +326,24 @@ export default class WebXr extends Vue {
         this.modelRaycaster.setFromCamera(this.center, this.camera);
         const modelHits = this.modelRaycaster.intersectObjects(this.scene.children, true);
         if (modelHits.length > 0) {
-            if (this.nopsy.scale.x > 0.01) this.nopsy.scale.subScalar(0.1);
+            const currentObject = modelHits[0].object;
+            if (currentObject.id !== this.focusedObject?.id) {
+                this.focusedObject = currentObject;
+                this.$root.$emit(Events.FocusedModel, currentObject);
+            }
+
+            if (this.nopsy.scale.x > 0.01) {
+                this.nopsy.scale.subScalar(0.1);
+            }
         } else {
-            if (this.nopsy.scale.x < 0.99) this.nopsy.scale.addScalar(0.1);
+            if (this.focusedObject) {
+                this.focusedObject = null;
+                this.$root.$emit(Events.UnfocusedModel);
+            }
+
+            if (this.nopsy.scale.x < 0.99) {
+                this.nopsy.scale.addScalar(0.1);
+            }
         }
 
         // Check hit test and update cursor and preview model
@@ -346,7 +380,7 @@ export default class WebXr extends Vue {
     private updatePreviewModel(): void {
         // Nopsy is absolutely required!
         if (!this.selectedModel) return;
-        const isSelectedModel = this.previewModel?.name == this.selectedModel.slug;
+        const isSelectedModel = this.previewModel?.name == `mdl-${this.selectedModel.slug}`;
 
         // Remove preview when it's not the current model
         if (this.previewModel && !isSelectedModel) {

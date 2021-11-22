@@ -8,8 +8,12 @@ export enum Events {
     SelectModel = 'selectModel',
     // Place selected model on cursor position
     PlaceModel = 'placeModel',
-    // Remove last placed model
+    // Remove specific model
     UnplaceModel = 'unplaceModel',
     // Remove all models
-    ClearPlaced = 'clearPlace',
+    ClearPlaced = 'clearPlaced',
+    // Model visible in center of screen;
+    FocusedModel = 'focusModel',
+    // Left model in center of screen
+    UnfocusedModel = 'unfocusedModel',
 }
