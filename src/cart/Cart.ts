@@ -10,11 +10,13 @@ export default class Cart {
     public updateModels(models: Model[]): void {
         const cartBuilder = new Map<Model, number>();
         for (const model of models) {
-            if (!cartBuilder.has(model)) {
+            const modelKeys = Array.from(cartBuilder.keys());
+            const storeModel = modelKeys.find(m => m.id === model.id);
+            if (!storeModel) {
                 cartBuilder.set(model, 1);
             } else {
-                const quantity = cartBuilder.get(model);
-                if (quantity) cartBuilder.set(model, quantity + 1);
+                const quantity = cartBuilder.get(storeModel);
+                if (quantity) cartBuilder.set(storeModel, quantity + 1);
             }
         }
 
