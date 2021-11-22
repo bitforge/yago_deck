@@ -1,12 +1,12 @@
 <template>
-    <div :class="['top-bar', 'hideable', { visible: isVisible }]">
+    <div :class="['top-bar', 'hideable', { visible: isModelFocused }]">
         <button @click="endSession" :class="['exit-button']" v-show="showBackButton">
             <span class="material-icons">arrow_back</span>
         </button>
 
-        <h1 :class="['title', { visible: isVisible }]">{{ title }}</h1>
+        <h1 :class="['title', { visible: isModelFocused }]">{{ title }}</h1>
 
-        <button @click="navigateToModelUrl" :class="['info-button', { visible: isVisible }]">
+        <button @click="navigateToModelUrl" :class="['info-button', { visible: isModelFocused }]">
             <span class="material-icons">info</span>
         </button>
     </div>
@@ -23,7 +23,7 @@ import { Model } from '@bitforgehq/genie-api-client';
 export default class TopBar extends Vue {
     public state = getModule(GlobalState, this.$store);
 
-    public get isVisible(): boolean {
+    public get isModelFocused(): boolean {
         return this.state.focused != null;
     }
 
@@ -43,7 +43,9 @@ export default class TopBar extends Vue {
         if (!this.state.focused) return;
         const model = this.state.focused.userData as Model;
         if (model.siteUrl) {
-            window.location.assign(model.siteUrl);
+            window.open(model.siteUrl, '_blank')?.focus();
+            this.state.setFocused(null);
+            this.$root.$emit(Events.EndXR);
         }
     }
 }
