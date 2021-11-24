@@ -53,4 +53,8 @@ export default class Modal extends Vue {}
     flex-direction: column;
     align-items: center;
 }
+
+.modal img {
+    max-width: 100%;
+}
 </style>

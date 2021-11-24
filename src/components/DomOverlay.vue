@@ -6,6 +6,7 @@
         <toolbar v-show="showToolbar" />
         <cart-view v-show="showCart" />
         <modal v-if="showOnboarding">
+            <img src="~@/assets/img/plane_scanning.png" />
             <p>Point your phone down at an empty space an move it slowly.</p>
         </modal>
         <div class="render-stats" v-show="showStats"></div>
