@@ -54,7 +54,7 @@ export default class DomOverlay extends Vue {
     }
 
     public get showDeck(): boolean {
-        return this.state.xrSupported;
+        return (this.state.xrSupported && !this.state.xrActive) || (this.state.xrActive && this.state.xrTracking);
     }
 
     public get showToolbar(): boolean {
