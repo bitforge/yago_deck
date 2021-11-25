@@ -8,8 +8,10 @@ export enum Events {
     SelectModel = 'selectModel',
     // Place selected model on cursor position
     PlaceModel = 'placeModel',
-    // Remove specific model
+    // Remove last placed model
     UnplaceModel = 'unplaceModel',
+    // Remove specific focused model
+    RemoveModel = 'deleteModel',
     // Remove all models
     ClearPlaced = 'clearPlaced',
 }

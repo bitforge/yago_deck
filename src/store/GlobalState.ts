@@ -81,7 +81,12 @@ export default class GlobalState extends VuexModule {
     }
 
     @Mutation
-    public unplaceModel(model: Model): void {
+    public unplaceModel(): void {
+        this.placed.pop();
+    }
+
+    @Mutation
+    public removeModel(model: Model): void {
         const indexToRemove = this.placed.findIndex(mdl => mdl.number === model.number);
         if (indexToRemove > -1) {
             this.placed.splice(indexToRemove, 1);

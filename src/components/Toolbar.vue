@@ -1,11 +1,19 @@
 <template>
     <div class="toolbar">
         <toolbar-button
+            v-show="!state.focused"
+            icon="undo"
+            text="Unplace"
+            @click="unplaceModel"
+            :hideable="true"
+            :disabled="state.placed.length == 0" />
+        <toolbar-button
+            v-show="state.focused"
             icon="delete"
             text="Remove"
             @click="deleteModel"
             :hideable="true"
-            :disabled="state.focused == null" />
+            :disabled="false" />
         <toolbar-button
             v-show="!state.viewOnlyMode"
             icon="style"
@@ -43,9 +51,14 @@ import { Events } from '@/events';
 export default class Toolbar extends Vue {
     private state = getModule(GlobalState, this.$store);
 
+    /** Remove last placed model */
+    public unplaceModel(): void {
+        this.$root.$emit(Events.UnplaceModel);
+    }
+
     /** Remove focused model */
     public deleteModel(): void {
-        this.$root.$emit(Events.UnplaceModel, this.state.focused);
+        this.$root.$emit(Events.RemoveModel, this.state.focused);
     }
 
     /** Hides most UI elements to view placed models only */

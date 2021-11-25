@@ -72,6 +72,7 @@ export default class WebXr extends Vue {
         this.$root.$on(Events.SelectModel, this.onSelectModel);
         this.$root.$on(Events.PlaceModel, this.onPlaceModel);
         this.$root.$on(Events.UnplaceModel, this.onUnplaceModel);
+        this.$root.$on(Events.RemoveModel, this.onRemoveModel);
         this.$root.$on(Events.ClearPlaced, this.onClearModels);
     }
 
@@ -82,6 +83,7 @@ export default class WebXr extends Vue {
         this.$root.$off(Events.SelectModel, this.onSelectModel);
         this.$root.$off(Events.PlaceModel, this.onPlaceModel);
         this.$root.$off(Events.UnplaceModel, this.onUnplaceModel);
+        this.$root.$off(Events.RemoveModel, this.onRemoveModel);
         this.$root.$off(Events.ClearPlaced, this.onClearModels);
     }
 
@@ -189,7 +191,15 @@ export default class WebXr extends Vue {
         }
     }
 
-    public onUnplaceModel(object: THREE.Object3D): void {
+    public onUnplaceModel(): void {
+        this.state.unplaceModel();
+        const lastChild = this.scene.children[this.scene.children.length - 1];
+        if (lastChild) {
+            this.scene.remove(lastChild);
+        }
+    }
+
+    public onRemoveModel(object: THREE.Object3D): void {
         // Find model root object
         while (object.parent && !object.name.startsWith('mdl')) {
             object = object.parent;
@@ -197,11 +207,12 @@ export default class WebXr extends Vue {
 
         // Remove object from scene and placed models
         const model = object.userData as Model;
-        this.state.unplaceModel(model);
+        this.state.removeModel(model);
         this.scene.remove(object);
     }
 
     public onClearModels(): void {
+        this.state.clearPlaced();
         const children = this.scene.children.slice().reverse();
         for (const child of children) {
             if (child.name.startsWith('model')) {
