@@ -5,10 +5,8 @@
         <models-deck v-show="showDeck" />
         <toolbar v-show="showToolbar" />
         <cart-view v-show="showCart" />
-        <modal v-if="showOnboarding">
-            <img src="~@/assets/img/plane_scanning.png" />
-            <p>Point your phone down at an empty space an move it slowly.</p>
-        </modal>
+        <onboarding v-show="showOnboarding" />
+        <!-- Initalized in WebXR.vue view -->
         <div class="render-stats" v-show="showStats"></div>
     </div>
 </template>
@@ -20,7 +18,7 @@ import GlobalState from '@/store/GlobalState';
 import TopBar from '@/components/TopBar.vue';
 import ModelsDeck from '@/components/ModelsDeck.vue';
 import Toolbar from '@/components/Toolbar.vue';
-import Modal from '@/components/Modal.vue';
+import Onboarding from '@/components/Onboarding.vue';
 import CartView from '@/views/CartView.vue';
 import { Events } from '@/events';
 import { Model } from '@bitforgehq/genie-api-client';
@@ -31,12 +29,12 @@ import { Model } from '@bitforgehq/genie-api-client';
         ModelsDeck,
         Toolbar,
         CartView,
-        Modal,
+        Onboarding,
     },
 })
 export default class DomOverlay extends Vue {
     private state = getModule(GlobalState, this.$store);
-    private selectedModel: Model | null = null;
+    public selectedModel: Model | null = null;
 
     public mounted(): void {
         this.$root.$on(Events.SelectModel, this.onModelSelected);
@@ -63,12 +61,12 @@ export default class DomOverlay extends Vue {
         return this.state.xrActive || this.state.devMode;
     }
 
-    public get showCart(): boolean {
-        return this.state.showCart;
+    public get showOnboarding(): boolean {
+        return this.state.xrActive;
     }
 
-    public get showOnboarding(): boolean {
-        return this.state.xrActive && !this.state.xrTracking;
+    public get showCart(): boolean {
+        return this.state.showCart;
     }
 
     public get showStats(): boolean {

@@ -46,12 +46,13 @@ export default class Modal extends Vue {}
     box-shadow: 0px 0px 20px #0009;
     border-radius: 16px;
     padding: 8px 16px;
-    font-size: 18px;
+    font-size: 16px;
     color: white;
 
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
 }
 
 .modal img {

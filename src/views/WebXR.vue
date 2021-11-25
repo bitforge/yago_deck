@@ -306,6 +306,11 @@ export default class WebXr extends Vue {
                 this.state.setXRTracking(true);
             }
 
+            // Show inital tracking established message
+            if (!this.state.xrTrackingEstablished && this.nopsy.visible) {
+                this.state.setXRTrackingEstablished(true);
+            }
+
             // Check if model is focused with Raycast form camera center
             this.updateFocusModel();
 
