@@ -252,7 +252,7 @@ export default class WebXr extends Vue {
         const xr = (navigator as any).xr;
         const domOverlay = document.querySelector('.domOverlay');
         this.session = await xr.requestSession('immersive-ar', {
-            requiredFeatures: ['hit-test', 'light-estimation'],
+            requiredFeatures: ['hit-test', 'light-estimation', 'camera-access'],
             optionalFeatures: ['dom-overlay'],
             domOverlay: { root: domOverlay },
         });

@@ -79,7 +79,9 @@ declare interface XRView {
     readonly viewMatrix: Float32Array;
     readonly transform: XRRigidTransform;
     readonly recommendedViewportScale: number | null;
+    readonly camera: XRCamera | null;
     requestViewportScale(scale: number | null): void;
+    getCameraImage(camera: XRCamera): WebGLTexture | null;
 }
 
 declare interface XRViewerPose {
@@ -235,4 +237,11 @@ type XRReflectionFormat = 'srgba8' | 'rgba16f';
 
 declare interface XRRequestLightProbeOptions {
     reflectionFormat: XRReflectionFormat;
+}
+
+// Custom extension: Camera Access
+
+interface XRCamera {
+    readonly width: long;
+    readonly height: long;
 }
