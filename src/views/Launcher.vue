@@ -2,7 +2,9 @@
     <div class="launcher">
         <branding />
         <div class="launch-area" v-if="state.xrSupported">
-            <p>It's all one big session.</p>
+            <p>Next level Web-Shopping with digital twins in your space.</p>
+            <p>This Demo tries to explore the capabilities of <a href="https://immersiveweb.dev/">WebXR</a>.</p>
+            <p>Currently focused on Android devices with WebXR support.</p>
             <button class="xr-button" @click="launchXR">
                 <img src="~@/assets/img/ar_icon.svg" />
                 Launch Demo 🥳🤳🪴
@@ -80,6 +82,12 @@ export default class Launcher extends Vue {
 
 .launcher p {
     color: white;
+    margin: 4px 0;
+}
+
+.launcher a,
+.launcher a:visited {
+    color: white;
 }
 
 @keyframes vibrant {
@@ -110,7 +118,7 @@ export default class Launcher extends Vue {
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    margin: 16px 0;
+    margin: 32px 0 0 0;
     background-color: #074e68;
     color: white;
     height: 64px;
