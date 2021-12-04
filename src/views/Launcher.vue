@@ -2,9 +2,9 @@
     <div class="launcher">
         <branding />
         <div class="launch-area" v-if="state.xrSupported">
-            <p>Next level Web-Shopping with digital twins in your space.</p>
-            <p>This Demo tries to explore the capabilities of <a href="https://immersiveweb.dev/">WebXR</a>.</p>
-            <p>Currently focused on Android devices with WebXR support.</p>
+            <p>Next level Web-Shopping experience.</p>
+            <p>Explores the capabilities of <a href="https://immersiveweb.dev/">WebXR</a>.</p>
+            <p>Currently focused on Android devices.</p>
             <button class="xr-button" @click="launchXR">
                 <img src="~@/assets/img/ar_icon.svg" />
                 Launch Demo 🥳🤳🪴
