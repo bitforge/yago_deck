@@ -1,5 +1,5 @@
 <template>
-    <button @click="onClick" :class="{ 'toolbar-button': true, hideable: hideable, disabled: disabled }">
+    <button @click="onClick" :class="{ 'toolbar-button': true, disabled: disabled, small: small }">
         <span class="material-icons primary">{{ icon }}</span>
         <span :class="{ 'material-icons': action, secondary: true }">{{ action || text }}</span>
         <span class="badge" v-if="showBadge">{{ badgeCount }}</span>
@@ -18,7 +18,7 @@ export default class ToolbarButton extends Vue {
     @Prop({ default: 'home' })
     public icon!: string;
 
-    @Prop({ default: '?' })
+    @Prop({ default: '' })
     public text!: string;
 
     @Prop({ default: '' })
@@ -30,8 +30,8 @@ export default class ToolbarButton extends Vue {
     @Prop({ default: false })
     public disabled!: boolean;
 
-    @Prop({ default: true })
-    public hideable!: boolean;
+    @Prop({ default: false })
+    public small!: boolean;
 
     public get showBadge(): boolean {
         return this.cartBadge && this.state.placed.length > 0;
@@ -69,6 +69,10 @@ export default class ToolbarButton extends Vue {
 
 .toolbar-button.disabled {
     color: #fff9;
+}
+
+.toolbar-button.small {
+    height: 35px;
 }
 
 .toolbar-button span.primary {

@@ -1,38 +1,44 @@
 <template>
+    <!-- I'd like to have all of this indented -->
+    <!-- prettier-ignore -->
     <div class="toolbar">
-        <toolbar-button
-            v-show="!state.focused"
-            icon="undo"
-            text="Unplace"
-            @click="unplaceModel"
-            :hideable="true"
-            :disabled="state.placed.length == 0" />
-        <toolbar-button
-            v-show="state.focused"
-            icon="delete"
-            text="Remove"
-            @click="deleteModel"
-            :hideable="true"
-            :disabled="false" />
-        <toolbar-button
-            v-show="!state.viewOnlyMode"
-            icon="style"
-            action="expand_more"
-            @click="enableViewOnlyMode"
-            :hideable="false" />
-        <toolbar-button
-            v-show="state.viewOnlyMode"
-            icon="expand_less"
-            action="style"
-            @click="disableViewOnlyMode"
-            :hideable="false" />
-        <toolbar-button
-            icon="shopping_cart"
-            text="Cart"
-            :cartBadge="true"
-            @click="showCart"
-            :hideable="true"
-            :disabled="state.placed.length == 0" />
+        <div class="left hideable">
+            <toolbar-button
+                v-show="!state.focused"
+                icon="undo"
+                text="Unplace"
+                @click="unplaceModel"
+                :disabled="state.placed.length == 0" />
+            <toolbar-button
+                v-show="state.focused"
+                icon="delete"
+                text="Remove"
+                @click="deleteModel"
+                :disabled="false" />
+        </div>
+        <div class="center">
+            <toolbar-button
+                v-show="!state.viewOnlyMode"
+                icon="visibility"
+                @click="enableViewOnlyMode" />
+            <toolbar-button
+                v-show="state.viewOnlyMode"
+                icon="camera"
+                @click="takeScreenshot" />
+            <toolbar-button
+                v-show="state.viewOnlyMode"
+                icon="expand_less"
+                :small="true"
+                @click="disableViewOnlyMode" />
+        </div>
+        <div class="right hideable">
+            <toolbar-button
+                icon="shopping_cart"
+                text="Cart"
+                :cartBadge="true"
+                @click="showCart"
+                :disabled="state.placed.length == 0" />
+        </div>
     </div>
 </template>
 
@@ -71,6 +77,11 @@ export default class Toolbar extends Vue {
         this.state.setViewOnlyMode(false);
     }
 
+    /** Take Screenshot of current view */
+    public takeScreenshot(): void {
+        throw new Error('Not implemented yet');
+    }
+
     /** Show current place models cart */
     public showCart(): void {
         this.state.setShowCart(true);
@@ -86,5 +97,13 @@ export default class Toolbar extends Vue {
     pointer-events: auto;
     padding: 12px;
     z-index: 150;
+}
+
+.toolbar .center {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    row-gap: 8px;
 }
 </style>

@@ -89,6 +89,7 @@ export default class DomOverlay extends Vue {
     left: 0;
     z-index: 100;
 
+    overflow: hidden;
     pointer-events: none;
     padding-top: calc(env(safe-area-inset-top) + 20px);
     padding-bottom: env(safe-area-inset-bottom);
@@ -108,11 +109,11 @@ export default class DomOverlay extends Vue {
 }
 
 .domOverlay.viewOnly .hideable {
-    transform: translateY(100px);
+    transform: translateY(180px);
 }
 
 .domOverlay.viewOnly .swiper.hideable {
-    transform: translateY(320px);
+    transform: translateY(420px);
 }
 
 .domOverlay.viewOnly .top-bar.hideable {
