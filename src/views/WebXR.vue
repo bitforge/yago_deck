@@ -470,11 +470,12 @@ export default class WebXr extends Vue {
 
         try {
             const wndw = window as any;
+            // @ts-ignore: Offical part of WebRTC Api
             const captureStream = await navigator.mediaDevices.getDisplayMedia();
             video.srcObject = captureStream;
             context.drawImage(video, 0, 0, wndw.width, wndw.height);
             const frame = canvas.toDataURL('image/png');
-            captureStream.getTracks().forEach(track => track.stop());
+            captureStream.getTracks().forEach((track: MediaStreamTrack) => track.stop());
             window.location.href = frame;
         } catch (err) {
             console.error('Error: ' + err);
