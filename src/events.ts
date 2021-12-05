@@ -14,4 +14,6 @@ export enum Events {
     RemoveModel = 'deleteModel',
     // Remove all models
     ClearPlaced = 'clearPlaced',
+    // Take Screenshot of current view
+    TakeScreenshot = 'takeScreenshot',
 }

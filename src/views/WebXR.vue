@@ -74,6 +74,7 @@ export default class WebXr extends Vue {
         this.$root.$on(Events.UnplaceModel, this.onUnplaceModel);
         this.$root.$on(Events.RemoveModel, this.onRemoveModel);
         this.$root.$on(Events.ClearPlaced, this.onClearModels);
+        this.$root.$on(Events.TakeScreenshot, this.captureWebRTCScreenshot);
     }
 
     public beforeDestroy(): void {
@@ -85,6 +86,7 @@ export default class WebXr extends Vue {
         this.$root.$off(Events.UnplaceModel, this.onUnplaceModel);
         this.$root.$off(Events.RemoveModel, this.onRemoveModel);
         this.$root.$off(Events.ClearPlaced, this.onClearModels);
+        this.$root.$off(Events.TakeScreenshot, this.captureWebRTCScreenshot);
     }
 
     private initCamera(): void {
@@ -252,7 +254,7 @@ export default class WebXr extends Vue {
         const xr = (navigator as any).xr;
         const domOverlay = document.querySelector('.domOverlay');
         this.session = await xr.requestSession('immersive-ar', {
-            requiredFeatures: ['hit-test', 'light-estimation', 'camera-access'],
+            requiredFeatures: ['hit-test', 'light-estimation'],
             optionalFeatures: ['dom-overlay'],
             domOverlay: { root: domOverlay },
         });
@@ -452,6 +454,31 @@ export default class WebXr extends Vue {
 
         // Update light estimation harmonics
         this.lightProbe.sh.fromArray(lightEstimate.sphericalHarmonicsCoefficients);
+    }
+
+    /**
+     * Creates a Screenshot using WebRTC Video Capture
+     * This is a hack, but WebXR 'camera-access' isn't really an option yet
+     * Inspiration:
+     * https://hackernoon.com/how-to-take-screenshots-in-the-browser-using-javascript-l92k3xq7
+     */
+    public async captureWebRTCScreenshot(): Promise<void> {
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        if (context == null) return;
+        const video = document.createElement('video');
+
+        try {
+            const wndw = window as any;
+            const captureStream = await navigator.mediaDevices.getDisplayMedia();
+            video.srcObject = captureStream;
+            context.drawImage(video, 0, 0, wndw.width, wndw.height);
+            const frame = canvas.toDataURL('image/png');
+            captureStream.getTracks().forEach(track => track.stop());
+            window.location.href = frame;
+        } catch (err) {
+            console.error('Error: ' + err);
+        }
     }
 }
 </script>

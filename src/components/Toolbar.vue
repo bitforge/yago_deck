@@ -79,7 +79,7 @@ export default class Toolbar extends Vue {
 
     /** Take Screenshot of current view */
     public takeScreenshot(): void {
-        throw new Error('Not implemented yet');
+        this.$root.$emit(Events.TakeScreenshot);
     }
 
     /** Show current place models cart */

@@ -240,6 +240,7 @@ declare interface XRRequestLightProbeOptions {
 }
 
 // Custom extension: Camera Access
+// Currently not in use by Genie Deck
 
 interface XRCamera {
     readonly width: long;
