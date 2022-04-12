@@ -20,11 +20,12 @@ export default class Branding extends Vue {}
     justify-content: center;
     align-items: center;
     padding: 4px;
+    margin: 16px 0;
 }
 
 .branding img.yago {
     width: 140px;
-    margin: 8px;
+    margin: 8px 8px 0px 8px;
 }
 
 .branding img.deck {

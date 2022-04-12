@@ -42,15 +42,12 @@ export default class FallbackContent extends Vue {
         data: this.qrUrl,
         dotsOptions: {
             type: 'rounded' as DotType,
-            color: '#074e68',
         },
         cornersSquareOptions: {
             type: 'dot' as CornerSquareType,
-            color: '#042633',
         },
         cornersDotOptions: {
             type: 'dot' as CornerDotType,
-            color: '#042633',
         },
     };
 
@@ -111,7 +108,7 @@ export default class FallbackContent extends Vue {
     justify-content: center;
     align-content: center;
     padding: 8px;
-    margin: 8px;
+    margin: 32px 8px;
     background: black;
     border-radius: 8px;
 }

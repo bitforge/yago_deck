@@ -912,9 +912,9 @@
     to-fast-properties "^2.0.0"
 
 "@bitforgehq/genie-api-client@^1.0.3":
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/@bitforgehq/genie-api-client/-/genie-api-client-1.0.3.tgz#8ede6d22c51b4d932de7d50a87fe3d55afde338d"
-  integrity sha512-4jZf+SSZpVFuQLdKjKLc4mAT01UdjIUqU69qHLnb6lS4ZMi6ijnRDhcj4m+LDDmx0LFP1f1TmHfvKnXRVwc/Vw==
+  version "1.0.32"
+  resolved "https://registry.yarnpkg.com/@bitforgehq/genie-api-client/-/genie-api-client-1.0.32.tgz#525f7546e81c6d2e3202e5db579af65e2f2832cb"
+  integrity sha512-jh04lXzaPPspVW9YgFntvMVzlBc/7tIgbV6Ao6es1VXYshruALjLq66L7OdfP534pYe7ZURijkX1C9L+41lOFQ==
 
 "@hapi/address@2.x.x":
   version "2.1.4"
