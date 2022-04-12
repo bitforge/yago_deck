@@ -7,7 +7,7 @@
             <p>Currently focused on Android devices.</p>
             <button class="xr-button" @click="launchXR">
                 <img src="~@/assets/img/ar_icon.svg" />
-                Launch Demo 🥳🤳🪴
+                Launch Demo
             </button>
             <div class="spacer"></div>
         </div>
@@ -76,18 +76,17 @@ export default class Launcher extends Vue {
     justify-content: center;
     align-items: center;
 
-    background-color: rgb(42, 44, 48);
+    background-color: white;
     z-index: 10;
 }
 
 .launcher p {
-    color: white;
-    margin: 4px 0;
+    color: black;
 }
 
 .launcher a,
 .launcher a:visited {
-    color: white;
+    color: black;
 }
 
 @keyframes vibrant {
@@ -119,11 +118,11 @@ export default class Launcher extends Vue {
     justify-content: center;
     align-items: center;
     margin: 32px 0 0 0;
-    background-color: #074e68;
+    background-color: #fb3640;
     color: white;
     height: 64px;
     line-height: 32px;
-    border: 1px solid #042d3b;
+    border: none;
     border-radius: 8px;
     padding: 0 16px;
     font-weight: 700;

@@ -1,13 +1,13 @@
 {
-  "name": "genie_deck",
-  "version": "0.2.2",
+  "name": "yago_deck",
+  "version": "0.3.0",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "release": "vue-cli-service build --modern --non-interactive && yarn deploy",
     "lint": "vue-cli-service lint",
-    "deploy": "gsutil -m -h \"Cache-Control: no-store\" rsync -d -r dist gs://genie-deck/",
+    "deploy": "gsutil -m -h \"Cache-Control: no-store\" rsync -d -r dist gs://yago-deck/",
     "ngrok": "ngrok http -host-header=rewrite 8080"
   },
   "dependencies": {

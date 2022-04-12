@@ -33,7 +33,7 @@ export default class FallbackContent extends Vue {
     private state = getModule(GlobalState, this.$store);
 
     // QR Code styling options
-    private qrUrl = 'https://webxr.genie-ar.ch';
+    private qrUrl = 'https://deck.yago.cloud';
     private qrCode: QRCodeStyling | null = null;
     private qrOptions = {
         width: 250,
@@ -85,32 +85,25 @@ export default class FallbackContent extends Vue {
     align-items: center;
 
     padding: 10px;
-    background-color: rgb(42, 44, 48);
-}
-
-.fallback p {
-    color: white;
+    background-color: white;
 }
 
 .fallback h2 {
     font-size: 24px;
-    color: white;
 }
 
 .fallback h3 {
     font-size: 22px;
-    color: white;
 }
 
 .fallback h4 {
     font-size: 18px;
-    color: white;
 }
 
 .fallback a,
 .fallback a:hover,
 .fallback a:visited {
-    color: white;
+    color: black;
 }
 
 .qr-element {

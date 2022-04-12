@@ -1,8 +1,8 @@
 <template>
     <!-- Used in launcher and fallback view -->
     <div class="branding">
-        <img src="~@/assets/img/genie_white.png" alt="Genie" class="genie" />
-        <img src="~@/assets/img/logo_white.svg" alt="deck" class="deck" />
+        <img src="~@/assets/img/yago.svg" alt="Genie" class="yago" />
+        <img src="~@/assets/img/logo_black.svg" alt="deck" class="deck" />
     </div>
 </template>
 
@@ -22,7 +22,7 @@ export default class Branding extends Vue {}
     padding: 4px;
 }
 
-.branding img.genie {
+.branding img.yago {
     width: 140px;
     margin: 8px;
 }
