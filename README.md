@@ -1,4 +1,4 @@
-# genie_deck
+# yado_deck
 
 Next level Web-Shopping experience exploring the capabilities of [WebXR](https://immersiveweb.dev/).
 
