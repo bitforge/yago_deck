@@ -32,7 +32,7 @@ export default class App extends Vue {
         // Feature detect WebXR support
         this.xrSupported = (navigator as any).xr !== undefined;
         // Fake WebXR support in local dev mode
-        // Comment this line to work on fallback view
+        // Comment next line to work on fallback view in development
         if (this.state.devMode) this.xrSupported = true;
         this.state.setXRSupported(this.xrSupported);
     }
