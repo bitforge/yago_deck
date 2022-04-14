@@ -1,8 +1,14 @@
 # genie_deck
 
-WebXR Demo store for Yago Cloud a few with magic tricks.
+Next level Web-Shopping experience.
 
+Explores the capabilities of [WebXR](https://immersiveweb.dev/).
 
+Currently aimed at Android devices.
+
+[Go Apple](https://firt.dev/ios-15.4b/#webxr-is-coming), [ you can do it!](https://webkit.org/status/#specification-webxr)! 👩‍💻 ✨ 🥳
+
+Demo 👉 https://deck.yago.cloud
 
 ## Project setup
 ```
