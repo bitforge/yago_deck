@@ -1,5 +1,5 @@
 import { Module, VuexModule, Mutation, Action } from 'vuex-module-decorators';
-import { Configuration, Model, ModelsApi, ModelStatus } from '@bitforgehq/genie-api-client';
+import { Configuration, Model, ModelsApi, ModelStatus } from '@bitforgehq/yago-api-client';
 import THREE from 'three';
 
 @Module({ name: 'global' })

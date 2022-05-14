@@ -1,4 +1,4 @@
-import { Model } from '@bitforgehq/genie-api-client';
+import { Model } from '@bitforgehq/yago-api-client';
 import Vue from 'vue';
 import LineItem from './LineItem';
 

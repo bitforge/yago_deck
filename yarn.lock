@@ -911,10 +911,10 @@
     "@babel/helper-validator-identifier" "^7.15.7"
     to-fast-properties "^2.0.0"
 
-"@bitforgehq/genie-api-client@^1.0.3":
-  version "1.0.32"
-  resolved "https://registry.yarnpkg.com/@bitforgehq/genie-api-client/-/genie-api-client-1.0.32.tgz#525f7546e81c6d2e3202e5db579af65e2f2832cb"
-  integrity sha512-jh04lXzaPPspVW9YgFntvMVzlBc/7tIgbV6Ao6es1VXYshruALjLq66L7OdfP534pYe7ZURijkX1C9L+41lOFQ==
+"@bitforgehq/yago-api-client@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@bitforgehq/yago-api-client/-/yago-api-client-1.0.1.tgz#85b544308546208130dcb3e121314d5aa5c17fa7"
+  integrity sha512-AmwRpPau4KUnB+UJn9x3Ns6ulQXi1h8qtKS7/yEjsuTcoa43C4e9UwSV94oSAakSLRJaljz8vhyReZilFTPJjQ==
 
 "@hapi/address@2.x.x":
   version "2.1.4"
@@ -2468,9 +2468,9 @@ caniuse-api@^3.0.0:
     lodash.uniq "^4.5.0"
 
 caniuse-lite@^1.0.0, caniuse-lite@^1.0.30001109, caniuse-lite@^1.0.30001280:
-  version "1.0.30001280"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001280.tgz#066a506046ba4be34cde5f74a08db7a396718fb7"
-  integrity sha512-kFXwYvHe5rix25uwueBxC569o53J6TpnGu0BEEn+6Lhl2vsnAumRFWEBhDft1fwyo6m1r4i+RqA4+163FpeFcA==
+  version "1.0.30001341"
+  resolved "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001341.tgz"
+  integrity sha512-2SodVrFFtvGENGCv0ChVJIDQ0KPaS1cg7/qtfMaICgeMolDdo/Z2OD32F0Aq9yl6F4YFwGPBS5AaPqNYiW4PoA==
 
 case-sensitive-paths-webpack-plugin@^2.3.0:
   version "2.4.0"

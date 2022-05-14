@@ -17,7 +17,7 @@ import { Component, Vue } from 'vue-property-decorator';
 import { getModule } from 'vuex-module-decorators';
 import GlobalState from '@/store/GlobalState';
 import { Events } from '@/events';
-import { Model } from '@bitforgehq/genie-api-client';
+import { Model } from '@bitforgehq/yago-api-client';
 
 @Component
 export default class TopBar extends Vue {

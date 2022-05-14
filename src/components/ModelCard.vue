@@ -8,7 +8,7 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
-import { Model } from '@bitforgehq/genie-api-client';
+import { Model } from '@bitforgehq/yago-api-client';
 
 @Component
 export default class ModelCard extends Vue {

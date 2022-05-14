@@ -11,7 +11,7 @@ import { getModule } from 'vuex-module-decorators';
 import GlobalState from '@/store/GlobalState';
 import DomOverlay from '@/components/DomOverlay.vue';
 import { Events } from '@/events';
-import { Model } from '@bitforgehq/genie-api-client';
+import { Model } from '@bitforgehq/yago-api-client';
 
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';

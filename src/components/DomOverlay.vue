@@ -21,7 +21,7 @@ import Toolbar from '@/components/Toolbar.vue';
 import Onboarding from '@/components/Onboarding.vue';
 import CartView from '@/views/CartView.vue';
 import { Events } from '@/events';
-import { Model } from '@bitforgehq/genie-api-client';
+import { Model } from '@bitforgehq/yago-api-client';
 
 @Component({
     components: {

@@ -1,4 +1,4 @@
-import { Model } from '@bitforgehq/genie-api-client';
+import { Model } from '@bitforgehq/yago-api-client';
 
 export default class LineItem {
     public model: Model;
