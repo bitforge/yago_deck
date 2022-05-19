@@ -28,9 +28,14 @@ export default class App extends Vue {
     private state = getModule(GlobalState, this.$store);
     private xrSupported = false;
 
-    public mounted(): void {
+    public async mounted(): Promise<void> {
         // Feature detect WebXR support
-        this.xrSupported = (navigator as any).xr !== undefined;
+        if (navigator.xr) {
+            this.xrSupported = await navigator.xr.isSessionSupported('immersive-ar');
+        } else {
+            this.xrSupported = false;
+        }
+
         // Fake WebXR support in local dev mode
         // Comment next line to work on fallback view in development
         if (this.state.devMode) this.xrSupported = true;
