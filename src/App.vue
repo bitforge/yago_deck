@@ -30,16 +30,18 @@ export default class App extends Vue {
 
     public async mounted(): Promise<void> {
         // Feature detect WebXR support
-        if (navigator.xr) {
-            this.xrSupported = await navigator.xr.isSessionSupported('immersive-ar');
-        } else {
-            this.xrSupported = false;
-        }
+        this.xrSupported = navigator.xr !== undefined;
 
         // Fake WebXR support in local dev mode
         // Comment next line to work on fallback view in development
         if (this.state.devMode) this.xrSupported = true;
         this.state.setXRSupported(this.xrSupported);
+
+        // Delayed check for immersive mode for Chrome on Desktop
+        if (navigator.xr) {
+            this.xrSupported = await navigator.xr.isSessionSupported('immersive-ar');
+            this.state.setXRSupported(this.xrSupported);
+        }
     }
 }
 </script>
