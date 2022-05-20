@@ -122,7 +122,6 @@ export default class WebXr extends Vue {
             roughness: 0.5,
             metalness: 0.5,
         });
-        transMat.format = THREE.RGBAFormat;
         transMat.transparent = true;
         transMat.opacity = 0.3;
         transMat.side = THREE.DoubleSide;
