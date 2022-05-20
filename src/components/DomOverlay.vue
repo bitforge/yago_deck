@@ -5,6 +5,7 @@
         <models-deck v-show="showDeck" />
         <toolbar v-show="showToolbar" />
         <cart-view v-show="showCart" />
+        <demo-hint />
         <onboarding v-show="showOnboarding" />
         <!-- Initalized in WebXR.vue view -->
         <div class="render-stats" v-show="showStats"></div>
@@ -20,6 +21,7 @@ import ModelsDeck from '@/components/ModelsDeck.vue';
 import Toolbar from '@/components/Toolbar.vue';
 import Onboarding from '@/components/Onboarding.vue';
 import CartView from '@/views/CartView.vue';
+import DemoHint from '@/components/DemoHint.vue';
 import { Events } from '@/events';
 import { Model } from '@bitforgehq/yago-api-client';
 
@@ -29,6 +31,7 @@ import { Model } from '@bitforgehq/yago-api-client';
         ModelsDeck,
         Toolbar,
         CartView,
+        DemoHint,
         Onboarding,
     },
 })

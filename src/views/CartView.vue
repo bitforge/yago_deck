@@ -16,12 +16,6 @@
                 <button class="checkout" @click="onCheckout">Checkout</button>
             </footer>
         </div>
-        <dialog class="demo-hint" ref="demoModal">
-            <form method="dialog">
-                <p>Not part of this demo (yet). 🥸😜</p>
-                <button value="cancel">Continue</button>
-            </form>
-        </dialog>
     </div>
 </template>
 
@@ -52,8 +46,9 @@ export default class CartView extends Vue {
     }
 
     public onCheckout(): void {
-        const modal = this.$refs?.demoModal as any;
-        modal?.showModal();
+        const demoHint = document.querySelector('.demo-hint') as any;
+        demoHint?.showModal();
+        this.state.setShowCart(false);
     }
 }
 </script>
@@ -131,24 +126,6 @@ export default class CartView extends Vue {
 }
 
 .cart button.checkout {
-    width: 100%;
-    font-size: 20px;
-    font-weight: bold;
-    background-color: #000;
-    color: white;
-    border-radius: 4px;
-    border: none;
-    padding: 12px;
-}
-
-dialog.demo-hint {
-    border-radius: 16px;
-    border: 1px solid #ccc;
-    box-shadow: 1px 1px 20px 1px #838383;
-    font-size: 18px;
-}
-
-dialog.demo-hint button {
     width: 100%;
     font-size: 20px;
     font-weight: bold;
