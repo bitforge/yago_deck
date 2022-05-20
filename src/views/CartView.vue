@@ -46,9 +46,8 @@ export default class CartView extends Vue {
     }
 
     public onCheckout(): void {
-        const demoHint = document.querySelector('.demo-hint') as any;
-        demoHint?.showModal();
         this.state.setShowCart(false);
+        this.state.setShowDemoHint(true);
     }
 }
 </script>

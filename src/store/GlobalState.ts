@@ -25,6 +25,9 @@ export default class GlobalState extends VuexModule {
     /** True when cart is visible */
     public showCart = false;
 
+    /** True when demo hint is visible */
+    public showDemoHint = false;
+
     /** Model details loaded from API */
     public models: Model[] = [];
 
@@ -62,6 +65,11 @@ export default class GlobalState extends VuexModule {
     @Mutation
     public setShowCart(showCart: boolean): void {
         this.showCart = showCart;
+    }
+
+    @Mutation
+    public setShowDemoHint(showDemoHint: boolean): void {
+        this.showDemoHint = showDemoHint;
     }
 
     @Mutation

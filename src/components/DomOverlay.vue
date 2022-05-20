@@ -5,7 +5,7 @@
         <models-deck v-show="showDeck" />
         <toolbar v-show="showToolbar" />
         <cart-view v-show="showCart" />
-        <demo-hint />
+        <demo-hint v-show="showDemoHint" />
         <onboarding v-show="showOnboarding" />
         <!-- Initalized in WebXR.vue view -->
         <div class="render-stats" v-show="showStats"></div>
@@ -70,6 +70,10 @@ export default class DomOverlay extends Vue {
 
     public get showCart(): boolean {
         return this.state.showCart;
+    }
+
+    public get showDemoHint(): boolean {
+        return this.state.showDemoHint;
     }
 
     public get showStats(): boolean {
